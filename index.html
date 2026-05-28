@@ -303,7 +303,7 @@ tr:hover td{background:#fafafa}
       <input type="password" id="login-password" placeholder="••••••••" />
     </div>
     <button class="btn btn-primary" onclick="doLogin()">Sign in &rarr;</button>
-    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <span style="font-weight:600">v11-m4</span></p>
+    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <span style="font-weight:600">v11-m5</span></p>
   </div>
 </div>
 
@@ -644,7 +644,7 @@ tr:hover td{background:#fafafa}
           </div>
         </div>
         <div class="grid-3">
-          <div class="nav-card" onclick="showIndividualReport()">
+          <div class="nav-card" onclick="openIndividualReportPicker()">
             <div class="nav-card-icon nc-blue">
               <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </div>
@@ -1644,7 +1644,17 @@ function dateStr() {
 
 function switchProperty(val) {
   currentProp = val;
-  document.getElementById('tb-sub').textContent = propLabel(val)+' \u2014 '+dateStr();
+  document.getElementById('tb-sub').textContent = propLabel(val)+' — '+dateStr();
+  // Re-filter staff table if on staff page
+  const staffPage = document.getElementById('page-staff');
+  if (staffPage && staffPage.classList.contains('active')) {
+    loadStaffPage();
+  }
+  // Re-filter appraisals if on appraisals page
+  const apprPage = document.getElementById('page-appraisals');
+  if (apprPage && apprPage.classList.contains('active')) {
+    loadAppraisalsPage();
+  }
 }
 
 // -- STAFF LOADER & TABLE -------------------------------------------
@@ -1659,8 +1669,10 @@ async function loadStaffPage() {
       .select('id,full_name,employee_no,date_of_joining,departments!staff_department_id_fkey(name),roles!staff_role_id_fkey(title,is_management),properties!staff_property_id_fkey(code)')
       .eq('status','active')
       .order('full_name');
-    if (currentUser && currentUser.role !== 'hr_admin') {
-      const { data: propRow } = await sb.from('properties').select('id').eq('code', currentUser.property).single();
+    // Filter by selected property (prop switcher) or user's own property
+    const propFilter = currentProp !== 'both' ? currentProp : (currentUser.role !== 'hr_admin' ? currentUser.property : null);
+    if (propFilter) {
+      const { data: propRow } = await sb.from('properties').select('id').eq('code', propFilter).single();
       if (propRow) query = query.eq('property_id', propRow.id);
     }
     const { data, error } = await query;
@@ -1861,9 +1873,10 @@ function searchStaff() {
     if (currentUser.role!=='hr_admin' && s.property!==currentUser.property) return false;
     return s.name.toLowerCase().includes(q) || s.role.toLowerCase().includes(q) || s.dept.toLowerCase().includes(q);
   });
+  const mode = window._staffSearchMode || 'appraise';
   document.getElementById('staff-search-results').innerHTML = list.length
     ? list.map(s=>`
-        <div onclick="selectStaffForAppraisal('${s.id}')"
+        <div onclick="${mode==='report' ? 'selectStaffForReport' : 'selectStaffForAppraisal'}('${s.id}')"
              style="padding:9px 12px;border-bottom:.5px solid #eee;cursor:pointer;transition:background .1s"
              onmouseover="this.style.background='#f0f1f4'" onmouseout="this.style.background=''">
           <div style="font-size:12px;font-weight:600;color:var(--navy)">${s.name}</div>
@@ -2287,10 +2300,12 @@ function renderJDTable() {
 
 function printJD() {
   const body = document.getElementById('jd-modal-body');
-  if (!body) { window.print(); return; }
+  if (!body || !body.innerHTML.trim()) { showToast('Please open a JD first, then print.'); return; }
+  const titleEl = document.getElementById('jd-modal-title');
+  const title = titleEl ? titleEl.textContent : 'Job Description';
   const w = window.open('','_blank');
   w.document.write('<html><head><title>Job Description</title><style>body{font-family:"Palatino Linotype",Palatino,Georgia,serif;padding:32px;color:#1a1a2e;font-size:13px}h1{color:#1B2A6B;font-size:20px;border-bottom:2px solid #800020;padding-bottom:6px;margin-bottom:16px}.section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#1B2A6B;border-left:3px solid #800020;padding-left:8px;margin:14px 0 6px}.section-content{color:#555;line-height:1.7;padding-left:11px}@media print{body{padding:16px}}</style></head><body>');
-  w.document.write('<h1>'+document.getElementById('jd-modal-title').textContent+'</h1>');
+  w.document.write('<h1>'+title+'</h1>');
   w.document.write(body.innerHTML.replace(/class="[^"]*"/g,'').replace(/style="[^"]*background[^"]*navy[^"]*"/g,'style="border:1px solid #1B2A6B;padding:12px;text-align:center;margin-bottom:16px"'));
   w.document.write('</body></html>');
   w.document.close();
@@ -3136,9 +3151,9 @@ function renderStaffTable() {
     const s      = _staffCache.find(x => x.id === sid);
     if (!s) return;
     if (action === 'edit') {
-      openStaffProfile(s.id, s.full_name, s.properties?.code||'', s.departments?.name||'', s.roles?.title||'', s.roles?.is_management||false);
+      openStaffProfile(s.id);
     } else if (action === 'appraise') {
-      startAppraisalFromStaff(s.id, s.full_name, s.properties?.code||'', s.departments?.name||'', s.roles?.title||'', s.roles?.is_management||false);
+      startAppraisal(s.id);
     }
   };
 }
@@ -3378,6 +3393,51 @@ async function loadSettingsPage() {
     if (sw)  sw.value  = cycle.self_weight;
     if (hw)  hw.value  = cycle.hod_weight;
   } catch(e) { console.warn('loadSettingsPage:', e.message); }
+}
+
+
+// ── INDIVIDUAL REPORT PICKER ──────────────────────────────
+function openIndividualReportPicker() {
+  // Reuse the staff search modal
+  document.getElementById('modal-staff-search').classList.remove('hidden');
+  const input = document.getElementById('staff-search-input');
+  if (input) { input.value = ''; input.placeholder = 'Search staff to view their report...'; }
+  document.getElementById('staff-search-results').innerHTML = '<div style="padding:16px;text-align:center;font-size:11px;color:var(--text-light)">Start typing to search…</div>';
+  // Override what happens when staff is selected
+  window._staffSearchMode = 'report';
+}
+
+function selectStaffForReport(staffId) {
+  closeModal('modal-staff-search');
+  window._staffSearchMode = null;
+  viewAppraisalByStaff(staffId);
+}
+
+async function viewAppraisalByStaff(staffId) {
+  try {
+    const sb = initSupabase();
+    const { data: cycle } = await sb.from('appraisal_cycles').select('id').eq('is_active',true).single();
+    if (!cycle) { showToast('No active cycle found.'); return; }
+    const { data: appraisal } = await sb.from('appraisals')
+      .select('*,staff(id,full_name,employee_no,date_of_joining,departments!staff_department_id_fkey(name),roles!staff_role_id_fkey(title),properties!staff_property_id_fkey(code,name))')
+      .eq('cycle_id', cycle.id)
+      .eq('staff_id', staffId)
+      .single();
+    if (!appraisal) {
+      showToast('No completed appraisal found for this staff member this cycle.');
+      return;
+    }
+    const s = appraisal.staff;
+    const mapped = {
+      id: s.id, name: s.full_name, emp: s.employee_no||'',
+      role: s.roles?.title||'', dept: s.departments?.name||'',
+      property: s.properties?.code||'', doj: s.date_of_joining||''
+    };
+    showIndividualReportFromData(mapped, appraisal);
+    navigate('reports');
+  } catch(e) {
+    showToast('No appraisal found for this staff member yet.');
+  }
 }
 
 // ── DEPT REPORT INIT ──────────────────────────────────────
