@@ -303,7 +303,7 @@ tr:hover td{background:#fafafa}
       <input type="password" id="login-password" placeholder="••••••••" />
     </div>
     <button class="btn btn-primary" onclick="doLogin()">Sign in &rarr;</button>
-    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <span style="font-weight:600">v11-m</span></p>
+    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <span style="font-weight:600">v11-m1</span></p>
   </div>
 </div>
 
@@ -570,16 +570,7 @@ tr:hover td{background:#fafafa}
               <th>Employee</th><th>Property</th><th>Department</th><th>Role</th>
               <th>Self-appraisal</th><th>HOD appraisal</th><th>Final score</th><th>Rating</th><th class="no-print">Actions</th>
             </tr></thead>
-            <tbody id="appraisals-tbody">
-              <tr><td><strong>Davis Mugabi</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Management</td><td>General Manager</td><td><span class="status-badge"><span class="status-dot dot-done"></span>Submitted</span></td><td><span class="status-badge"><span class="status-dot dot-done"></span>Complete</span></td><td><strong>88%</strong></td><td><span class="band band-exceeds">Exceeds</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="openAppraisalForm('Davis Mugabi','PHK','Management','General Manager')">View</button><button class="btn btn-ghost btn-sm" onclick="openAppraisalForm('Davis Mugabi');setTimeout(()=>window.print(),500)">Print</button></div></td></tr>
-              <tr><td><strong>Mandal Monoranjan</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Kitchen</td><td>Executive Chef</td><td><span class="status-badge"><span class="status-dot dot-done"></span>Submitted</span></td><td><span class="status-badge"><span class="status-dot dot-prog"></span>In progress</span></td><td>&mdash;</td><td><span style="color:var(--text-light);font-size:10px">Pending</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-primary btn-sm" onclick="openAppraisalForm('Mandal Monoranjan','PHK','Kitchen','Executive Chef')">HOD review</button></div></td></tr>
-              <tr><td><strong>David Omondi</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Food &amp; Beverage</td><td>F&amp;B Manager</td><td><span class="status-badge"><span class="status-dot dot-done"></span>Submitted</span></td><td><span class="status-badge"><span class="status-dot dot-done"></span>Complete</span></td><td><strong>79%</strong></td><td><span class="band band-exceeds">Exceeds</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="openAppraisalForm('David Omondi','PHK','F&B','F&B Manager')">View</button><button class="btn btn-ghost btn-sm" onclick="printReport()">Print</button></div></td></tr>
-              <tr><td><strong>Hope Kugonza</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Housekeeping</td><td>Floor Supervisor</td><td><span class="status-badge"><span class="status-dot dot-open"></span>Not started</span></td><td><span class="status-badge"><span class="status-dot dot-open"></span>Awaiting self</span></td><td>&mdash;</td><td><span style="color:var(--text-light);font-size:10px">Pending</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="openAppraisalForm('Hope Kugonza','PHK','Housekeeping','Floor Supervisor')">Start</button></div></td></tr>
-              <tr><td><strong>Abel Asingwiire</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Sales &amp; Marketing</td><td>Sales Manager</td><td><span class="status-badge"><span class="status-dot dot-done"></span>Submitted</span></td><td><span class="status-badge"><span class="status-dot dot-done"></span>Complete</span></td><td><strong>65%</strong></td><td><span class="band band-meets">Meets</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="openAppraisalForm('Abel Asingwiire','PHK','Sales','Sales Manager')">View</button><button class="btn btn-ghost btn-sm" onclick="printReport()">Print</button></div></td></tr>
-              <tr><td><strong>Phillip Wandera</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Maintenance</td><td>Maintenance Supervisor</td><td><span class="status-badge"><span class="status-dot dot-done"></span>Submitted</span></td><td><span class="status-badge"><span class="status-dot dot-open"></span>Not started</span></td><td>&mdash;</td><td><span style="color:var(--text-light);font-size:10px">Pending</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-primary btn-sm" onclick="openAppraisalForm('Phillip Wandera','PHK','Maintenance','Maintenance Supervisor')">HOD review</button></div></td></tr>
-              <tr><td><strong>Gerald Mugumya</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Finance</td><td>Senior Accountant</td><td><span class="status-badge"><span class="status-dot dot-open"></span>Not started</span></td><td><span class="status-badge"><span class="status-dot dot-open"></span>Awaiting self</span></td><td>&mdash;</td><td><span style="color:var(--text-light);font-size:10px">Pending</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="openAppraisalForm('Gerald Mugumya','PHK','Finance','Senior Accountant')">Start</button></div></td></tr>
-              <tr><td><strong>Annet Nabude</strong></td><td><span class="pill pill-phk">PHK</span></td><td>HR</td><td>HR Manager</td><td><span class="status-badge"><span class="status-dot dot-done"></span>Submitted</span></td><td><span class="status-badge"><span class="status-dot dot-done"></span>Complete</span></td><td><strong>82%</strong></td><td><span class="band band-exceeds">Exceeds</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="openAppraisalForm('Annet Nabude','PHK','HR','HR Manager')">View</button><button class="btn btn-ghost btn-sm" onclick="printReport()">Print</button></div></td></tr>
-            </tbody>
+            <tbody id="appraisals-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-light);font-size:12px">Loading appraisals…</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -1635,7 +1626,12 @@ function navigate(page) {
     staff:'Staff & Roles', kpis:'KPI Setup', jds:'Job Descriptions', departments:'Departments', settings:'Settings' };
   document.getElementById('tb-title').textContent = titles[page]||page;
   document.getElementById('tb-sub').textContent   = propLabel(currentProp)+' \u2014 '+dateStr();
-  if (page==='staff') renderStaffTable();
+  if (page==='staff')       loadStaffPage();
+  if (page==='appraisals')  loadAppraisalsPage();
+  if (page==='analytics')   loadAnalyticsPage();
+  if (page==='reports')     { /* loaded on demand */ }
+  if (page==='kpis')        renderKPITable();
+  if (page==='settings')    loadSettingsPage();
 }
 
 function propLabel(p) {
@@ -2004,13 +2000,82 @@ function saveDraftAppraisal() {
   showToast('Draft saved for '+s.name+'. Return to their profile to resume.');
 }
 
-function submitAppraisal() {
+async function submitAppraisal() {
   if (appraisalSubmitted) return;
   const ack = document.getElementById('ack-checkbox');
   if (!ack || !ack.checked) { showToast('Please tick the acknowledgement checkbox before submitting.'); return; }
-  appraisalSubmitted = true;
-  closeModal('modal-appraisal');
-  showToast('Appraisal submitted and locked. Cannot be deleted.');
+
+  const s    = window._appraisalStaff;
+  const kpis = window._appraisalKPIs || [];
+  if (!s) return;
+
+  // Collect KPI ratings
+  const RATING_SCORES = {'Exceptional':5,'Exceeds Expectations':4,'Meets Expectations':3,'Needs Improvement':2,'Unsatisfactory':1};
+  const kpiResponses = kpis.map((k,i) => ({
+    kpi:       k.kpi,
+    target:    k.target,
+    weight:    k.weight,
+    self_rating: (document.querySelector('.kpi-self-'+i)||{value:''}).value,
+    hod_rating:  (document.querySelector('.kpi-hod-'+i)||{value:''}).value,
+    comment:     (document.querySelector('.kpi-comment-'+i)||{value:''}).value,
+  }));
+
+  // Collect competency ratings
+  const compKeys = ['time_management','dependability','appearance','cooperation','responsibility','accuracy','quality','quantity','initiative','knowledge'];
+  const compResponses = compKeys.map(key => {
+    const selfBtn = document.querySelector(`.comp-btn[data-key="${key}"][data-type="self"].selected-1,.comp-btn[data-key="${key}"][data-type="self"].selected-2,.comp-btn[data-key="${key}"][data-type="self"].selected-3,.comp-btn[data-key="${key}"][data-type="self"].selected-4,.comp-btn[data-key="${key}"][data-type="self"].selected-5`);
+    const hodBtn  = document.querySelector(`.comp-btn[data-key="${key}"][data-type="hod"].selected-1,.comp-btn[data-key="${key}"][data-type="hod"].selected-2,.comp-btn[data-key="${key}"][data-type="hod"].selected-3,.comp-btn[data-key="${key}"][data-type="hod"].selected-4,.comp-btn[data-key="${key}"][data-type="hod"].selected-5`);
+    return { key, self_val: selfBtn ? parseInt(selfBtn.dataset.val) : null, hod_val: hodBtn ? parseInt(hodBtn.dataset.val) : null };
+  });
+
+  // Calculate scores
+  let selfKPI=0, hodKPI=0, totalW=0;
+  kpiResponses.forEach(k => {
+    const sw = (RATING_SCORES[k.self_rating]||0)/5 * k.weight;
+    const hw = (RATING_SCORES[k.hod_rating]||0)/5  * k.weight;
+    selfKPI += sw; hodKPI += hw; totalW += k.weight;
+  });
+  selfKPI = totalW>0 ? Math.round(selfKPI/totalW*100) : 0;
+  hodKPI  = totalW>0 ? Math.round(hodKPI/totalW*100)  : 0;
+  const selfComp = compResponses.filter(c=>c.self_val).reduce((a,c)=>a+c.self_val,0) / (compResponses.filter(c=>c.self_val).length||1) / 5 * 100;
+  const hodComp  = compResponses.filter(c=>c.hod_val).reduce((a,c)=>a+c.hod_val,0)  / (compResponses.filter(c=>c.hod_val).length||1)  / 5 * 100;
+  const finalScore = Math.round(selfKPI * 0.4 + hodKPI * 0.6);
+  const ratingBand = finalScore>=90?'Exceptional':finalScore>=75?'Exceeds Expectations':finalScore>=60?'Meets Expectations':finalScore>=40?'Needs Improvement':'Unsatisfactory';
+
+  try {
+    const sb = initSupabase();
+    const { data: cycle } = await sb.from('appraisal_cycles').select('id').eq('is_active',true).single();
+    if (!cycle) { showToast('No active appraisal cycle found.'); return; }
+
+    await sb.from('appraisals').upsert({
+      cycle_id:        cycle.id,
+      staff_id:        s.id,
+      appraised_by:    currentUser.id,
+      status:          'complete',
+      self_kpi_score:  selfKPI,
+      hod_kpi_score:   hodKPI,
+      self_comp_score: Math.round(selfComp),
+      hod_comp_score:  Math.round(hodComp),
+      final_score:     finalScore,
+      rating_band:     ratingBand,
+      kpi_responses:   kpiResponses,
+      comp_responses:  compResponses,
+      dev_strong:      (document.getElementById('dev-strong')   ||{value:''}).value,
+      dev_training:    (document.getElementById('dev-training') ||{value:''}).value,
+      dev_career:      (document.getElementById('dev-career')   ||{value:''}).value,
+      submitted_at:    new Date().toISOString(),
+    }, { onConflict: 'cycle_id,staff_id' });
+
+    // Clear draft if any
+    try { localStorage.removeItem('appraisal_draft_'+s.id); } catch(e) {}
+    appraisalSubmitted = true;
+    closeModal('modal-appraisal');
+    showToast(s.name + ' — appraisal submitted. Final score: ' + finalScore + '% (' + ratingBand + ')');
+    loadAppraisalsPage();
+  } catch(e) {
+    console.error('submitAppraisal:', e);
+    showToast('Error saving appraisal: ' + e.message);
+  }
 }
 
 // ── MODALS ─────────────────────────────────────────────────
@@ -2148,8 +2213,6 @@ function printJD() {
 }
 
 function printReport()  { window.print(); }
-function openAddStaffModal()  { showToast('Connect Supabase to enable live staff import.'); }
-function openAddKPIModal()    { showToast('Connect Supabase to enable live KPI management.'); }
 
 // ── REPORTS ────────────────────────────────────────────────
 function showIndividualReport(staffId) {
@@ -2388,27 +2451,7 @@ function printIndividualReport() {
   setTimeout(()=>w.print(), 500);
 }
 
-function showDeptReport() {
-  document.getElementById('report-output').innerHTML = `
-    <div class="card" style="margin-bottom:0">
-      <div class="card-title">Department summary &mdash; H1 2026 &middot; Both properties</div>
-      <div class="table-wrap" style="margin-bottom:10px">
-        <table>
-          <thead><tr><th>Department</th><th>Property</th><th>Staff appraised</th><th>Avg. score</th><th>Rating</th></tr></thead>
-          <tbody>
-            <tr><td>Management</td><td><span class="pill pill-both">Both</span></td><td>4/4</td><td><strong>88%</strong></td><td><span class="band band-exceeds">Exceeds</span></td></tr>
-            <tr><td>Food &amp; Beverage</td><td><span class="pill pill-both">Both</span></td><td>38/55</td><td><strong>79%</strong></td><td><span class="band band-exceeds">Exceeds</span></td></tr>
-            <tr><td>Kitchen</td><td><span class="pill pill-both">Both</span></td><td>24/30</td><td><strong>74%</strong></td><td><span class="band band-meets">Meets</span></td></tr>
-            <tr><td>Maintenance</td><td><span class="pill pill-both">Both</span></td><td>6/7</td><td><strong>58%</strong></td><td><span class="band band-needs">Needs improvement</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div style="display:flex;justify-content:flex-end;gap:8px" class="no-print">
-        <button class="btn btn-ghost btn-sm" onclick="printReport()">Print / PDF</button>
-        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('report-output').innerHTML=''">Close</button>
-      </div>
-    </div>`;
-}
+// showDeptReport — live version below
 
 let _apprTab = 'all';
 
@@ -3013,6 +3056,243 @@ function renderStaffTable() {
       startAppraisalFromStaff(s.id, s.full_name, s.properties?.code||'', s.departments?.name||'', s.roles?.title||'', s.roles?.is_management||false);
     }
   };
+}
+
+// ── APPRAISALS PAGE LOADER ────────────────────────────────
+async function loadAppraisalsPage() {
+  const tbody  = document.getElementById('appraisals-tbody');
+  const counter= document.getElementById('appr-count');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-light);font-size:12px">Loading appraisals\u2026</td></tr>';
+  try {
+    const sb = initSupabase();
+    const { data: cycle } = await sb.from('appraisal_cycles').select('id,label').eq('is_active',true).single();
+    if (!cycle) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;font-size:12px">No active cycle found.</td></tr>'; return; }
+
+    let query = sb.from('appraisals')
+      .select('id,status,self_kpi_score,hod_kpi_score,final_score,rating_band,staff(id,full_name,departments(name),roles(title),properties(code))')
+      .eq('cycle_id', cycle.id)
+      .order('final_score', { ascending: false, nullsFirst: false });
+
+    const { data: appraisals, error } = await query;
+    if (error) throw error;
+
+    if (!appraisals || appraisals.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-light);font-size:12px">No appraisals yet for this cycle. Use \u201C+ New\u201D to start one.</td></tr>';
+      if (counter) counter.textContent = '0 records';
+      return;
+    }
+
+    if (counter) counter.textContent = appraisals.length + ' records';
+
+    const BAND_CLASS = { 'Exceptional':'band-exc','Exceeds Expectations':'band-exceeds','Meets Expectations':'band-meets','Needs Improvement':'band-needs','Unsatisfactory':'band-unsat' };
+    const statusDot  = s => s==='complete'?'dot-done': s==='in_progress'?'dot-prog':'dot-open';
+    const statusLabel= s => s==='complete'?'Complete': s==='in_progress'?'In progress':'Not started';
+
+    tbody.innerHTML = appraisals.map(a => {
+      const s        = a.staff || {};
+      const propCode = s.properties?.code || '';
+      const propPill = propCode==='skyz'?'pill-skyz':'pill-phk';
+      const score    = a.final_score != null ? '<strong>'+Math.round(a.final_score)+'%</strong>' : '\u2014';
+      const band     = a.rating_band ? '<span class="band '+(BAND_CLASS[a.rating_band]||'band-meets')+'">'+a.rating_band+'</span>' : '<span style="color:var(--text-light);font-size:10px">Pending</span>';
+      const isComplete = a.status === 'complete';
+      const actions  = isComplete
+        ? `<button class="btn btn-secondary btn-sm" onclick="viewAppraisal('${a.id}')">View</button>
+           <button class="btn btn-ghost btn-sm" onclick="viewAppraisal('${a.id}');setTimeout(printIndividualReport,500)">Print</button>`
+        : `<button class="btn btn-primary btn-sm" onclick="openAppraisalById('${a.staff?.id}')">Continue</button>`;
+      return `<tr>
+        <td><strong>${s.full_name||'\u2014'}</strong></td>
+        <td><span class="pill ${propPill}">${propCode.toUpperCase()}</span></td>
+        <td>${s.departments?.name||'\u2014'}</td>
+        <td>${s.roles?.title||'\u2014'}</td>
+        <td><span class="status-badge"><span class="status-dot ${statusDot(a.status)}"></span>${statusLabel(a.status)}</span></td>
+        <td><span class="status-badge"><span class="status-dot ${isComplete?'dot-done':'dot-open'}"></span>${isComplete?'Complete':'Pending'}</span></td>
+        <td>${score}</td>
+        <td>${band}</td>
+        <td class="no-print"><div class="table-actions">${actions}</div></td>
+      </tr>`;
+    }).join('');
+
+    // Re-apply current filter/tab
+    filterAppraisals();
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--red);font-size:12px">Error: '+e.message+'</td></tr>';
+  }
+}
+
+function openAppraisalById(staffId) {
+  if (!staffId) return;
+  const s = ALL_STAFF.find(x => x.id === staffId) || _staffCache.find(x => x.id === staffId);
+  if (s) startAppraisal(s.id);
+  else showToast('Staff record not found.');
+}
+
+async function viewAppraisal(appraisalId) {
+  try {
+    const sb = initSupabase();
+    const { data: a, error } = await sb.from('appraisals')
+      .select('*,staff(id,full_name,employee_no,date_of_joining,departments(name),roles(title),properties(code,name))')
+      .eq('id', appraisalId).single();
+    if (error) throw error;
+    // Map to the shape showIndividualReport expects and render
+    const s = {
+      id: a.staff.id, name: a.staff.full_name, emp: a.staff.employee_no||'',
+      role: a.staff.roles?.title||'', dept: a.staff.departments?.name||'',
+      property: a.staff.properties?.code||'', doj: a.staff.date_of_joining||''
+    };
+    showIndividualReportFromData(s, a);
+    navigate('reports');
+  } catch(e) { showToast('Error loading appraisal: '+e.message); }
+}
+
+function showIndividualReportFromData(s, a) {
+  const kpis        = a.kpi_responses  || getKPIsForRole(s.role);
+  const compData    = a.comp_responses || [];
+  const RATINGS     = {'Exceptional':5,'Exceeds Expectations':4,'Meets Expectations':3,'Needs Improvement':2,'Unsatisfactory':1};
+  const selfKPI     = Math.round(a.self_kpi_score||0);
+  const hodKPI      = Math.round(a.hod_kpi_score||0);
+  const selfComp    = Math.round(a.self_comp_score||0);
+  const hodComp     = Math.round(a.hod_comp_score||0);
+  const finalScore  = Math.round(a.final_score||0);
+  const band        = a.rating_band||'';
+  const bandClass   = finalScore>=90?'band-exc':finalScore>=75?'band-exceeds':finalScore>=60?'band-meets':finalScore>=40?'band-needs':'band-unsat';
+  const propName    = s.property==='skyz'?'Protea Hotel Skyz Kampala':'Protea Hotel Kampala';
+  const today       = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+  const kpiRows = kpis.map((k,i) => {
+    const sr = k.self_rating || '\u2014';
+    const hr = k.hod_rating  || '\u2014';
+    const ws = Math.round((RATINGS[hr]||0)/5*100);
+    return `<tr>
+      <td style="padding:8px 10px;border-bottom:.5px solid #eee;font-size:12px"><strong>${k.kpi||k.kpi}</strong><br><span style="font-size:10px;color:#888">Target: ${k.target}</span></td>
+      <td style="padding:8px 10px;border-bottom:.5px solid #eee;font-size:11px;text-align:center">${sr}</td>
+      <td style="padding:8px 10px;border-bottom:.5px solid #eee;font-size:11px;text-align:center">${hr}</td>
+      <td style="padding:8px 10px;border-bottom:.5px solid #eee;font-size:11px;text-align:center;color:#800020;font-weight:600">${k.weight}%</td>
+      <td style="padding:8px 10px;border-bottom:.5px solid #eee;font-size:11px;text-align:center;font-weight:600">${ws}%</td>
+    </tr>`;
+  }).join('');
+
+  const compLabels = ['Time management','Dependability','Appearance','Cooperation','Responsibility','Accuracy','Quality of work','Quantity of work','Initiative','Knowledge & skill'];
+  const compRows = compLabels.map((label,i) => {
+    const c = compData[i] || {};
+    return `<tr>
+      <td style="padding:7px 10px;border-bottom:.5px solid #eee;font-size:12px">${label}</td>
+      <td style="padding:7px 10px;border-bottom:.5px solid #eee;font-size:11px;text-align:center">${c.self_val||'\u2014'} / 5</td>
+      <td style="padding:7px 10px;border-bottom:.5px solid #eee;font-size:11px;text-align:center">${c.hod_val||'\u2014'} / 5</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('report-output').innerHTML = `
+    <div style="background:#fff;border:1px solid #d0d0d8;border-radius:8px;overflow:hidden;margin-bottom:20px">
+      <div style="position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #d0d0d8;padding:10px 20px;display:flex;align-items:center;justify-content:space-between" class="no-print">
+        <div style="font-size:12px;font-weight:600;color:var(--navy)">Appraisal Report \u2014 ${s.name}</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="printIndividualReport()">\uD83D\uDDB8 Print / PDF</button>
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('report-output').innerHTML=''">Close</button>
+        </div>
+      </div>
+      <div id="individual-report-print" style="padding:28px 32px;font-family:'Palatino Linotype',Palatino,Georgia,serif">
+        <div style="text-align:center;padding-bottom:16px;border-bottom:2px solid #000;margin-bottom:20px">
+          <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#888;margin-bottom:6px">Simba Group Hotels \u2014 Performance Management System</div>
+          <div style="font-size:22px;font-weight:700;color:#1B2A6B">Employee Appraisal Report</div>
+          <div style="font-size:12px;color:#555;margin-top:4px">H1 2026 \u2014 January to June 2026 \u00B7 Generated ${today}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:20px;border:1px solid #000;border-radius:4px;overflow:hidden">
+          <div style="padding:10px 14px;border-right:1px solid #000;border-bottom:1px solid #000;background:#f0f1f4"><div style="font-size:9px;text-transform:uppercase;color:#888;margin-bottom:3px">Full name</div><div style="font-size:13px;font-weight:600;color:#1B2A6B">${s.name}</div></div>
+          <div style="padding:10px 14px;border-bottom:1px solid #000;background:#f0f1f4"><div style="font-size:9px;text-transform:uppercase;color:#888;margin-bottom:3px">Employee No.</div><div style="font-size:13px;font-weight:600;color:#1B2A6B">${s.emp||'\u2014'}</div></div>
+          <div style="padding:10px 14px;border-right:1px solid #000;border-bottom:1px solid #000"><div style="font-size:9px;text-transform:uppercase;color:#888;margin-bottom:3px">Position</div><div style="font-size:12px">${s.role}</div></div>
+          <div style="padding:10px 14px;border-bottom:1px solid #000"><div style="font-size:9px;text-transform:uppercase;color:#888;margin-bottom:3px">Department</div><div style="font-size:12px">${s.dept}</div></div>
+          <div style="padding:10px 14px;border-right:1px solid #000"><div style="font-size:9px;text-transform:uppercase;color:#888;margin-bottom:3px">Property</div><div style="font-size:12px">${propName}</div></div>
+          <div style="padding:10px 14px"><div style="font-size:9px;text-transform:uppercase;color:#888;margin-bottom:3px">Date of appraisal</div><div style="font-size:12px">${today}</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+          <div style="background:#f0f1f4;border-radius:6px;padding:12px;text-align:center"><div style="font-size:10px;text-transform:uppercase;color:#888;margin-bottom:4px">KPI score (self)</div><div style="font-size:24px;font-weight:700;color:#1B2A6B">${selfKPI}%</div></div>
+          <div style="background:#f0f1f4;border-radius:6px;padding:12px;text-align:center"><div style="font-size:10px;text-transform:uppercase;color:#888;margin-bottom:4px">KPI score (HOD)</div><div style="font-size:24px;font-weight:700;color:#1B2A6B">${hodKPI}%</div></div>
+          <div style="background:#f0f1f4;border-radius:6px;padding:12px;text-align:center"><div style="font-size:10px;text-transform:uppercase;color:#888;margin-bottom:4px">Final score</div><div style="font-size:24px;font-weight:700;color:#800020">${finalScore}%</div></div>
+          <div style="background:#f0f1f4;border-radius:6px;padding:12px;text-align:center"><div style="font-size:10px;text-transform:uppercase;color:#888;margin-bottom:4px">Rating</div><div style="margin-top:6px"><span class="band ${bandClass}">${band}</span></div></div>
+        </div>
+        <div style="margin-bottom:20px">
+          <div style="font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:12px">Section 1 \u2014 KPI Performance</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <thead><tr style="background:#f0f1f4">
+              <th style="padding:8px 10px;text-align:left;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">KPI / Measure</th>
+              <th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Staff response</th>
+              <th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">HOD rating</th>
+              <th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Weight</th>
+              <th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Weighted score</th>
+            </tr></thead>
+            <tbody>${kpiRows}</tbody>
+          </table>
+        </div>
+        <div style="margin-bottom:20px">
+          <div style="font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:12px">Section 2 \u2014 Behavioural Competencies</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <thead><tr style="background:#f0f1f4">
+              <th style="padding:8px 10px;text-align:left;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Competency</th>
+              <th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Staff score</th>
+              <th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">HOD score</th>
+            </tr></thead>
+            <tbody>${compRows}</tbody>
+          </table>
+        </div>
+        <div style="margin-bottom:20px">
+          <div style="font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:12px">Section 3 \u2014 Development Plan</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <tr><td style="padding:10px 12px;border:1px solid #000;background:#f0f1f4;font-weight:600;font-size:11px;width:200px;vertical-align:top">Strong points</td><td style="padding:10px 12px;border:1px solid #000;vertical-align:top">${a.dev_strong||'Not recorded.'}</td></tr>
+            <tr><td style="padding:10px 12px;border:1px solid #000;background:#f0f1f4;font-weight:600;font-size:11px;vertical-align:top">Training &amp; development needs</td><td style="padding:10px 12px;border:1px solid #000;vertical-align:top">${a.dev_training||'Not recorded.'}</td></tr>
+            <tr><td style="padding:10px 12px;border:1px solid #000;background:#f0f1f4;font-weight:600;font-size:11px;vertical-align:top">Career objectives</td><td style="padding:10px 12px;border:1px solid #000;vertical-align:top">${a.dev_career||'Not recorded.'}</td></tr>
+          </table>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:16px">Acknowledgement &amp; Signatures</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px">
+            <div><div style="border-top:1.5px solid #000;margin-bottom:6px;padding-top:6px"></div><div style="font-size:11px;font-weight:600;color:#1B2A6B">${s.name}</div><div style="font-size:10px;color:#888">${s.role}</div><div style="font-size:10px;color:#aaa;margin-top:2px">Date: _______________</div></div>
+            <div><div style="border-top:1.5px solid #000;margin-bottom:6px;padding-top:6px"></div><div style="font-size:11px;font-weight:600;color:#1B2A6B">HOD / Appraiser</div><div style="font-size:10px;color:#888">${s.dept} Department</div><div style="font-size:10px;color:#aaa;margin-top:2px">Date: _______________</div></div>
+            <div><div style="border-top:1.5px solid #000;margin-bottom:6px;padding-top:6px"></div><div style="font-size:11px;font-weight:600;color:#1B2A6B">Kusain Kabugo</div><div style="font-size:10px;color:#888">Head of Human Resources</div><div style="font-size:10px;color:#aaa;margin-top:2px">Date: _______________</div></div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── ANALYTICS PAGE LOADER ─────────────────────────────────
+async function loadAnalyticsPage() {
+  // Analytics page uses live data when appraisals exist, static otherwise
+  try {
+    const sb = initSupabase();
+    const { data: cycle } = await sb.from('appraisal_cycles').select('id').eq('is_active',true).single();
+    if (!cycle) return;
+    const { data: appraisals } = await sb.from('appraisals')
+      .select('final_score,rating_band,staff(departments(name),properties(code))')
+      .eq('cycle_id', cycle.id).eq('status','complete');
+    if (!appraisals || appraisals.length === 0) return;
+
+    // Update metric cards
+    const avg = Math.round(appraisals.reduce((a,b)=>a+(b.final_score||0),0)/appraisals.length);
+    const completion = appraisals.length;
+    document.querySelectorAll('.metric-value.text-navy')[0] && (document.querySelectorAll('.metric-value')[0].textContent = completion);
+    document.querySelectorAll('.metric-value')[1] && (document.querySelectorAll('.metric-value')[1].innerHTML = avg+'<span style="font-size:15px">%</span>');
+  } catch(e) { console.warn('loadAnalyticsPage:', e.message); }
+}
+
+// ── SETTINGS PAGE LOADER ──────────────────────────────────
+async function loadSettingsPage() {
+  try {
+    const sb = initSupabase();
+    const { data: cycle } = await sb.from('appraisal_cycles')
+      .select('label,start_date,end_date,self_weight,hod_weight').eq('is_active',true).single();
+    if (!cycle) return;
+    const lbl = document.getElementById('set-cycle-label');
+    const sd  = document.getElementById('set-cycle-start');
+    const ed  = document.getElementById('set-cycle-end');
+    const sw  = document.getElementById('set-self-weight');
+    const hw  = document.getElementById('set-hod-weight');
+    if (lbl) lbl.value = cycle.label;
+    if (sd)  sd.value  = cycle.start_date;
+    if (ed)  ed.value  = cycle.end_date;
+    if (sw)  sw.value  = cycle.self_weight;
+    if (hw)  hw.value  = cycle.hod_weight;
+  } catch(e) { console.warn('loadSettingsPage:', e.message); }
 }
 
 // ── DEPT REPORT INIT ──────────────────────────────────────
