@@ -711,6 +711,12 @@ tr:hover td{background:#fafafa}
           <div class="form-group"><label>Department *</label><select id="asf-dept"><option value="">Select department</option></select></div>
           <div class="form-group"><label>Role</label><select id="asf-role"><option value="">Select role</option></select></div>
         </div>
+      </div>
+        <div class="form-group">
+          <label>Appraisal mode</label>
+          <select id="asf-mode"><option value="auto">Auto (based on role)</option><option value="self">Self-service (always)</option><option value="assisted">Assisted (always)</option></select>
+          <div style="font-size:10px;color:#888;margin-top:4px">Auto: managers are self-service, operational staff are assisted.</div>
+        </div>
       </form>
     </div>
     <div class="modal-footer">
@@ -880,6 +886,162 @@ const ROLE_KPIS = {
     { kpi:'Attendance and punctuality',            target:'Zero unexcused absences',weight:10,p:'People',        freq:'Monthly' }
   ],
 
+
+  'Assistant General Manager': [
+    { kpi:'Revenue performance vs budget', target:'Within 5% variance', weight:25, p:'Financial', freq:'Monthly' },
+    { kpi:'Guest satisfaction score', target:'90% and above', weight:25, p:'Guest Experience', freq:'Monthly' },
+    { kpi:'HOD meeting and reporting compliance', target:'100%', weight:20, p:'Internal Processes', freq:'Monthly' },
+    { kpi:'Staff appraisal completion rate', target:'100% within cycle', weight:15, p:'People', freq:'Bi-annual' },
+    { kpi:'Operational audit compliance', target:'Zero critical findings', weight:15, p:'Internal Processes', freq:'Quarterly' }
+  ],
+
+  'Duty Manager': [
+    { kpi:'Guest satisfaction during shift', target:'90% and above', weight:35, p:'Guest Experience', freq:'Monthly' },
+    { kpi:'Incident response time', target:'Under 15 minutes', weight:25, p:'Internal Processes', freq:'Weekly' },
+    { kpi:'Shift handover report accuracy', target:'100% completed on time', weight:25, p:'Internal Processes', freq:'Daily' },
+    { kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:15, p:'People', freq:'Monthly' }
+  ],
+
+  'Night Duty Manager': [
+    { kpi:'Night audit accuracy', target:'Zero discrepancies', weight:35, p:'Financial', freq:'Daily' },
+    { kpi:'Guest satisfaction during night shift', target:'90% and above', weight:30, p:'Guest Experience', freq:'Monthly' },
+    { kpi:'Security compliance', target:'100% checks completed', weight:20, p:'Internal Processes', freq:'Daily' },
+    { kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:15, p:'People', freq:'Monthly' }
+  ],
+
+  'Revenue Manager': [
+    { kpi:'RevPAR growth', target:'15% year on year', weight:35, p:'Financial', freq:'Monthly' },
+    { kpi:'Occupancy rate', target:'75% and above', weight:25, p:'Financial', freq:'Monthly' },
+    { kpi:'Direct booking growth', target:'25% year on year', weight:25, p:'Financial', freq:'Monthly' },
+    { kpi:'Channel mix optimisation', target:'OTA cost below 20% of revenue', weight:15, p:'Financial', freq:'Monthly' }
+  ],
+
+  'Front Office Supervisor': [
+    { kpi:'Guest satisfaction - Front Office', target:'90% and above', weight:35, p:'Guest Experience', freq:'Monthly' },
+    { kpi:'Check-in and check-out wait time', target:'Under 5 minutes', weight:25, p:'Guest Experience', freq:'Weekly' },
+    { kpi:'Room readiness at check-in', target:'98% and above', weight:25, p:'Internal Processes', freq:'Daily' },
+    { kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:15, p:'People', freq:'Monthly' }
+  ],
+
+  'Receptionist': [
+    { kpi:'Guest satisfaction - Front Office', target:'90% and above', weight:35, p:'Guest Experience', freq:'Monthly' },
+    { kpi:'Check-in and check-out accuracy', target:'Zero billing errors', weight:30, p:'Internal Processes', freq:'Monthly' },
+    { kpi:'Upselling conversion', target:'15% of check-ins', weight:20, p:'Financial', freq:'Monthly' },
+    { kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:15, p:'People', freq:'Monthly' }
+  ],
+
+  'Concierge': [
+    { kpi:'Guest satisfaction - Concierge services', target:'90% and above', weight:40, p:'Guest Experience', freq:'Monthly' },
+    { kpi:'Guest requests fulfilled on time', target:'98% and above', weight:30, p:'Guest Experience', freq:'Weekly' },
+    { kpi:'Local knowledge and recommendations', target:'Positive guest mentions', weight:15, p:'Guest Experience', freq:'Monthly' },
+    { kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:15, p:'People', freq:'Monthly' }
+  ],
+
+  'Bellman': [
+    { kpi:'Guest satisfaction - arrival experience', target:'90% and above', weight:40, p:'Guest Experience', freq:'Monthly' },
+    { kpi:'Luggage handling accuracy', target:'Zero incidents', weight:30, p:'Internal Processes', freq:'Monthly' },
+    { kpi:'Upselling and referrals', target:'5 referrals per month', weight:15, p:'Financial', freq:'Monthly' },
+    { kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:15, p:'People', freq:'Monthly' }
+  ],
+
+  'Housekeeping Supervisor': [
+    { kpi:'Room cleanliness inspection pass rate', target:'95% and above', weight:35, p:'Internal Processes', freq:'Monthly' },
+    { kpi:'Room turnaround time', target:'30 minutes or less', weight:30, p:'Internal Processes', freq:'Weekly' },
+    { kpi:'Guest satisfaction - Housekeeping', target:'90% and above', weight:20, p:'Guest Experience', freq:'Monthly' },
+    { kpi:'Team attendance rate', target:'95% and above', weight:15, p:'People', freq:'Monthly' }
+  ],
+
+  'Maintenance Coordinator': [
+    { kpi:'Maintenance response time', target:'Under 60 minutes', weight:35, p:'Internal Processes', freq:'Weekly' },
+    { kpi:'Preventive maintenance schedule adherence', target:'100%', weight:30, p:'Internal Processes', freq:'Monthly' },
+    { kpi:'Work order completion rate', target:'95% within agreed SLA', weight:20, p:'Internal Processes', freq:'Monthly' },
+    { kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:15, p:'People', freq:'Monthly' }
+  ],
+
+  'Electrician': [
+    { kpi:'Maintenance response time', target:'Under 60 minutes', weight:35, p:'Internal Processes', freq:'Weekly' },
+    { kpi:'Preventive maintenance compliance', target:'100% of schedule', weight:30, p:'Internal Processes', freq:'Monthly' },
+    { kpi:'Zero electrical safety incidents', target:'Zero incidents', weight:20, p:'Internal Processes', freq:'Monthly' },
+    { kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:15, p:'People', freq:'Monthly' }
+  ],
+
+  'Handyman': [
+    { kpi:'Work order completion rate', target:'95% within agreed SLA', weight:35, p:'Internal Processes', freq:'Monthly' },
+    { kpi:'Maintenance response time', target:'Under 60 minutes', weight:30, p:'Internal Processes', freq:'Weekly' },
+    { kpi:'Quality of repairs - zero repeat callouts', target:'Zero repeat callouts', weight:20, p:'Internal Processes', freq:'Monthly' },
+    { kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:15, p:'People', freq:'Monthly' }
+  ],
+
+  'Painter': [
+    { kpi:'Quality of paintwork and finishing', target:'Zero guest complaints', weight:40, p:'Internal Processes', freq:'Monthly' },
+    { kpi:'Project completion on time', target:'Within agreed timeline', weight:30, p:'Internal Processes', freq:'Monthly' },
+    { kpi:'Material wastage control', target:'Within approved budget', weight:15, p:'Financial', freq:'Monthly' },
+    { kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:15, p:'People', freq:'Monthly' }
+  ],
+
+  'Rooms Division Technician': [
+    { kpi:'Room maintenance response time', target:'Under 30 minutes', weight:35, p:'Internal Processes', freq:'Weekly' },
+    { kpi:'Room readiness compliance', target:'98% rooms defect-free', weight:30, p:'Internal Processes', freq:'Daily' },
+    { kpi:'Preventive maintenance compliance', target:'100% of schedule', weight:20, p:'Internal Processes', freq:'Monthly' },
+    { kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:15, p:'People', freq:'Monthly' }
+  ],
+
+  'Finance Controller': [
+    { kpi:'Financial reporting accuracy', target:'Zero material errors', weight:30, p:'Financial', freq:'Monthly' },
+    { kpi:'Budget variance', target:'Within 5%', weight:25, p:'Financial', freq:'Monthly' },
+    { kpi:'Statutory compliance', target:'100% on time', weight:25, p:'Financial', freq:'Monthly' },
+    { kpi:'Internal audit findings', target:'Zero repeat findings', weight:20, p:'Financial', freq:'Quarterly' }
+  ],
+
+  'Cost Controller': [
+    { kpi:'Food and beverage cost % of revenue', target:'Within approved budget', weight:35, p:'Financial', freq:'Monthly' },
+    { kpi:'Procurement compliance rate', target:'100%', weight:25, p:'Financial', freq:'Monthly' },
+    { kpi:'Variance reporting accuracy', target:'Zero errors in flash reports', weight:25, p:'Financial', freq:'Monthly' },
+    { kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:15, p:'People', freq:'Monthly' }
+  ],
+
+  'Accounts Clerk': [
+    { kpi:'Posting and reconciliation accuracy', target:'Zero errors', weight:35, p:'Financial', freq:'Monthly' },
+    { kpi:'Supplier payment timeliness', target:'Within agreed payment terms', weight:30, p:'Financial', freq:'Monthly' },
+    { kpi:'Filing and records management', target:'100% compliance', weight:20, p:'Internal Processes', freq:'Monthly' },
+    { kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:15, p:'People', freq:'Monthly' }
+  ],
+
+  'Purchasing Officer': [
+    { kpi:'Procurement compliance rate', target:'100%', weight:35, p:'Financial', freq:'Monthly' },
+    { kpi:'Cost savings vs budget', target:'3% savings year on year', weight:30, p:'Financial', freq:'Quarterly' },
+    { kpi:'Supplier performance - zero supply failures', target:'Zero supply failures', weight:20, p:'Internal Processes', freq:'Monthly' },
+    { kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:15, p:'People', freq:'Monthly' }
+  ],
+
+  'Sales Executive': [
+    { kpi:'Revenue from assigned accounts', target:'Meet monthly target', weight:35, p:'Financial', freq:'Monthly' },
+    { kpi:'New accounts acquired', target:'2 per month minimum', weight:25, p:'Financial', freq:'Monthly' },
+    { kpi:'Client retention rate', target:'85% and above', weight:25, p:'Guest Experience', freq:'Quarterly' },
+    { kpi:'Sales call reports submitted on time', target:'100% weekly', weight:15, p:'Internal Processes', freq:'Weekly' }
+  ],
+
+  'Sales Executive Kenya': [
+    { kpi:'Revenue from Kenya market', target:'Meet monthly target', weight:40, p:'Financial', freq:'Monthly' },
+    { kpi:'New Kenya corporate accounts', target:'3 per quarter minimum', weight:25, p:'Financial', freq:'Quarterly' },
+    { kpi:'Client retention rate', target:'85% and above', weight:20, p:'Guest Experience', freq:'Quarterly' },
+    { kpi:'Sales call reports submitted on time', target:'100% weekly', weight:15, p:'Internal Processes', freq:'Weekly' }
+  ],
+
+  'Sales Intern': [
+    { kpi:'Sales support tasks completed on time', target:'100%', weight:35, p:'Internal Processes', freq:'Weekly' },
+    { kpi:'Market research reports submitted', target:'As assigned', weight:30, p:'Internal Processes', freq:'Monthly' },
+    { kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:20, p:'People', freq:'Monthly' },
+    { kpi:'Learning and development participation', target:'Complete assigned training', weight:15, p:'People', freq:'Quarterly' }
+  ],
+
+  'HR Assistant': [
+    { kpi:'HR records accuracy', target:'Zero errors in personnel files', weight:30, p:'Internal Processes', freq:'Monthly' },
+    { kpi:'Recruitment support turnaround', target:'Vacancies posted within 48 hours', weight:25, p:'People', freq:'Monthly' },
+    { kpi:'Onboarding completion rate', target:'100% within first week', weight:25, p:'People', freq:'Monthly' },
+    { kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:20, p:'People', freq:'Monthly' }
+  ],
+
   // ── DEFAULT (all other roles) ────────────────────────────
   'default': [
     { kpi:'Quality and accuracy of work',    target:'Meets department standards', weight:35, p:'Internal Processes',freq:'Monthly'  },
@@ -891,6 +1053,11 @@ const ROLE_KPIS = {
 
 // Role aliases — map payroll role names to KPI templates
 const ROLE_ALIASES = {
+  'Night Duty Manager':         'Night Duty Manager',
+  'Duty Manager':               'Duty Manager',
+  'Assistant General Manager':  'Assistant General Manager',
+  'Revenue Manager':            'Revenue Manager',
+  'Maintenance Super visor':    'Chief Engineer',
   'Waitress':                   'Waiter',
   'Head Waitress':              'Waiter',
   'Barman':                     'Waiter',
@@ -1121,7 +1288,7 @@ async function loadStaffPage() {
   try {
     if (Object.keys(_deptMap).length === 0) await loadLookups();
     const client = getClient();
-    let query = client.from('staff').select('id,full_name,employee_no,date_of_joining,property_id,department_id,role_id,status').eq('status','active').order('full_name');
+    let query = client.from('staff').select('id,full_name,employee_no,date_of_joining,property_id,department_id,role_id,status,appraisal_mode').eq('status','active').order('full_name');
     const propFilter = currentProp !== 'both' ? currentProp : (currentUser.role !== 'hr_admin' ? currentUser.property : null);
     if (propFilter) {
       const pRow = Object.values(_propMap).find(function(p) { return p.code === propFilter; });
@@ -1130,11 +1297,15 @@ async function loadStaffPage() {
     const { data, error } = await query;
     if (error) throw error;
     _staffCache = (data || []).map(function(s) {
+      var roleMgmt = (_roleMap[s.role_id] || {}).is_management || false;
+      var aMode = s.appraisal_mode || 'auto';
+      var isMgmt = aMode === 'self' ? true : aMode === 'assisted' ? false : roleMgmt;
       return Object.assign({}, s, {
-        deptName: (_deptMap[s.department_id] || {}).name || '',
-        roleTitle: (_roleMap[s.role_id] || {}).title || '',
-        isMgmt: (_roleMap[s.role_id] || {}).is_management || false,
-        propCode: (_propMap[s.property_id] || {}).code || '',
+        deptName:       (_deptMap[s.department_id] || {}).name || '',
+        roleTitle:      (_roleMap[s.role_id] || {}).title || '',
+        isMgmt:         isMgmt,
+        propCode:       (_propMap[s.property_id] || {}).code || '',
+        appraisal_mode: aMode,
       });
     });
     if (counter) counter.textContent = _staffCache.length + ' staff';
@@ -1167,7 +1338,11 @@ function renderStaffTable() {
 
   tbody.innerHTML = staff.map(function(s) {
     const pill = s.propCode === 'skyz' ? 'pill-skyz' : 'pill-phk';
-    const mode = s.isMgmt ? '<span class="band band-meets">Self-service</span>' : '<span class="band band-needs">Assisted</span>';
+    var modeLabel = s.appraisal_mode === 'self' ? 'Self-service'
+      : s.appraisal_mode === 'assisted' ? 'Assisted'
+      : s.isMgmt ? 'Self-service' : 'Assisted';
+    var modeOverride = s.appraisal_mode && s.appraisal_mode !== 'auto' ? ' <span style="font-size:9px;color:#854F0B">(override)</span>' : '';
+    const mode = '<span class="band ' + (s.isMgmt ? 'band-meets' : 'band-needs') + '">' + modeLabel + '</span>' + modeOverride;
     const doj  = s.date_of_joining ? new Date(s.date_of_joining).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '\u2014';
     return '<tr data-staff-id="' + s.id + '">'
       + '<td><strong>' + s.full_name + '</strong></td>'
@@ -3505,7 +3680,10 @@ async function openStaffProfile(sid) {
   document.getElementById('sp-prop').innerHTML      = '<span class="pill ' + pill + '">' + s.propCode.toUpperCase() + '</span>';
   document.getElementById('sp-emp-no').textContent  = s.employee_no || 'Not assigned';
   document.getElementById('sp-doj').textContent     = doj;
-  document.getElementById('sp-mode').textContent    = mode;
+  var modeText = (s.appraisal_mode === 'self') ? 'Self-service (manual override)'
+    : (s.appraisal_mode === 'assisted') ? 'Assisted (manual override)'
+    : s.isMgmt ? 'Self-service (auto)' : 'Assisted (auto)';
+  document.getElementById('sp-mode').textContent = modeText;
   document.getElementById('sp-appr-history').innerHTML = '<div style="font-size:11px;color:#888;padding:8px 0">Loading appraisal history...</div>';
 
   // Show/hide edit controls based on role
@@ -3602,6 +3780,7 @@ function openEditStaff(s) {
   document.getElementById('asf-dept').value    = s.deptName || '';
   document.getElementById('asf-role').value    = s.roleTitle || '';
   document.getElementById('asf-doj').value     = s.date_of_joining ? s.date_of_joining.substring(0,10) : '';
+  document.getElementById('asf-mode').value    = s.appraisal_mode || 'auto';
   modal.classList.remove('hidden');
 }
 
@@ -3651,6 +3830,7 @@ async function saveStaff() {
     if (!propRow) { showToast('Property not found. Check Supabase properties table.'); return; }
     if (!deptRow) { showToast('Department "' + dept + '" not found in database.'); return; }
 
+    var mode = (document.getElementById('asf-mode')||{value:'auto'}).value || 'auto';
     var payload = {
       full_name:       name,
       employee_no:     empno || null,
@@ -3659,6 +3839,7 @@ async function saveStaff() {
       role_id:         roleRow ? roleRow.id : null,
       date_of_joining: doj || null,
       status:          'active',
+      appraisal_mode:  mode,
     };
 
     var res;
