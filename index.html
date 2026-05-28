@@ -1001,9 +1001,9 @@ async function loadAppraisalsPage() {
     const { data: cycle, error: ce } = await client.from('appraisal_cycles').select('id,label').eq('is_active', true).single();
     if (ce) throw ce;
     const { data: appraisals, error: ae } = await client.from('appraisals')
-      .select('id,status,self_kpi_score,hod_kpi_score,final_score,rating_band,staff_id,submitted_at')
+      .select('id,status,self_kpi_score,hod_kpi_score,final_score,rating_band,staff_id,hod_submitted_at')
       .eq('cycle_id', cycle.id)
-      .order('submitted_at', { ascending: false, nullsFirst: false });
+      .order('hod_submitted_at', { ascending: false, nullsFirst: false });
     if (ae) throw ae;
 
     window._appraisalsCache = appraisals || [];
@@ -1466,7 +1466,7 @@ async function submitAppraisal() {
       dev_strong:      (document.getElementById('dev-strong')   || { value:'' }).value,
       dev_training:    (document.getElementById('dev-training') || { value:'' }).value,
       dev_career:      (document.getElementById('dev-career')   || { value:'' }).value,
-      submitted_at:    new Date().toISOString(),
+      hod_submitted_at: new Date().toISOString(),
     }, { onConflict: 'cycle_id,staff_id' });
 
     if (error) throw error;
@@ -1507,7 +1507,7 @@ async function loadHomeData() {
     const { data: staffData, count: staffCount } = await staffQ;
     const total = staffCount || (staffData || []).length;
 
-    let apprQ = client.from('appraisals').select('id,status,final_score,staff_id,submitted_at').eq('cycle_id', cycle.id);
+    let apprQ = client.from('appraisals').select('id,status,final_score,staff_id,hod_submitted_at').eq('cycle_id', cycle.id);
     const { data: appraisals } = await apprQ;
     let appr = appraisals || [];
     if (propId && staffData) {
@@ -1588,7 +1588,7 @@ function renderRecentActivity(items) {
     const s     = _staffCache.find(function(x) { return x.id === a.staff_id; }) || {};
     const name  = s.full_name || 'Staff member';
     const score = a.final_score ? ' \u2014 ' + Math.round(a.final_score) + '%' : '';
-    const time  = a.submitted_at ? new Date(a.submitted_at).toLocaleDateString('en-GB', { day:'numeric', month:'short' }) : '';
+    const time  = a.hod_submitted_at ? new Date(a.hod_submitted_at).toLocaleDateString('en-GB', { day:'numeric', month:'short' }) : '';
     return '<div class="activity-row">'
       + '<div class="act-dot" style="background:var(--green)"></div>'
       + '<div><div class="act-text">' + name + score + '</div><div class="act-time">' + time + '</div></div>'
