@@ -154,6 +154,58 @@ h1,h2,h3,h4{font-family:var(--font-heading)}
 .form-group input:focus{outline:none;border-color:var(--navy)}
 .login-card .btn{width:100%;justify-content:center;margin-top:4px}
 
+
+/* ── SECTION HEADER ─── */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.section-title{font-family:var(--font-heading);font-size:13px;font-weight:600;color:var(--navy);border-bottom:2px solid var(--red);padding-bottom:4px;display:inline-block}
+.filter-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.filter-select{font-size:11px;padding:5px 9px;border-radius:4px;border:1px solid var(--grey-border);background:var(--white);color:var(--text-dark);font-family:var(--font-ui)}
+.filter-select:focus{outline:none;border-color:var(--navy)}
+/* TABLES */
+.table-wrap{background:var(--white);border:1px solid var(--grey-border);border-radius:8px;overflow:hidden;margin-bottom:20px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--grey-bg);color:var(--text-dark);font-weight:600;padding:9px 12px;text-align:left;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase;letter-spacing:.04em}
+td{padding:9px 12px;border-bottom:.5px solid #e8e8ec;color:var(--text-dark);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+.table-actions{display:flex;gap:5px}
+/* STATUS */
+.status-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500}
+.status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot-open{background:var(--red)}
+.dot-prog{background:var(--amber)}
+.dot-done{background:var(--green)}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:flex;align-items:center;justify-content:center}
+.modal{background:var(--white);border-radius:10px;width:620px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 4px 32px rgba(0,0,0,.18)}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--grey-border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--white);z-index:2}
+.modal-header h3{font-family:var(--font-heading);font-size:14px;font-weight:600;color:var(--navy)}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--text-light);font-size:20px;line-height:1;padding:0 4px}
+.modal-close:hover{color:var(--red)}
+.modal-body{padding:20px}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--grey-border);display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;background:var(--white)}
+/* FORM */
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:11px;font-weight:600;color:var(--navy);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:7px 10px;border:1px solid var(--grey-border);border-radius:5px;font-size:12px;color:var(--text-dark);background:var(--white)}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--navy)}
+.form-group textarea{resize:vertical;min-height:70px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-section-title{font-family:var(--font-heading);font-size:12px;font-weight:600;color:var(--navy);border-bottom:2px solid var(--red);padding-bottom:3px;margin-bottom:12px;display:inline-block}
+/* RATING BUTTONS */
+.rating-selector{display:flex;gap:4px}
+.r-btn{width:30px;height:30px;border-radius:4px;border:1px solid var(--grey-border);background:var(--white);font-size:11px;font-weight:600;cursor:pointer;color:var(--text-mid);transition:all .12s;display:flex;align-items:center;justify-content:center}
+.r-btn:hover{background:var(--grey-bg)}
+.r-btn.sel-1{background:#fcebeb;border-color:#f7c1c1;color:#A32D2D}
+.r-btn.sel-2{background:#faeeda;border-color:#FAC775;color:#854F0B}
+.r-btn.sel-3{background:var(--grey-bg);border-color:var(--grey-border);color:var(--navy)}
+.r-btn.sel-4{background:#e6f1fb;border-color:#B5D4F4;color:#185FA5}
+.r-btn.sel-5{background:#eaf3de;border-color:#C0DD97;color:var(--green)}
+/* SCORE BAR */
+.score-footer{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--grey-bg);border-top:1.5px solid #000}
+.score-label{font-size:11px;color:var(--text-mid)}
+.score-val{font-family:var(--font-heading);font-size:16px;font-weight:600;color:var(--navy)}
+
 /* TOAST */
 #toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;padding:10px 18px;border-radius:6px;font-size:12px;z-index:3000;opacity:0;transition:opacity .25s;pointer-events:none}
 #toast.show{opacity:1}
@@ -179,7 +231,7 @@ h1,h2,h3,h4{font-family:var(--font-heading)}
       <input type="password" id="login-password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
     </div>
     <button class="btn btn-primary" id="login-btn" onclick="doLogin()">Sign in &rarr;</button>
-    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <strong>R1</strong></p>
+    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <strong>R2</strong></p>
   </div>
 </div>
 
@@ -354,10 +406,35 @@ h1,h2,h3,h4{font-family:var(--font-heading)}
       </div><!-- /page-home -->
 
       <!-- PLACEHOLDER PAGES — built one at a time -->
+      <!-- APPRAISALS PAGE -->
       <div class="page-view" id="page-appraisals">
-        <div style="text-align:center;padding:60px 20px;color:var(--text-light)">
-          <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:8px">Appraisals</div>
-          <div style="font-size:12px">Coming in R2</div>
+        <div class="section-header">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="section-title">Appraisals</div>
+            <span id="appr-count" style="font-size:11px;color:var(--text-light)"></span>
+          </div>
+          <div class="filter-row">
+            <div style="display:flex;gap:4px;background:#f0f1f4;padding:3px;border-radius:5px;border:1px solid var(--grey-border)">
+              <button class="btn btn-sm appr-tab" id="tab-all"     data-tab="all"     style="background:#fff;color:var(--navy);border:none;padding:4px 10px;border-radius:3px;font-size:11px;font-weight:500">All</button>
+              <button class="btn btn-sm appr-tab" id="tab-pending" data-tab="pending" style="background:transparent;color:var(--text-mid);border:none;padding:4px 10px;border-radius:3px;font-size:11px">Pending</button>
+              <button class="btn btn-sm appr-tab" id="tab-done"    data-tab="done"    style="background:transparent;color:var(--text-mid);border:none;padding:4px 10px;border-radius:3px;font-size:11px">Submitted</button>
+            </div>
+            <select class="filter-select" id="filter-appr-prop"><option value="">Both properties</option><option value="skyz">Skyz</option><option value="phk">PHK</option></select>
+            <select class="filter-select" id="filter-appr-dept"><option value="">All departments</option><option>Food &amp; Beverage</option><option>Front Office</option><option>Housekeeping</option><option>Kitchen</option><option>Finance</option><option>Sales &amp; Marketing</option><option>Maintenance</option><option>Management &amp; Admin</option><option>ICT &amp; Telecom</option><option>HR</option><option>Laundry</option></select>
+            <button class="btn btn-primary btn-sm" id="btn-new-appraisal">+ New</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Employee</th><th>Property</th><th>Department</th><th>Role</th>
+              <th>Self-appraisal</th><th>HOD appraisal</th><th>Final score</th><th>Rating</th>
+              <th class="no-print">Actions</th>
+            </tr></thead>
+            <tbody id="appr-tbody">
+              <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text-light);font-size:12px">Loading appraisals...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
       <div class="page-view" id="page-analytics">
@@ -372,10 +449,26 @@ h1,h2,h3,h4{font-family:var(--font-heading)}
           <div style="font-size:12px">Coming in R4</div>
         </div>
       </div>
+      <!-- STAFF PAGE -->
       <div class="page-view" id="page-staff">
-        <div style="text-align:center;padding:60px 20px;color:var(--text-light)">
-          <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:8px">Staff &amp; Roles</div>
-          <div style="font-size:12px">Coming in R2</div>
+        <div class="section-header">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="section-title">Staff &amp; Roles</div>
+            <span id="staff-count" style="font-size:11px;color:var(--text-light)"></span>
+          </div>
+          <div class="filter-row">
+            <input type="text" id="filter-staff-search" class="filter-select" placeholder="Search name..." style="width:160px" />
+            <select class="filter-select" id="filter-staff-prop"><option value="">Both properties</option><option value="skyz">Skyz</option><option value="phk">PHK</option></select>
+            <select class="filter-select" id="filter-staff-dept"><option value="">All departments</option><option>Food &amp; Beverage</option><option>Front Office</option><option>House Keeping</option><option>Finance</option><option>Sales &amp; Marketing</option><option>Maintenance</option><option>OPM/AGM</option><option>ICT &amp; Telecom</option><option>HR</option><option>Laundry</option><option>Admin</option></select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Property</th><th>Department</th><th>Role</th><th>Date of joining</th><th>Mode</th><th class="no-print">Actions</th></tr></thead>
+            <tbody id="staff-tbody">
+              <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-light);font-size:12px">Loading staff...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
       <div class="page-view" id="page-kpis">
@@ -407,9 +500,235 @@ h1,h2,h3,h4{font-family:var(--font-heading)}
   </div><!-- /main -->
 </div><!-- /app -->
 
+
+<!-- MODAL: Staff search for new appraisal -->
+<div class="modal-overlay hidden" id="modal-staff-search">
+  <div class="modal" style="width:480px">
+    <div class="modal-header">
+      <h3 id="staff-search-title">Select staff member</h3>
+      <button class="modal-close" id="btn-close-staff-search">&times;</button>
+    </div>
+    <div class="modal-body" style="padding-bottom:8px">
+      <div class="form-group">
+        <label>Search by name, role or department</label>
+        <input type="text" id="staff-search-input" placeholder="e.g. Grace, Waitress, Kitchen..." />
+      </div>
+      <div id="staff-search-results" style="border:1px solid var(--grey-border);border-radius:6px;max-height:300px;overflow-y:auto;font-size:12px">
+        <div style="padding:16px;text-align:center;font-size:11px;color:var(--text-light)">Start typing to search...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Appraisal form -->
+<div class="modal-overlay hidden" id="modal-appraisal">
+  <div class="modal" style="width:700px">
+    <div class="modal-header">
+      <h3 id="appr-modal-title">Appraisal Form</h3>
+      <button class="modal-close" id="btn-close-appraisal">&times;</button>
+    </div>
+    <div class="modal-body" id="appr-modal-body"></div>
+    <div class="modal-footer">
+      <div id="appr-score-display" style="margin-right:auto;font-size:12px;color:var(--text-mid)">Score: pending</div>
+      <button class="btn btn-secondary" id="btn-save-draft">Save draft</button>
+      <button class="btn btn-primary" id="btn-submit-appraisal">Submit appraisal</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
+
 <script>
+
+const ROLE_KPIS = {
+
+  // ── GENERAL MANAGER ──────────────────────────────────────
+  'General Manager': [
+    { kpi:'Total revenue growth',            target:'15% YoY (Skyz) / 25% YoY (PHK)', weight:25, p:'Financial',       freq:'Monthly'   },
+    { kpi:'RevPAR growth',                   target:'15% year on year',               weight:20, p:'Financial',       freq:'Monthly'   },
+    { kpi:'Occupancy rate',                  target:'75% and above',                  weight:15, p:'Financial',       freq:'Monthly'   },
+    { kpi:'Marriott Guest Satisfaction Score',target:'90% and above',                 weight:20, p:'Guest Experience',freq:'Monthly'   },
+    { kpi:'New corporate clients acquired',  target:'40/yr (Skyz) / 30/yr (PHK)',     weight:10, p:'Guest Experience',freq:'Quarterly' },
+    { kpi:'KPI and JD compliance rate',      target:'100%',                           weight:10, p:'People',          freq:'Quarterly' }
+  ],
+
+  // ── HR MANAGER ───────────────────────────────────────────
+  'HR Manager': [
+    { kpi:'Staff on formal development programmes', target:'80% annually',             weight:25, p:'People',freq:'Quarterly'  },
+    { kpi:'Regrettable attrition reduction',        target:'50% year on year',         weight:20, p:'People',freq:'Quarterly'  },
+    { kpi:'Staff satisfaction score',               target:'90% and above',            weight:20, p:'People',freq:'Bi-annual'  },
+    { kpi:'Internal promotion rate (leadership)',   target:'40% of all vacancies',     weight:15, p:'People',freq:'Quarterly'  },
+    { kpi:'Time-to-hire reduction',                 target:'30% vs 2025 baseline',     weight:10, p:'People',freq:'Quarterly'  },
+    { kpi:'New hire retention at 6 months',         target:'90% and above',            weight:10, p:'People',freq:'Bi-annual'  }
+  ],
+
+  // ── FINANCE MANAGER ──────────────────────────────────────
+  'Finance Manager': [
+    { kpi:'Fraud and leakage incidents',     target:'Zero',        weight:30, p:'Financial',freq:'Monthly'   },
+    { kpi:'Cash handling controls adherence',target:'100%',        weight:25, p:'Financial',freq:'Monthly'   },
+    { kpi:'Procurement compliance rate',     target:'100%',        weight:25, p:'Financial',freq:'Monthly'   },
+    { kpi:'Budget variance',                 target:'Within 5%',   weight:20, p:'Financial',freq:'Monthly'   }
+  ],
+
+  // ── F&B MANAGER ──────────────────────────────────────────
+  'F&B Manager': [
+    { kpi:'Restaurant and event covers growth', target:'30% by 2027 (Skyz) / 20% (PHK)', weight:25, p:'Financial',       freq:'Quarterly' },
+    { kpi:'Marriott Guest Satisfaction — F&B', target:'90% and above',               weight:25, p:'Guest Experience',freq:'Monthly'   },
+    { kpi:'Food waste reduction',               target:'30% year on year',                weight:20, p:'Internal Processes',freq:'Quarterly'},
+    { kpi:'Upselling training completion',      target:'100% of F&B staff',               weight:15, p:'People',          freq:'Bi-annual' },
+    { kpi:'Kitchen hygiene audit pass rate',    target:'Pass every audit',                weight:15, p:'Internal Processes',freq:'Quarterly'}
+  ],
+
+  // ── EXECUTIVE CHEF ───────────────────────────────────────
+  'Executive Chef': [
+    { kpi:'Food waste reduction',            target:'30% year on year',   weight:30, p:'Internal Processes',freq:'Quarterly' },
+    { kpi:'Kitchen hygiene audit pass rate', target:'Pass every audit',   weight:25, p:'Internal Processes',freq:'Quarterly' },
+    { kpi:'Upselling training completion',   target:'100% of kitchen staff',weight:20,p:'People',          freq:'Bi-annual' },
+    { kpi:'Food cost % of revenue',          target:'Within approved budget',weight:25,p:'Financial',       freq:'Monthly'   }
+  ],
+
+  // ── SALES MANAGER ────────────────────────────────────────
+  'Sales Manager': [
+    { kpi:'New corporate clients acquired',  target:'40/yr (Skyz) / 30/yr (PHK)', weight:35, p:'Financial',       freq:'Quarterly' },
+    { kpi:'Direct booking growth',           target:'25% year on year',            weight:25, p:'Financial',       freq:'Monthly'   },
+    { kpi:'Event revenue growth',            target:'30% by 2027 (Skyz) / 20% (PHK)',weight:25,p:'Financial',      freq:'Quarterly' },
+    { kpi:'Guest retention growth',          target:'60% (Skyz) / 25% (PHK)',      weight:15, p:'Guest Experience',freq:'Quarterly' }
+  ],
+
+  // ── FRONT OFFICE (Manager/Supervisor) ───────────────────
+  'Front Office Manager': [
+    { kpi:'Marriott Guest Satisfaction Score',target:'90% and above',  weight:30, p:'Guest Experience',freq:'Monthly'   },
+    { kpi:'Service delivery compliance rate', target:'99% and above',  weight:25, p:'Guest Experience',freq:'Monthly'   },
+    { kpi:'Room readiness rate at check-in',  target:'98% and above',  weight:25, p:'Internal Processes',freq:'Daily'   },
+    { kpi:'Direct booking growth',            target:'25% year on year',weight:20, p:'Financial',        freq:'Monthly'  }
+  ],
+
+  // ── EXECUTIVE HOUSEKEEPER ────────────────────────────────
+  'Executive Housekeeper': [
+    { kpi:'Room cleanliness inspection pass rate', target:'95% and above',    weight:35, p:'Internal Processes',freq:'Monthly'  },
+    { kpi:'Room turnaround time',                  target:'30 minutes or less',weight:30, p:'Internal Processes',freq:'Weekly'   },
+    { kpi:'Room readiness rate at check-in',       target:'98% and above',    weight:20, p:'Guest Experience',  freq:'Daily'    },
+    { kpi:'Guest satisfaction — Housekeeping',target:'90% and above',    weight:15, p:'Guest Experience',  freq:'Monthly'  }
+  ],
+
+  // ── CHIEF ENGINEER / MAINTENANCE SUPERVISOR ─────────────
+  'Chief Engineer': [
+    { kpi:'Maintenance cost reduction',  target:'10% year on year',   weight:35, p:'Financial',        freq:'Quarterly' },
+    { kpi:'Maintenance response time',   target:'Under 60 minutes',   weight:35, p:'Internal Processes',freq:'Weekly'   },
+    { kpi:'Preventive maintenance compliance', target:'100% schedule', weight:30, p:'Internal Processes',freq:'Monthly'  }
+  ],
+
+  // ── IT MANAGER ───────────────────────────────────────────
+  'IT Manager': [
+    { kpi:'Opera PMS system active and utilised', target:'100%',        weight:35, p:'Internal Processes',freq:'Monthly'  },
+    { kpi:'Materials Control System operational', target:'Operational', weight:30, p:'Internal Processes',freq:'Quarterly'},
+    { kpi:'System downtime',                      target:'Zero unplanned',weight:35,p:'Internal Processes',freq:'Monthly' }
+  ],
+
+  // ── FLOOR SUPERVISOR ─────────────────────────────────────
+  'Floor Supervisor': [
+    { kpi:'Room cleanliness inspection pass rate', target:'95% and above',    weight:35, p:'Internal Processes',freq:'Monthly' },
+    { kpi:'Room turnaround time',                  target:'30 minutes or less',weight:30, p:'Internal Processes',freq:'Weekly'  },
+    { kpi:'Guest satisfaction — Housekeeping',target:'90% and above',    weight:20, p:'Guest Experience',  freq:'Monthly' },
+    { kpi:'Team attendance rate',                  target:'95% and above',    weight:15, p:'People',            freq:'Monthly' }
+  ],
+
+  // ── RESTAURANT SUPERVISOR ────────────────────────────────
+  'Restaurant Supervisor': [
+    { kpi:'Guest satisfaction — F&B',   target:'90% and above',        weight:35, p:'Guest Experience',  freq:'Monthly'  },
+    { kpi:'Upselling conversion rate',        target:'20% of covers',        weight:25, p:'Financial',         freq:'Monthly'  },
+    { kpi:'Service delivery compliance',      target:'99% and above',        weight:25, p:'Internal Processes',freq:'Monthly'  },
+    { kpi:'Attendance and punctuality',       target:'Zero unexcused absences',weight:15,p:'People',           freq:'Monthly'  }
+  ],
+
+  // ── WAITER / WAITRESS ────────────────────────────────────
+  'Waiter': [
+    { kpi:'Guest satisfaction score',    target:'90%+',                  weight:35, p:'Guest Experience',  freq:'Monthly'  },
+    { kpi:'Upselling conversion',        target:'20% of covers',         weight:25, p:'Financial',         freq:'Monthly'  },
+    { kpi:'Table turnaround time',       target:'On time per standard',  weight:20, p:'Internal Processes',freq:'Weekly'   },
+    { kpi:'Attendance and punctuality',  target:'Zero unexcused absences',weight:20,p:'People',            freq:'Monthly'  }
+  ],
+
+  // ── ROOM ATTENDANT ───────────────────────────────────────
+  'Room Attendant': [
+    { kpi:'Room cleanliness inspection pass rate', target:'95% and above',     weight:40, p:'Internal Processes',freq:'Monthly' },
+    { kpi:'Room turnaround time',                  target:'30 minutes or less', weight:30, p:'Internal Processes',freq:'Weekly'  },
+    { kpi:'Guest satisfaction — Housekeeping',target:'90% and above',     weight:20, p:'Guest Experience',  freq:'Monthly' },
+    { kpi:'Attendance and punctuality',            target:'Zero unexcused absences',weight:10,p:'People',        freq:'Monthly' }
+  ],
+
+  // ── DEFAULT (all other roles) ────────────────────────────
+  'default': [
+    { kpi:'Quality and accuracy of work',    target:'Meets department standards', weight:35, p:'Internal Processes',freq:'Monthly'  },
+    { kpi:'Guest / customer satisfaction',   target:'90% and above',              weight:25, p:'Guest Experience',  freq:'Monthly'  },
+    { kpi:'Attendance and punctuality',      target:'Zero unexcused absences',    weight:25, p:'People',            freq:'Monthly'  },
+    { kpi:'Team cooperation and conduct',    target:'No disciplinary issues',     weight:15, p:'People',            freq:'Monthly'  }
+  ]
+};
+
+// Role aliases — map payroll role names to KPI templates
+const ROLE_ALIASES = {
+  'Waitress':                   'Waiter',
+  'Head Waitress':              'Waiter',
+  'Barman':                     'Waiter',
+  'Mixologist':                 'Waiter',
+  'Hostess':                    'Waiter',
+  'Food & Beverage Controller': 'F&B Manager',
+  'Restaurant Manager':         'F&B Manager',
+  'Assistant Restaurant Manager':'Restaurant Supervisor',
+  'Assistant Banquet Manager':  'Restaurant Supervisor',
+  'Banquet Supervisor':         'Restaurant Supervisor',
+  'Banquet Coordinator':        'Restaurant Supervisor',
+  'Acting Banquet Supervisor':  'Restaurant Supervisor',
+  'Room Service Supervisor':    'Restaurant Supervisor',
+  'Chef de Partie':             'Executive Chef',
+  'Junior Chef de Partie':      'Executive Chef',
+  'Senior Chef de Partie':      'Executive Chef',
+  'Junior Sous Chef':           'Executive Chef',
+  'Pastry Chef':                'Executive Chef',
+  'Baker':                      'Executive Chef',
+  'Commis Chef':                'Executive Chef',
+  'Cook':                       'Room Attendant',
+  'Staff Cook':                 'Room Attendant',
+  'Still Room Cook':            'Room Attendant',
+  'Steward':                    'Room Attendant',
+  'Public Area Supervisor':     'Floor Supervisor',
+  'Public Area Attendant':      'Room Attendant',
+  'Laundry Supervisor':         'Floor Supervisor',
+  'Laundry Attendant':          'Room Attendant',
+  'Housekeeping Coordinator':   'Floor Supervisor',
+  'Front Office Agent':         'Waiter',
+  'Golf Cart Concierge':        'Waiter',
+  'Driver':                     'default',
+  'Gardener':                   'default',
+  'Mason':                      'default',
+  'Plumber':                    'default',
+  'Pool Attendant':             'default',
+  'Sales Coordinator':          'Sales Manager',
+  'Accounts Assistant':         'Finance Manager',
+  'Accounts Assistant-Creditors':'Finance Manager',
+  'Senior Accountant':          'Finance Manager',
+  'Storekeeper':                'Finance Manager',
+  'Receiving Clerk':            'Finance Manager',
+  'IT Assistant':               'IT Manager',
+  'Surveillance Officer':       'IT Manager',
+  'Cluster Procurement Manager':'Finance Manager',
+  'Graphics Designer':          'default',
+  'Human Resource Manager':     'HR Manager',
+  'HR Assistant':               'HR Manager',
+  'Maintenance Supervisor':     'Chief Engineer',
+  'Maintenance Super visor':    'Chief Engineer',
+  'Assistant Guest Relations Manager':'Front Office Manager'
+};
+
+function getKPIsForRole(role) {
+  if (ROLE_KPIS[role]) return ROLE_KPIS[role];
+  if (ROLE_ALIASES[role] && ROLE_KPIS[ROLE_ALIASES[role]]) return ROLE_KPIS[ROLE_ALIASES[role]];
+  return ROLE_KPIS['default'];
+}
+
+
 // ── CONFIG ────────────────────────────────────────────────
 const SUPABASE_URL = 'https://iyxgdzukzltlqisdfeoq.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_E3iYX07fL0dLqSoYz_-MuQ_da3IoNQP';
@@ -420,8 +739,13 @@ function getClient() {
   return sb;
 }
 
-let currentUser = null;
-let currentProp = 'both';
+let currentUser  = null;
+let currentProp  = 'both';
+let _staffCache  = [];   // flat staff records with resolved dept/role/prop names
+let _deptMap     = {};
+let _roleMap     = {};
+let _propMap     = {};
+let _currentAppraisalTab = 'all';
 
 // ── HELPERS ───────────────────────────────────────────────
 function showToast(msg) {
@@ -430,23 +754,38 @@ function showToast(msg) {
   t.classList.add('show');
   setTimeout(function() { t.classList.remove('show'); }, 3000);
 }
-
 function propLabel(p) {
   if (p === 'skyz') return 'Protea Hotel Skyz';
   if (p === 'phk')  return 'Protea Hotel Kampala';
   return 'Both properties';
 }
-
 function dateStr() {
   return new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
 }
-
 function roleLabel(r) {
   if (r === 'hr_admin') return 'HR Admin';
   if (r === 'hr')       return 'HR Manager';
   if (r === 'gm')       return 'General Manager';
   if (r === 'hod')      return 'HOD';
   return r;
+}
+function bandClass(score) {
+  if (score >= 90) return 'band-exc';
+  if (score >= 75) return 'band-exceeds';
+  if (score >= 60) return 'band-meets';
+  if (score >= 40) return 'band-needs';
+  return 'band-unsat';
+}
+function bandLabel(score) {
+  if (score >= 90) return 'Exceptional';
+  if (score >= 75) return 'Exceeds expectations';
+  if (score >= 60) return 'Meets expectations';
+  if (score >= 40) return 'Needs improvement';
+  return 'Unsatisfactory';
+}
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.add('hidden');
 }
 
 // ── AUTH ──────────────────────────────────────────────────
@@ -462,11 +801,7 @@ async function doLogin() {
     const client = getClient();
     const { data: authData, error: authErr } = await client.auth.signInWithPassword({ email: email, password: pwd });
     if (authErr) throw authErr;
-    const { data: profile, error: profErr } = await client
-      .from('user_profiles')
-      .select('name, role, property, initials')
-      .eq('id', authData.user.id)
-      .single();
+    const { data: profile, error: profErr } = await client.from('user_profiles').select('name,role,property,initials').eq('id', authData.user.id).single();
     if (profErr || !profile) throw new Error('User profile not found. Contact HR Admin.');
     currentUser = { id: authData.user.id, email: email, name: profile.name, role: profile.role, property: profile.property, initials: profile.initials };
     document.getElementById('login-screen').style.display = 'none';
@@ -474,14 +809,14 @@ async function doLogin() {
     document.getElementById('sb-avatar').textContent    = profile.initials || email[0].toUpperCase();
     document.getElementById('sb-user-name').textContent = profile.name;
     document.getElementById('sb-user-role').textContent = roleLabel(profile.role);
-    // Lock property switcher for GM and HR (non-admin)
-    if (profile.role === 'gm' || (profile.role === 'hr' && profile.role !== 'hr_admin')) {
+    if (profile.role === 'gm' || profile.role === 'hr') {
       currentProp = profile.property;
-      var sw = document.getElementById('prop-switcher');
+      const sw = document.getElementById('prop-switcher');
       sw.value = profile.property;
       sw.disabled = true;
     }
     setWelcome();
+    await loadLookups();
     loadHomeData();
   } catch(e) {
     err.textContent = e.message || 'Invalid email or password.';
@@ -494,8 +829,7 @@ async function doLogin() {
 
 async function doLogout() {
   await getClient().auth.signOut();
-  currentUser = null;
-  currentProp = 'both';
+  currentUser = null; currentProp = 'both'; _staffCache = [];
   document.getElementById('login-email').value = '';
   document.getElementById('login-password').value = '';
   document.getElementById('app').style.display = 'none';
@@ -503,184 +837,771 @@ async function doLogout() {
   document.getElementById('prop-switcher').disabled = false;
 }
 
+// ── LOOKUPS (load once after login) ──────────────────────
+async function loadLookups() {
+  const client = getClient();
+  const [dr, rr, pr] = await Promise.all([
+    client.from('departments').select('id,name'),
+    client.from('roles').select('id,title,is_management'),
+    client.from('properties').select('id,code,name'),
+  ]);
+  _deptMap = Object.fromEntries((dr.data || []).map(function(d) { return [d.id, d]; }));
+  _roleMap = Object.fromEntries((rr.data || []).map(function(r) { return [r.id, r]; }));
+  _propMap = Object.fromEntries((pr.data || []).map(function(p) { return [p.id, p]; }));
+}
+
 // ── NAVIGATION ────────────────────────────────────────────
 function navigate(page) {
   document.querySelectorAll('.page-view').forEach(function(v) { v.classList.remove('active'); });
   document.querySelectorAll('.sb-item').forEach(function(i) { i.classList.remove('active'); });
-  var el  = document.getElementById('page-' + page);
-  var nav = document.querySelector('[data-page="' + page + '"]');
+  const el  = document.getElementById('page-' + page);
+  const nav = document.querySelector('[data-page="' + page + '"]');
   if (el)  el.classList.add('active');
   if (nav) nav.classList.add('active');
-  var titles = { home:'Home', appraisals:'Appraisals', analytics:'Analytics', reports:'Reports', staff:'Staff & Roles', kpis:'KPI Setup', jds:'Job Descriptions', departments:'Departments', settings:'Settings' };
+  const titles = { home:'Home', appraisals:'Appraisals', analytics:'Analytics', reports:'Reports', staff:'Staff & Roles', kpis:'KPI Setup', jds:'Job Descriptions', departments:'Departments', settings:'Settings' };
   document.getElementById('tb-title').textContent = titles[page] || page;
   document.getElementById('tb-sub').textContent   = propLabel(currentProp) + ' \u2014 ' + dateStr();
+  if (page === 'staff')       loadStaffPage();
+  if (page === 'appraisals')  loadAppraisalsPage();
+  if (page === 'home')        loadHomeData();
 }
 
 function switchProperty(val) {
   currentProp = val;
   document.getElementById('tb-sub').textContent = propLabel(val) + ' \u2014 ' + dateStr();
-  var activePage = document.querySelector('.page-view.active');
-  if (activePage && activePage.id === 'page-home') loadHomeData();
+  const active = document.querySelector('.page-view.active');
+  if (!active) return;
+  if (active.id === 'page-home')       loadHomeData();
+  if (active.id === 'page-staff')      loadStaffPage();
+  if (active.id === 'page-appraisals') loadAppraisalsPage();
 }
 
-// ── WELCOME ───────────────────────────────────────────────
 function setWelcome() {
-  var h = new Date().getHours();
-  var g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
-  var firstName = currentUser.name.split(' ')[0];
-  document.getElementById('welcome-msg').textContent = g + ', ' + firstName;
+  const h = new Date().getHours();
+  const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('welcome-msg').textContent = g + ', ' + currentUser.name.split(' ')[0];
   document.getElementById('tb-sub').textContent = propLabel(currentProp) + ' \u2014 ' + dateStr();
+}
+
+// ── STAFF LOADER ──────────────────────────────────────────
+async function loadStaffPage() {
+  const tbody   = document.getElementById('staff-tbody');
+  const counter = document.getElementById('staff-count');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-light);font-size:12px">Loading staff...</td></tr>';
+  try {
+    if (Object.keys(_deptMap).length === 0) await loadLookups();
+    const client = getClient();
+    let query = client.from('staff').select('id,full_name,employee_no,date_of_joining,property_id,department_id,role_id,status').eq('status','active').order('full_name');
+    const propFilter = currentProp !== 'both' ? currentProp : (currentUser.role !== 'hr_admin' ? currentUser.property : null);
+    if (propFilter) {
+      const pRow = Object.values(_propMap).find(function(p) { return p.code === propFilter; });
+      if (pRow) query = query.eq('property_id', pRow.id);
+    }
+    const { data, error } = await query;
+    if (error) throw error;
+    _staffCache = (data || []).map(function(s) {
+      return Object.assign({}, s, {
+        deptName: (_deptMap[s.department_id] || {}).name || '',
+        roleTitle: (_roleMap[s.role_id] || {}).title || '',
+        isMgmt: (_roleMap[s.role_id] || {}).is_management || false,
+        propCode: (_propMap[s.property_id] || {}).code || '',
+      });
+    });
+    if (counter) counter.textContent = _staffCache.length + ' staff';
+    renderStaffTable();
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--red);font-size:12px">Error: ' + e.message + '</td></tr>';
+    console.error('loadStaffPage:', e);
+  }
+}
+
+function renderStaffTable() {
+  const tbody  = document.getElementById('staff-tbody');
+  const search = (document.getElementById('filter-staff-search') || { value: '' }).value.toLowerCase();
+  const dept   = (document.getElementById('filter-staff-dept')   || { value: '' }).value.toLowerCase();
+  const prop   = (document.getElementById('filter-staff-prop')   || { value: '' }).value.toLowerCase();
+  if (!tbody) return;
+
+  let staff = _staffCache;
+  if (search) staff = staff.filter(function(s) { return s.full_name.toLowerCase().includes(search); });
+  if (dept)   staff = staff.filter(function(s) { return s.deptName.toLowerCase().includes(dept); });
+  if (prop)   staff = staff.filter(function(s) { return s.propCode === prop; });
+
+  const counter = document.getElementById('staff-count');
+  if (counter) counter.textContent = staff.length + ' staff';
+
+  if (staff.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-light);font-size:12px">No staff found.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = staff.map(function(s) {
+    const pill = s.propCode === 'skyz' ? 'pill-skyz' : 'pill-phk';
+    const mode = s.isMgmt ? '<span class="band band-meets">Self-service</span>' : '<span class="band band-needs">Assisted</span>';
+    const doj  = s.date_of_joining ? new Date(s.date_of_joining).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '\u2014';
+    return '<tr data-staff-id="' + s.id + '">'
+      + '<td><strong>' + s.full_name + '</strong></td>'
+      + '<td><span class="pill ' + pill + '">' + s.propCode.toUpperCase() + '</span></td>'
+      + '<td>' + (s.deptName || '\u2014') + '</td>'
+      + '<td>' + (s.roleTitle || '\u2014') + '</td>'
+      + '<td style="font-size:11px;color:var(--text-mid)">' + doj + '</td>'
+      + '<td>' + mode + '</td>'
+      + '<td class="no-print"><div class="table-actions">'
+      + '<button class="btn btn-secondary btn-sm" data-action="view" data-staff-id="' + s.id + '">View</button>'
+      + '<button class="btn btn-primary btn-sm"   data-action="appraise" data-staff-id="' + s.id + '">Appraise</button>'
+      + '</div></td></tr>';
+  }).join('');
+}
+
+// Staff table event delegation
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('button[data-action][data-staff-id]');
+  if (!btn) return;
+  const sid    = btn.dataset.staffId;
+  const action = btn.dataset.action;
+  const s      = _staffCache.find(function(x) { return x.id === sid; });
+  if (!s) return;
+  if (action === 'appraise') openAppraisalForm(s);
+  if (action === 'view')     showToast('Staff profile coming in R3');
+});
+
+// Staff filters
+document.addEventListener('input',  function(e) { if (e.target.id === 'filter-staff-search') renderStaffTable(); });
+document.addEventListener('change', function(e) {
+  if (e.target.id === 'filter-staff-dept' || e.target.id === 'filter-staff-prop') renderStaffTable();
+  if (e.target.id === 'filter-appr-prop'  || e.target.id === 'filter-appr-dept')  filterAppraisalsTable();
+});
+
+// Appraisal tab buttons
+document.addEventListener('click', function(e) {
+  const tab = e.target.closest('.appr-tab');
+  if (!tab) return;
+  _currentAppraisalTab = tab.dataset.tab;
+  document.querySelectorAll('.appr-tab').forEach(function(b) {
+    b.style.background = 'transparent';
+    b.style.color = 'var(--text-mid)';
+    b.style.fontWeight = '400';
+  });
+  tab.style.background = '#fff';
+  tab.style.color = 'var(--navy)';
+  tab.style.fontWeight = '500';
+  filterAppraisalsTable();
+});
+
+// ── APPRAISALS LOADER ─────────────────────────────────────
+async function loadAppraisalsPage() {
+  const tbody  = document.getElementById('appr-tbody');
+  const counter= document.getElementById('appr-count');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text-light);font-size:12px">Loading appraisals...</td></tr>';
+  try {
+    if (_staffCache.length === 0) await loadStaffPage();
+    const client = getClient();
+    const { data: cycle, error: ce } = await client.from('appraisal_cycles').select('id,label').eq('is_active', true).single();
+    if (ce) throw ce;
+    const { data: appraisals, error: ae } = await client.from('appraisals')
+      .select('id,status,self_kpi_score,hod_kpi_score,final_score,rating_band,staff_id,submitted_at')
+      .eq('cycle_id', cycle.id)
+      .order('submitted_at', { ascending: false, nullsFirst: false });
+    if (ae) throw ae;
+
+    window._appraisalsCache = appraisals || [];
+    window._activeCycleId   = cycle.id;
+    if (counter) counter.textContent = (appraisals || []).length + ' records';
+    renderAppraisalsTable(appraisals || []);
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--red);font-size:12px">Error: ' + e.message + '</td></tr>';
+    console.error('loadAppraisalsPage:', e);
+  }
+}
+
+function renderAppraisalsTable(appraisals) {
+  const tbody = document.getElementById('appr-tbody');
+  if (!tbody) return;
+  if (!appraisals || appraisals.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text-light);font-size:12px">No appraisals yet this cycle. Click \u201C+ New\u201D to start one.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = appraisals.map(function(a) {
+    const s       = _staffCache.find(function(x) { return x.id === a.staff_id; }) || {};
+    const pill    = s.propCode === 'skyz' ? 'pill-skyz' : 'pill-phk';
+    const score   = a.final_score != null ? '<strong>' + Math.round(a.final_score) + '%</strong>' : '\u2014';
+    const band    = a.rating_band ? '<span class="band ' + bandClass(a.final_score||0) + '">' + a.rating_band + '</span>' : '<span style="color:var(--text-light);font-size:10px">Pending</span>';
+    const selfDot = a.status === 'complete' || a.status === 'in_progress' ? 'dot-done' : 'dot-open';
+    const selfLbl = a.status === 'complete' || a.status === 'in_progress' ? 'Submitted' : 'Not started';
+    const hodDot  = a.status === 'complete' ? 'dot-done' : a.status === 'in_progress' ? 'dot-prog' : 'dot-open';
+    const hodLbl  = a.status === 'complete' ? 'Complete' : a.status === 'in_progress' ? 'In progress' : 'Awaiting';
+    const actions = a.status === 'complete'
+      ? '<button class="btn btn-secondary btn-sm" data-action="view-appr" data-appr-id="' + a.id + '">View</button>'
+      : '<button class="btn btn-primary btn-sm" data-action="continue-appr" data-staff-id="' + a.staff_id + '">Continue</button>';
+    return '<tr data-appr-id="' + a.id + '" data-prop="' + (s.propCode||'') + '" data-dept="' + (s.deptName||'').toLowerCase() + '" data-status="' + a.status + '">'
+      + '<td><strong>' + (s.full_name || '\u2014') + '</strong></td>'
+      + '<td>' + (s.propCode ? '<span class="pill ' + pill + '">' + s.propCode.toUpperCase() + '</span>' : '\u2014') + '</td>'
+      + '<td>' + (s.deptName || '\u2014') + '</td>'
+      + '<td>' + (s.roleTitle || '\u2014') + '</td>'
+      + '<td><span class="status-badge"><span class="status-dot ' + selfDot + '"></span>' + selfLbl + '</span></td>'
+      + '<td><span class="status-badge"><span class="status-dot ' + hodDot + '"></span>' + hodLbl + '</span></td>'
+      + '<td>' + score + '</td>'
+      + '<td>' + band + '</td>'
+      + '<td class="no-print"><div class="table-actions">' + actions + '</div></td>'
+      + '</tr>';
+  }).join('');
+}
+
+function filterAppraisalsTable() {
+  const propF = (document.getElementById('filter-appr-prop') || { value:'' }).value;
+  const deptF = (document.getElementById('filter-appr-dept') || { value:'' }).value.toLowerCase();
+  const rows  = document.querySelectorAll('#appr-tbody tr[data-appr-id]');
+  let visible = 0;
+  rows.forEach(function(row) {
+    const rProp   = row.dataset.prop   || '';
+    const rDept   = row.dataset.dept   || '';
+    const rStatus = row.dataset.status || '';
+    let show = true;
+    if (propF && rProp !== propF) show = false;
+    if (deptF && !rDept.includes(deptF)) show = false;
+    if (_currentAppraisalTab === 'done'    && rStatus !== 'complete') show = false;
+    if (_currentAppraisalTab === 'pending' && rStatus === 'complete') show = false;
+    row.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  const counter = document.getElementById('appr-count');
+  if (counter) counter.textContent = visible + ' records';
+}
+
+// Appraisals action delegation
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('button[data-action]');
+  if (!btn) return;
+  if (btn.dataset.action === 'view-appr') {
+    showToast('Full report view coming in R3');
+  }
+  if (btn.dataset.action === 'continue-appr') {
+    const s = _staffCache.find(function(x) { return x.id === btn.dataset.staffId; });
+    if (s) openAppraisalForm(s);
+  }
+});
+
+// New appraisal button
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'btn-new-appraisal') {
+    openStaffSearchModal('appraise');
+  }
+});
+
+// ── STAFF SEARCH MODAL ───────────────────────────────────
+let _searchMode = 'appraise';
+
+function openStaffSearchModal(mode) {
+  _searchMode = mode || 'appraise';
+  const title = mode === 'appraise' ? 'Select staff member to appraise' : 'Select staff member';
+  document.getElementById('staff-search-title').textContent = title;
+  document.getElementById('staff-search-input').value = '';
+  document.getElementById('staff-search-results').innerHTML = '<div style="padding:16px;text-align:center;font-size:11px;color:var(--text-light)">Start typing to search...</div>';
+  document.getElementById('modal-staff-search').classList.remove('hidden');
+  setTimeout(function() { document.getElementById('staff-search-input').focus(); }, 100);
+}
+
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'btn-close-staff-search') closeModal('modal-staff-search');
+  if (e.target.id === 'btn-close-appraisal')    closeModal('modal-appraisal');
+});
+
+document.addEventListener('input', function(e) {
+  if (e.target.id !== 'staff-search-input') return;
+  const q = e.target.value.toLowerCase().trim();
+  const results = document.getElementById('staff-search-results');
+  if (!q) {
+    results.innerHTML = '<div style="padding:16px;text-align:center;font-size:11px;color:var(--text-light)">Start typing to search...</div>';
+    return;
+  }
+  // Always use full staff list for search — load from cache or ALL_STAFF fallback
+  let source = _staffCache;
+  if (source.length === 0) {
+    // Fallback to static list if cache not loaded yet
+    source = (typeof ALL_STAFF !== 'undefined' ? ALL_STAFF : []).map(function(s) {
+      return { id:s.id, full_name:s.name, roleTitle:s.role, deptName:s.dept, propCode:s.property, isMgmt:s.mgmt };
+    });
+  }
+  const filtered = source.filter(function(s) {
+    return s.full_name.toLowerCase().includes(q)
+      || (s.roleTitle || '').toLowerCase().includes(q)
+      || (s.deptName  || '').toLowerCase().includes(q);
+  }).slice(0, 20);
+
+  if (filtered.length === 0) {
+    results.innerHTML = '<div style="padding:16px;text-align:center;font-size:11px;color:var(--text-light)">No staff found</div>';
+    return;
+  }
+  results.innerHTML = filtered.map(function(s) {
+    const pill = s.propCode === 'skyz' ? 'pill-skyz' : 'pill-phk';
+    return '<div class="staff-search-item" data-staff-id="' + s.id + '" style="padding:10px 12px;border-bottom:.5px solid #eee;cursor:pointer;transition:background .1s">'
+      + '<div style="font-size:12px;font-weight:600;color:var(--navy)">' + s.full_name + '</div>'
+      + '<div style="font-size:10px;color:var(--text-light);margin-top:2px">'
+      + (s.roleTitle || '') + ' \u00B7 ' + (s.deptName || '') + ' \u00B7 <span class="pill ' + pill + '">' + (s.propCode || '').toUpperCase() + '</span>'
+      + '</div></div>';
+  }).join('');
+});
+
+// Search result hover
+document.addEventListener('mouseover', function(e) {
+  const item = e.target.closest('.staff-search-item');
+  if (item) item.style.background = '#f0f1f4';
+});
+document.addEventListener('mouseout', function(e) {
+  const item = e.target.closest('.staff-search-item');
+  if (item) item.style.background = '';
+});
+
+// Select from search results
+document.addEventListener('click', function(e) {
+  const item = e.target.closest('.staff-search-item');
+  if (!item) return;
+  const sid = item.dataset.staffId;
+  closeModal('modal-staff-search');
+  const s = _staffCache.find(function(x) { return x.id === sid; })
+    || (typeof ALL_STAFF !== 'undefined' ? ALL_STAFF : []).map(function(x) {
+      return { id:x.id, full_name:x.name, roleTitle:x.role, deptName:x.dept, propCode:x.property, isMgmt:x.mgmt };
+    }).find(function(x) { return x.id === sid; });
+  if (!s) return;
+  if (_searchMode === 'appraise') openAppraisalForm(s);
+});
+
+// ── APPRAISAL FORM ────────────────────────────────────────
+let _appraisalStaff = null;
+let _appraisalKPIs  = [];
+let _submitted      = false;
+
+function openAppraisalForm(staff) {
+  _appraisalStaff = staff;
+  _submitted = false;
+  _appraisalKPIs = getKPIsForRole(staff.roleTitle || '');
+
+  const propName = staff.propCode === 'skyz' ? 'Protea Hotel Skyz' : 'Protea Hotel Kampala';
+  document.getElementById('appr-modal-title').textContent = 'Appraisal \u2014 ' + staff.full_name + ' \u00B7 H1 2026';
+
+  const isMgmt = staff.isMgmt;
+  const COMPETENCIES = [
+    { key:'time_mgmt',    label:'Time management',   desc:'Punctuality and reliability' },
+    { key:'dependability',label:'Dependability',      desc:'Attendance and consistency' },
+    { key:'appearance',   label:'Appearance',         desc:'Grooming and uniform standards' },
+    { key:'cooperation',  label:'Cooperation',        desc:'Working well with colleagues' },
+    { key:'responsibility',label:'Responsibility',    desc:'Ownership of tasks' },
+    { key:'accuracy',     label:'Accuracy',           desc:'Correctness of work' },
+    { key:'quality',      label:'Quality of work',    desc:'Standards of output' },
+    { key:'quantity',     label:'Quantity of work',   desc:'Volume and productivity' },
+    { key:'initiative',   label:'Initiative',         desc:'Proactiveness and self-direction' },
+    { key:'knowledge',    label:'Knowledge & skill',  desc:'Role-specific expertise' },
+  ];
+  const MGMT_FACTORS = [
+    { key:'planning',    label:'Planning'    },
+    { key:'leading',     label:'Leading'     },
+    { key:'organising',  label:'Organising'  },
+    { key:'control',     label:'Control'     },
+  ];
+
+  function ratingSelect(cls, idx) {
+    return '<select class="' + cls + '" data-idx="' + idx + '" style="width:100%;padding:5px 7px;border:1px solid var(--grey-border);border-radius:4px;font-size:11px">'
+      + '<option value="">Select</option>'
+      + '<option value="5">Exceptional (5)</option>'
+      + '<option value="4">Exceeds expectations (4)</option>'
+      + '<option value="3">Meets expectations (3)</option>'
+      + '<option value="2">Needs improvement (2)</option>'
+      + '<option value="1">Unsatisfactory (1)</option>'
+      + '</select>';
+  }
+
+  function ratingBtns(key, type) {
+    return [1,2,3,4,5].map(function(v) {
+      return '<button type="button" class="r-btn" data-key="' + key + '" data-type="' + type + '" data-val="' + v + '">' + v + '</button>';
+    }).join('');
+  }
+
+  // Section 1 — KPIs
+  const kpiRows = _appraisalKPIs.map(function(k, i) {
+    return '<div style="padding:10px 0;border-bottom:.5px solid #eee">'
+      + '<div style="display:grid;grid-template-columns:1.8fr 1fr 1fr .4fr;gap:10px;align-items:center">'
+      + '<div><div style="font-size:12px;font-weight:500">' + k.kpi + '</div><div style="font-size:10px;color:var(--text-light);margin-top:2px">Target: ' + k.target + '</div></div>'
+      + '<div>' + ratingSelect('kpi-self', i) + '</div>'
+      + '<div>' + ratingSelect('kpi-hod', i) + '</div>'
+      + '<div style="font-size:10px;font-weight:600;color:var(--red);text-align:right">' + k.weight + '%</div>'
+      + '</div>'
+      + '<div style="margin-top:6px"><textarea class="kpi-comment" data-idx="' + i + '" placeholder="Comments / evidence..." style="width:100%;padding:6px 8px;border:1px solid var(--grey-border);border-radius:4px;font-size:11px;min-height:40px;resize:vertical"></textarea></div>'
+      + '</div>';
+  }).join('');
+
+  // Section 2 — Competencies
+  const compRows = COMPETENCIES.map(function(c) {
+    return '<div style="display:grid;grid-template-columns:1.8fr 1fr 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:.5px solid #eee">'
+      + '<div><div style="font-size:12px">' + c.label + '</div><div style="font-size:10px;color:var(--text-light)">' + c.desc + '</div></div>'
+      + '<div class="rating-selector">' + ratingBtns(c.key, 'self') + '</div>'
+      + '<div class="rating-selector">' + ratingBtns(c.key, 'hod') + '</div>'
+      + '</div>';
+  }).join('');
+
+  // Section 3 — Management (supervisory only)
+  const mgmtSection = isMgmt ? '<div class="form-section-title" style="margin-top:18px;margin-bottom:10px">Section 3 \u2014 Management factors <span style="font-size:10px;color:var(--green);font-weight:400">(supervisory roles)</span></div>'
+    + '<div style="display:grid;grid-template-columns:1.8fr 1fr 1fr;gap:10px;padding:6px 0;border-bottom:1.5px solid #000;margin-bottom:4px">'
+    + '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light)">Factor</div>'
+    + '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light);text-align:center">Staff</div>'
+    + '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light);text-align:center">HOD</div>'
+    + '</div>'
+    + MGMT_FACTORS.map(function(m) {
+      return '<div style="display:grid;grid-template-columns:1.8fr 1fr 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:.5px solid #eee">'
+        + '<div style="font-size:12px">' + m.label + '</div>'
+        + '<div class="rating-selector">' + ratingBtns(m.key, 'self') + '</div>'
+        + '<div class="rating-selector">' + ratingBtns(m.key, 'hod') + '</div>'
+        + '</div>';
+    }).join('') : '';
+
+  document.getElementById('appr-modal-body').innerHTML =
+    // Header
+    '<div style="background:var(--navy);color:#fff;padding:12px 16px;border-radius:6px;margin-bottom:16px">'
+    + '<div style="font-family:var(--font-heading);font-size:13px;font-weight:600">' + staff.full_name + '</div>'
+    + '<div style="font-size:10px;opacity:.7;margin-top:2px">' + (staff.roleTitle||'') + ' \u00B7 ' + (staff.deptName||'') + ' \u00B7 ' + propName + ' \u00B7 H1 2026</div>'
+    + '</div>'
+    // Section 1
+    + '<div class="form-section-title" style="margin-bottom:10px">Section 1 \u2014 KPI performance</div>'
+    + '<div style="display:grid;grid-template-columns:1.8fr 1fr 1fr .4fr;gap:10px;padding:6px 0;border-bottom:1.5px solid #000;margin-bottom:2px">'
+    + '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light)">KPI / Measure</div>'
+    + '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light);text-align:center">Staff response (40%)</div>'
+    + '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light);text-align:center">HOD rating (60%)</div>'
+    + '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light);text-align:right">Weight</div>'
+    + '</div>'
+    + kpiRows
+    // Section 2
+    + '<div class="form-section-title" style="margin-top:18px;margin-bottom:10px">Section 2 \u2014 Behavioural competencies</div>'
+    + '<div style="display:grid;grid-template-columns:1.8fr 1fr 1fr;gap:10px;padding:6px 0;border-bottom:1.5px solid #000;margin-bottom:4px">'
+    + '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light)">Competency</div>'
+    + '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light);text-align:center">Staff</div>'
+    + '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light);text-align:center">HOD</div>'
+    + '</div>'
+    + compRows
+    + mgmtSection
+    // Section 4
+    + '<div class="form-section-title" style="margin-top:18px;margin-bottom:10px">Section 4 \u2014 Development plan</div>'
+    + '<div class="form-group"><label>Strong points</label><textarea id="dev-strong" placeholder="Key strengths observed this period..."></textarea></div>'
+    + '<div class="form-group"><label>Training & development needs</label><textarea id="dev-training" placeholder="Training gaps or development areas for next cycle..."></textarea></div>'
+    + '<div class="form-group"><label>Career objectives \u2014 next 6 months</label><textarea id="dev-career" placeholder="Agreed career development goals..."></textarea></div>'
+    // Acknowledgement
+    + '<div style="background:var(--grey-bg);border:1px solid var(--grey-border);border-radius:6px;padding:12px 14px;margin-top:8px">'
+    + '<label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">'
+    + '<input type="checkbox" id="ack-checkbox" style="margin-top:2px;width:14px;height:14px;flex-shrink:0;accent-color:var(--navy)" />'
+    + '<span style="font-size:11px;color:var(--text-mid);line-height:1.5">I confirm this appraisal was conducted in the presence of <strong>' + staff.full_name + '</strong> and all ratings and the development plan were discussed and agreed upon.</span>'
+    + '</label></div>';
+
+  document.getElementById('modal-appraisal').classList.remove('hidden');
+  updateAppraisalScore();
+}
+
+// Rating button selection
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('.r-btn');
+  if (!btn) return;
+  const key  = btn.dataset.key;
+  const type = btn.dataset.type;
+  const val  = btn.dataset.val;
+  const container = btn.closest('.rating-selector');
+  if (!container) return;
+  container.querySelectorAll('.r-btn').forEach(function(b) {
+    b.className = 'r-btn';
+  });
+  btn.classList.add('sel-' + val);
+  updateAppraisalScore();
+});
+
+// KPI select change triggers score update
+document.addEventListener('change', function(e) {
+  if (e.target.classList.contains('kpi-self') || e.target.classList.contains('kpi-hod')) {
+    updateAppraisalScore();
+  }
+});
+
+function updateAppraisalScore() {
+  const kpis = _appraisalKPIs;
+  if (!kpis || kpis.length === 0) return;
+  let selfScore = 0, hodScore = 0, totalW = 0;
+  kpis.forEach(function(k, i) {
+    const selfEl = document.querySelector('.kpi-self[data-idx="' + i + '"]');
+    const hodEl  = document.querySelector('.kpi-hod[data-idx="' + i + '"]');
+    const sv = selfEl ? parseFloat(selfEl.value) || 0 : 0;
+    const hv = hodEl  ? parseFloat(hodEl.value)  || 0 : 0;
+    selfScore += (sv / 5) * k.weight;
+    hodScore  += (hv / 5) * k.weight;
+    totalW    += k.weight;
+  });
+  if (totalW === 0) return;
+  const selfPct  = Math.round(selfScore / totalW * 100);
+  const hodPct   = Math.round(hodScore  / totalW * 100);
+  const finalPct = Math.round(selfPct * 0.4 + hodPct * 0.6);
+  const display  = document.getElementById('appr-score-display');
+  if (display) {
+    if (finalPct > 0) {
+      display.innerHTML = 'KPI score: Self <strong>' + selfPct + '%</strong> \u00B7 HOD <strong>' + hodPct + '%</strong> \u00B7 Final <strong style="color:var(--red)">' + finalPct + '%</strong> (' + bandLabel(finalPct) + ')';
+    } else {
+      display.textContent = 'Score: pending \u2014 fill in KPI ratings above';
+    }
+  }
+}
+
+// Save draft
+document.addEventListener('click', function(e) {
+  if (e.target.id !== 'btn-save-draft') return;
+  if (!_appraisalStaff) return;
+  const draft = {
+    staffId: _appraisalStaff.id,
+    staffName: _appraisalStaff.full_name,
+    savedAt: new Date().toISOString(),
+    kpiSelf: _appraisalKPIs.map(function(k, i) {
+      const el = document.querySelector('.kpi-self[data-idx="' + i + '"]');
+      return el ? el.value : '';
+    }),
+    kpiHod: _appraisalKPIs.map(function(k, i) {
+      const el = document.querySelector('.kpi-hod[data-idx="' + i + '"]');
+      return el ? el.value : '';
+    }),
+    kpiComments: _appraisalKPIs.map(function(k, i) {
+      const el = document.querySelector('.kpi-comment[data-idx="' + i + '"]');
+      return el ? el.value : '';
+    }),
+    devStrong:   (document.getElementById('dev-strong')   || { value:'' }).value,
+    devTraining: (document.getElementById('dev-training') || { value:'' }).value,
+    devCareer:   (document.getElementById('dev-career')   || { value:'' }).value,
+  };
+  try { localStorage.setItem('draft_' + _appraisalStaff.id, JSON.stringify(draft)); } catch(ignore) {}
+  closeModal('modal-appraisal');
+  showToast('Draft saved for ' + _appraisalStaff.full_name);
+});
+
+// Submit appraisal
+document.addEventListener('click', function(e) {
+  if (e.target.id !== 'btn-submit-appraisal') return;
+  submitAppraisal();
+});
+
+async function submitAppraisal() {
+  if (_submitted) return;
+  const ack = document.getElementById('ack-checkbox');
+  if (!ack || !ack.checked) { showToast('Please tick the acknowledgement checkbox before submitting.'); return; }
+
+  const s    = _appraisalStaff;
+  const kpis = _appraisalKPIs;
+  if (!s) return;
+
+  // Collect KPI responses
+  const kpiResponses = kpis.map(function(k, i) {
+    const selfEl = document.querySelector('.kpi-self[data-idx="' + i + '"]');
+    const hodEl  = document.querySelector('.kpi-hod[data-idx="' + i + '"]');
+    const commEl = document.querySelector('.kpi-comment[data-idx="' + i + '"]');
+    return {
+      kpi:         k.kpi,
+      target:      k.target,
+      weight:      k.weight,
+      self_rating: selfEl ? selfEl.value : '',
+      hod_rating:  hodEl  ? hodEl.value  : '',
+      comment:     commEl ? commEl.value : '',
+    };
+  });
+
+  // Collect competency responses
+  const compKeys = ['time_mgmt','dependability','appearance','cooperation','responsibility','accuracy','quality','quantity','initiative','knowledge'];
+  const compResponses = compKeys.map(function(key) {
+    function getSelected(type) {
+      const sel = document.querySelector('.r-btn[data-key="' + key + '"][data-type="' + type + '"][class*="sel-"]');
+      return sel ? parseInt(sel.dataset.val) : null;
+    }
+    return { key: key, self_val: getSelected('self'), hod_val: getSelected('hod') };
+  });
+
+  // Collect management responses
+  const mgmtKeys = ['planning','leading','organising','control'];
+  const mgmtResponses = s.isMgmt ? mgmtKeys.map(function(key) {
+    function getSelected(type) {
+      const sel = document.querySelector('.r-btn[data-key="' + key + '"][data-type="' + type + '"][class*="sel-"]');
+      return sel ? parseInt(sel.dataset.val) : null;
+    }
+    return { key: key, self_val: getSelected('self'), hod_val: getSelected('hod') };
+  }) : [];
+
+  // Calculate scores
+  let selfKPI = 0, hodKPI = 0, totalW = 0;
+  kpiResponses.forEach(function(k) {
+    const sv = parseFloat(k.self_rating) || 0;
+    const hv = parseFloat(k.hod_rating)  || 0;
+    selfKPI += (sv / 5) * k.weight;
+    hodKPI  += (hv / 5) * k.weight;
+    totalW  += k.weight;
+  });
+  selfKPI = totalW > 0 ? Math.round(selfKPI / totalW * 100) : 0;
+  hodKPI  = totalW > 0 ? Math.round(hodKPI  / totalW * 100) : 0;
+
+  const compSelfVals = compResponses.filter(function(c) { return c.self_val; }).map(function(c) { return c.self_val; });
+  const compHodVals  = compResponses.filter(function(c) { return c.hod_val;  }).map(function(c) { return c.hod_val;  });
+  const selfComp = compSelfVals.length ? Math.round(compSelfVals.reduce(function(a,b){return a+b;},0) / compSelfVals.length / 5 * 100) : 0;
+  const hodComp  = compHodVals.length  ? Math.round(compHodVals.reduce(function(a,b){return a+b;},0)  / compHodVals.length  / 5 * 100) : 0;
+
+  const finalScore = Math.round(selfKPI * 0.4 + hodKPI * 0.6);
+  const rBand = finalScore >= 90 ? 'Exceptional' : finalScore >= 75 ? 'Exceeds expectations' : finalScore >= 60 ? 'Meets expectations' : finalScore >= 40 ? 'Needs improvement' : 'Unsatisfactory';
+
+  try {
+    const client = getClient();
+    const { data: cycle } = await client.from('appraisal_cycles').select('id').eq('is_active', true).single();
+    if (!cycle) { showToast('No active appraisal cycle found.'); return; }
+
+    const { error } = await client.from('appraisals').upsert({
+      cycle_id:        cycle.id,
+      staff_id:        s.id,
+      appraised_by:    currentUser.id,
+      status:          'complete',
+      self_kpi_score:  selfKPI,
+      hod_kpi_score:   hodKPI,
+      self_comp_score: selfComp,
+      hod_comp_score:  hodComp,
+      final_score:     finalScore,
+      rating_band:     rBand,
+      kpi_responses:   kpiResponses,
+      comp_responses:  compResponses,
+      mgmt_responses:  mgmtResponses,
+      dev_strong:      (document.getElementById('dev-strong')   || { value:'' }).value,
+      dev_training:    (document.getElementById('dev-training') || { value:'' }).value,
+      dev_career:      (document.getElementById('dev-career')   || { value:'' }).value,
+      submitted_at:    new Date().toISOString(),
+    }, { onConflict: 'cycle_id,staff_id' });
+
+    if (error) throw error;
+
+    _submitted = true;
+    try { localStorage.removeItem('draft_' + s.id); } catch(ignore) {}
+    closeModal('modal-appraisal');
+    showToast(s.full_name + ' \u2014 ' + finalScore + '% \u00B7 ' + rBand + '. Appraisal submitted.');
+    loadAppraisalsPage();
+    loadHomeData();
+  } catch(e) {
+    showToast('Error saving: ' + e.message);
+    console.error('submitAppraisal:', e);
+  }
 }
 
 // ── HOME DATA ─────────────────────────────────────────────
 async function loadHomeData() {
   try {
-    var client = getClient();
+    const client = getClient();
+    const { data: cycle, error: ce } = await client.from('appraisal_cycles').select('id,label,start_date,end_date').eq('is_active', true).single();
+    if (ce) throw ce;
 
-    // Get active cycle
-    var cycleRes = await client.from('appraisal_cycles').select('id,label,start_date,end_date').eq('is_active', true).single();
-    if (cycleRes.error) throw cycleRes.error;
-    var cycle = cycleRes.data;
-
-    // Update cycle badge
     document.getElementById('cycle-badge').textContent = cycle.label + ' Active';
-    var sd = new Date(cycle.start_date).toLocaleDateString('en-GB', { month:'short', year:'numeric' });
-    var ed = new Date(cycle.end_date).toLocaleDateString('en-GB',   { month:'short', year:'numeric' });
+    const sd = new Date(cycle.start_date).toLocaleDateString('en-GB', { month:'short', year:'numeric' });
+    const ed = new Date(cycle.end_date).toLocaleDateString('en-GB',   { month:'short', year:'numeric' });
     document.getElementById('tb-cycle').innerHTML = '&#128197;  ' + cycle.label + '  ·  ' + sd + ' \u2013 ' + ed;
 
-    // Get all lookup data
-    var propsRes = await client.from('properties').select('id,code,name');
-    var props = propsRes.data || [];
-    var propIds = currentProp === 'both' ? props.map(function(p) { return p.id; }) : props.filter(function(p) { return p.code === currentProp; }).map(function(p) { return p.id; });
-
-    // Total staff
-    var staffQuery = client.from('staff').select('id,property_id', { count: 'exact', head: false }).eq('status', 'active');
+    const { data: props } = await client.from('properties').select('id,code,name');
+    let propId = null;
     if (currentProp !== 'both') {
-      var pRow = props.find(function(p) { return p.code === currentProp; });
-      if (pRow) staffQuery = client.from('staff').select('id', { count: 'exact', head: false }).eq('status', 'active').eq('property_id', pRow.id);
-    }
-    var staffRes = await staffQuery;
-    var totalStaff = staffRes.count || (staffRes.data || []).length;
-
-    // Appraisals for this cycle
-    var apprRes = await client.from('appraisals').select('id,status,final_score,staff_id').eq('cycle_id', cycle.id);
-    var appraisals = apprRes.data || [];
-
-    // Filter by property if needed
-    if (currentProp !== 'both') {
-      var pRow2 = props.find(function(p) { return p.code === currentProp; });
-      if (pRow2) {
-        var staffInProp = (staffRes.data || []).map(function(s) { return s.id; });
-        appraisals = appraisals.filter(function(a) { return staffInProp.indexOf(a.staff_id) !== -1; });
-      }
+      const p = (props || []).find(function(p) { return p.code === currentProp; });
+      if (p) propId = p.id;
     }
 
-    var submitted  = appraisals.filter(function(a) { return a.status === 'complete' || a.status === 'in_progress'; }).length;
-    var pending    = appraisals.filter(function(a) { return a.status === 'in_progress'; }).length;
-    var completed  = appraisals.filter(function(a) { return a.status === 'complete'; });
-    var avgScore   = completed.length > 0 ? Math.round(completed.reduce(function(s, a) { return s + (a.final_score || 0); }, 0) / completed.length) : 0;
-    var completion = totalStaff > 0 ? Math.round(submitted / totalStaff * 100) : 0;
+    let staffQ = client.from('staff').select('id,property_id', { count:'exact', head:false }).eq('status','active');
+    if (propId) staffQ = staffQ.eq('property_id', propId);
+    const { data: staffData, count: staffCount } = await staffQ;
+    const total = staffCount || (staffData || []).length;
 
-    // Update metric cards
-    document.getElementById('m-total').textContent        = totalStaff;
+    let apprQ = client.from('appraisals').select('id,status,final_score,staff_id,submitted_at').eq('cycle_id', cycle.id);
+    const { data: appraisals } = await apprQ;
+    let appr = appraisals || [];
+    if (propId && staffData) {
+      const propStaffIds = staffData.map(function(s) { return s.id; });
+      appr = appr.filter(function(a) { return propStaffIds.indexOf(a.staff_id) !== -1; });
+    }
+
+    const submitted  = appr.filter(function(a) { return a.status === 'complete' || a.status === 'in_progress'; }).length;
+    const pending    = appr.filter(function(a) { return a.status === 'in_progress'; }).length;
+    const completed  = appr.filter(function(a) { return a.status === 'complete'; });
+    const avgScore   = completed.length ? Math.round(completed.reduce(function(s,a) { return s+(a.final_score||0); }, 0) / completed.length) : 0;
+    const completion = total ? Math.round(submitted / total * 100) : 0;
+
+    document.getElementById('m-total').textContent        = total;
     document.getElementById('m-total-sub').textContent    = propLabel(currentProp);
     document.getElementById('m-submitted').textContent    = submitted;
     document.getElementById('m-submitted-sub').textContent = completion + '% completion rate';
     document.getElementById('m-pending').textContent      = pending;
     document.getElementById('m-pending-sub').textContent  = 'Awaiting HOD review';
     document.getElementById('m-avg').innerHTML             = avgScore > 0 ? avgScore + '<span style="font-size:15px">%</span>' : '--';
-    document.getElementById('m-avg-sub').textContent      = avgScore > 0 ? (avgScore >= 75 ? 'Exceeds expectations' : avgScore >= 60 ? 'Meets expectations' : 'Needs improvement') : 'No data yet';
+    document.getElementById('m-avg-sub').textContent      = avgScore > 0 ? bandLabel(avgScore) : 'No data yet';
+    document.getElementById('welcome-sub').textContent    = cycle.label + ' cycle active. ' + submitted + ' of ' + total + ' appraisals submitted.';
 
-    // Welcome sub
-    document.getElementById('welcome-sub').textContent = cycle.label + ' appraisal cycle is active. ' + submitted + ' forms submitted across ' + propLabel(currentProp) + '.';
-
-    // Department scores
-    renderDeptBars(appraisals);
-
-    // Rating distribution
+    renderDeptBars(appr);
     renderRatingDist(completed);
-
-    // Recent activity (last 5 appraisals by submitted_at)
-    var recentRes = await client.from('appraisals')
-      .select('id,status,final_score,rating_band,submitted_at,staff_id')
-      .eq('cycle_id', cycle.id)
-      .not('submitted_at', 'is', null)
-      .order('submitted_at', { ascending: false })
-      .limit(5);
-    renderRecentActivity(recentRes.data || []);
-
+    renderRecentActivity(completed.slice(0, 5));
   } catch(e) {
     console.error('loadHomeData:', e);
-    document.getElementById('welcome-sub').textContent = 'Could not load summary. Check your connection.';
   }
 }
 
-function renderDeptBars(appraisals) {
-  // Group by department using staff cache or just show counts
-  var el = document.getElementById('dept-bars');
-  if (!appraisals || appraisals.length === 0) {
+function renderDeptBars(appr) {
+  const el = document.getElementById('dept-bars');
+  if (!el) return;
+  if (!appr || appr.length === 0) {
     el.innerHTML = '<div style="font-size:11px;color:var(--text-light)">No appraisal data yet.</div>';
     return;
   }
-  // Band distribution as simple bars
-  var total    = appraisals.length;
-  var complete = appraisals.filter(function(a) { return a.status === 'complete'; });
-  var pct      = total > 0 ? Math.round(complete.length / total * 100) : 0;
-  el.innerHTML = '<div style="font-size:11px;color:var(--text-mid);margin-bottom:10px">Completion across all departments</div>'
-    + '<div class="dept-bar-row"><div class="dept-name">Completed</div><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div><div class="bar-pct">' + pct + '%</div></div>'
-    + '<div style="font-size:10px;color:var(--text-light);margin-top:8px">' + complete.length + ' of ' + total + ' appraisals complete — Department breakdown available in Analytics.</div>';
+  const complete = appr.filter(function(a) { return a.status === 'complete'; });
+  const pct = appr.length ? Math.round(complete.length / appr.length * 100) : 0;
+  el.innerHTML = '<div style="font-size:11px;color:var(--text-mid);margin-bottom:10px">Overall completion</div>'
+    + '<div class="dept-bar-row"><div class="dept-name">Submitted</div><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div><div class="bar-pct">' + pct + '%</div></div>'
+    + '<div style="font-size:10px;color:var(--text-light);margin-top:8px">' + complete.length + ' of ' + appr.length + ' complete. Department breakdown available in Analytics (R3).</div>';
 }
 
 function renderRatingDist(completed) {
-  var el = document.getElementById('rating-dist');
+  const el = document.getElementById('rating-dist');
+  if (!el) return;
   if (!completed || completed.length === 0) {
     el.innerHTML = '<div style="font-size:11px;color:var(--text-light);grid-column:1/-1">No completed appraisals yet.</div>';
     return;
   }
-  var counts = { exc:0, exceeds:0, meets:0, needs:0, unsat:0 };
+  const counts = { exc:0, exceeds:0, meets:0, needs:0, unsat:0 };
   completed.forEach(function(a) {
-    var s = a.final_score || 0;
-    if (s >= 90) counts.exc++;
-    else if (s >= 75) counts.exceeds++;
-    else if (s >= 60) counts.meets++;
-    else if (s >= 40) counts.needs++;
+    const sc = a.final_score || 0;
+    if (sc >= 90) counts.exc++;
+    else if (sc >= 75) counts.exceeds++;
+    else if (sc >= 60) counts.meets++;
+    else if (sc >= 40) counts.needs++;
     else counts.unsat++;
   });
   el.innerHTML = ''
     + '<div class="rating-box" style="background:#eaf3de"><div class="rating-num" style="color:var(--green)">' + counts.exc + '</div><div class="rating-name" style="color:var(--green)">Exceptional</div></div>'
     + '<div class="rating-box" style="background:#e6f1fb"><div class="rating-num" style="color:#185FA5">' + counts.exceeds + '</div><div class="rating-name" style="color:#185FA5">Exceeds</div></div>'
     + '<div class="rating-box" style="background:var(--grey-bg)"><div class="rating-num" style="color:var(--navy)">' + counts.meets + '</div><div class="rating-name" style="color:var(--navy)">Meets</div></div>'
-    + '<div class="rating-box" style="background:#faeeda"><div class="rating-num" style="color:var(--amber)">' + counts.needs + '</div><div class="rating-name" style="color:var(--amber)">Needs improvement</div></div>'
+    + '<div class="rating-box" style="background:#faeeda"><div class="rating-num" style="color:var(--amber)">' + counts.needs + '</div><div class="rating-name" style="color:var(--amber)">Needs impr.</div></div>'
     + '<div class="rating-box" style="background:#fcebeb;grid-column:1/-1"><div class="rating-num" style="color:#A32D2D">' + counts.unsat + '</div><div class="rating-name" style="color:#A32D2D">Unsatisfactory</div></div>';
 }
 
 function renderRecentActivity(items) {
-  var el = document.getElementById('recent-activity');
+  const el = document.getElementById('recent-activity');
+  if (!el) return;
   if (!items || items.length === 0) {
     el.innerHTML = '<div style="font-size:11px;color:var(--text-light)">No recent activity.</div>';
     return;
   }
   el.innerHTML = items.map(function(a) {
-    var dot   = a.status === 'complete' ? 'var(--green)' : 'var(--amber)';
-    var label = a.status === 'complete' ? 'Appraisal completed' : 'Appraisal in progress';
-    var score = a.final_score ? ' \u2014 ' + Math.round(a.final_score) + '%' : '';
-    var time  = a.submitted_at ? new Date(a.submitted_at).toLocaleDateString('en-GB', { day:'numeric', month:'short' }) : '';
+    const s     = _staffCache.find(function(x) { return x.id === a.staff_id; }) || {};
+    const name  = s.full_name || 'Staff member';
+    const score = a.final_score ? ' \u2014 ' + Math.round(a.final_score) + '%' : '';
+    const time  = a.submitted_at ? new Date(a.submitted_at).toLocaleDateString('en-GB', { day:'numeric', month:'short' }) : '';
     return '<div class="activity-row">'
-      + '<div class="act-dot" style="background:' + dot + '"></div>'
-      + '<div><div class="act-text">' + label + score + '</div><div class="act-time">' + time + '</div></div>'
+      + '<div class="act-dot" style="background:var(--green)"></div>'
+      + '<div><div class="act-text">' + name + score + '</div><div class="act-time">' + time + '</div></div>'
       + '</div>';
   }).join('');
 }
 
 // ── KEYBOARD ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('login-password').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') doLogin();
-  });
-  document.getElementById('login-email').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') doLogin();
-  });
+  document.getElementById('login-password').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
+  document.getElementById('login-email').addEventListener('keydown',    function(e) { if (e.key === 'Enter') doLogin(); });
 });
+
 </script>
 </body>
 </html>
