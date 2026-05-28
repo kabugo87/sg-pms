@@ -303,7 +303,7 @@ tr:hover td{background:#fafafa}
       <input type="password" id="login-password" placeholder="••••••••" />
     </div>
     <button class="btn btn-primary" onclick="doLogin()">Sign in &rarr;</button>
-    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <span style="font-weight:600">v11-m5</span></p>
+    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <span style="font-weight:600">v11-m6</span></p>
   </div>
 </div>
 
@@ -1741,7 +1741,7 @@ function openStaffProfile(staffId) {
           <input type="text"   class="kpi-edit-name"   value="${k.kpi}"    placeholder="KPI name"   style="padding:6px 8px;border:1px solid var(--grey-border);border-radius:4px;font-size:11px" />
           <input type="text"   class="kpi-edit-target" value="${k.target}" placeholder="Target"     style="padding:6px 8px;border:1px solid var(--grey-border);border-radius:4px;font-size:11px" />
           <input type="number" class="kpi-edit-weight" value="${k.weight}" min="0" max="100" oninput="updateWeightTotal()" style="padding:6px 8px;border:1px solid var(--grey-border);border-radius:4px;font-size:11px;text-align:center" />
-          <button onclick="removeKPIRow(this)" style="background:#fcebeb;border:1px solid #f7c1c1;color:#A32D2D;border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer">&times;</button>
+          <button onclick="removeKPIRow(this)" style="background:#fcebeb;border:1px solid #f7c1c1;color:#A32D2D;border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer">×</button>
         </div>`).join('')}
     </div>
     <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="addKPIRow()">+ Add KPI</button>
@@ -1767,7 +1767,7 @@ function addKPIRow() {
     <input type="text"   class="kpi-edit-name"   placeholder="KPI name"   style="padding:6px 8px;border:1px solid var(--grey-border);border-radius:4px;font-size:11px" />
     <input type="text"   class="kpi-edit-target" placeholder="Target"     style="padding:6px 8px;border:1px solid var(--grey-border);border-radius:4px;font-size:11px" />
     <input type="number" class="kpi-edit-weight" value="0" min="0" max="100" oninput="updateWeightTotal()" style="padding:6px 8px;border:1px solid var(--grey-border);border-radius:4px;font-size:11px;text-align:center" />
-    <button onclick="removeKPIRow(this)" style="background:#fcebeb;border:1px solid #f7c1c1;color:#A32D2D;border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer">&times;</button>`;
+    <button onclick="removeKPIRow(this)" style="background:#fcebeb;border:1px solid #f7c1c1;color:#A32D2D;border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer">×</button>`;
   editor.appendChild(div);
   updateWeightTotal();
 }
@@ -1880,7 +1880,7 @@ function searchStaff() {
              style="padding:9px 12px;border-bottom:.5px solid #eee;cursor:pointer;transition:background .1s"
              onmouseover="this.style.background='#f0f1f4'" onmouseout="this.style.background=''">
           <div style="font-size:12px;font-weight:600;color:var(--navy)">${s.name}</div>
-          <div style="font-size:10px;color:var(--text-light)">${s.role} &middot; ${s.dept} &middot; ${s.property.toUpperCase()}</div>
+          <div style="font-size:10px;color:var(--text-light)">${s.role} · ${s.dept} · ${s.property.toUpperCase()}</div>
         </div>`).join('')
     : '<div style="padding:16px;text-align:center;font-size:11px;color:var(--text-light)">No staff found</div>';
 }
@@ -1909,7 +1909,7 @@ function buildAppraisalForm(s) {
   document.getElementById('appraisal-modal-title').textContent = 'Appraisal \u2014 '+s.role+' \u00B7 '+s.property.toUpperCase()+' \u00B7 H1 2026';
   document.getElementById('appraisal-staff-header').innerHTML =
     `<h3 style="font-family:var(--font-heading);font-size:13px;font-weight:600">${s.name}</h3>
-     <p style="font-size:10px;opacity:.7;margin-top:2px">${s.role} &middot; ${s.dept} &middot; ${s.property==='skyz'?'Protea Hotel Skyz':'Protea Hotel Kampala'} &middot; H1 2026</p>`;
+     <p style="font-size:10px;opacity:.7;margin-top:2px">${s.role} · ${s.dept} · ${s.property==='skyz'?'Protea Hotel Skyz':'Protea Hotel Kampala'} · H1 2026</p>`;
 
   const RATINGS = ['','Exceptional','Exceeds Expectations','Meets Expectations','Needs Improvement','Unsatisfactory'];
   const ratingSelect = (cls) => `<select class="${cls}" style="width:100%;padding:5px 7px;border:1px solid var(--grey-border);border-radius:4px;font-size:11px;font-family:var(--font-ui)">
@@ -1963,7 +1963,7 @@ function buildAppraisalForm(s) {
   const isMgmt = !s.assisted;
   const MGMT = [{key:'planning',label:'Planning'},{key:'leading',label:'Leading'},{key:'organising',label:'Organising'},{key:'control',label:'Control'}];
   const mgmtSection = isMgmt ? `
-    <div class="form-section-title" style="margin-top:18px;margin-bottom:10px">Section 3 &mdash; Management factors <span style="font-size:10px;color:var(--green);font-weight:400">(supervisory roles)</span></div>
+    <div class="form-section-title" style="margin-top:18px;margin-bottom:10px">Section 3 — Management factors <span style="font-size:10px;color:var(--green);font-weight:400">(supervisory roles)</span></div>
     <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr;gap:10px;padding:6px 0;border-bottom:1.5px solid #000;margin-bottom:4px">
       <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light)">Factor</div>
       <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light);text-align:center">Staff response</div>
@@ -1977,7 +1977,7 @@ function buildAppraisalForm(s) {
       </div>`).join('')}` : '';
 
   document.getElementById('appraisal-form-body').innerHTML = `
-    <div class="form-section-title" style="margin-bottom:10px">Section 1 &mdash; KPI performance</div>
+    <div class="form-section-title" style="margin-bottom:10px">Section 1 — KPI performance</div>
     <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr .4fr;gap:10px;padding:6px 0;border-bottom:1.5px solid #000;margin-bottom:2px">
       <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light)">KPI / Measure</div>
       <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light);text-align:center">Staff response</div>
@@ -1986,7 +1986,7 @@ function buildAppraisalForm(s) {
     </div>
     ${kpiRows}
 
-    <div class="form-section-title" style="margin-top:18px;margin-bottom:10px">Section 2 &mdash; Behavioural competencies</div>
+    <div class="form-section-title" style="margin-top:18px;margin-bottom:10px">Section 2 — Behavioural competencies</div>
     <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr;gap:10px;padding:6px 0;border-bottom:1.5px solid #000;margin-bottom:4px">
       <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light)">Competency</div>
       <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light);text-align:center">Staff response</div>
@@ -1995,10 +1995,10 @@ function buildAppraisalForm(s) {
     ${compRows}
     ${mgmtSection}
 
-    <div class="form-section-title" style="margin-top:18px;margin-bottom:10px">Section 4 &mdash; Development plan</div>
+    <div class="form-section-title" style="margin-top:18px;margin-bottom:10px">Section 4 — Development plan</div>
     <div class="form-group"><label>Strong points</label><textarea id="dev-strong" placeholder="Key strengths observed during this period..."></textarea></div>
     <div class="form-group"><label>Training and development needs</label><textarea id="dev-training" placeholder="Training gaps or development areas for next cycle..."></textarea></div>
-    <div class="form-group"><label>Career objectives &mdash; next 6 months</label><textarea id="dev-career" placeholder="Agreed career development goals..."></textarea></div>
+    <div class="form-group"><label>Career objectives — next 6 months</label><textarea id="dev-career" placeholder="Agreed career development goals..."></textarea></div>
 
     <div style="background:var(--grey-bg);border:1px solid var(--grey-border);border-radius:6px;padding:12px 14px;margin-top:8px">
       <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
@@ -2182,9 +2182,9 @@ function previewJD(key) {
   const propLabel = jd.property==='both'?'Both properties': jd.property==='skyz'?'Protea Hotel Skyz':'Protea Hotel Kampala';
   document.getElementById('jd-modal-body').innerHTML = `
     <div style="background:var(--navy);color:#fff;text-align:center;padding:16px;border-radius:6px;margin-bottom:16px">
-      <div style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;opacity:.6;margin-bottom:4px">${propLabel} &middot; ${jd.dept} Department</div>
+      <div style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;opacity:.6;margin-bottom:4px">${propLabel} · ${jd.dept} Department</div>
       <div style="font-family:var(--font-heading);font-size:18px;font-weight:600">${jd.title}</div>
-      <div style="font-size:11px;opacity:.6;margin-top:4px">Reports to: ${jd.reportsTo}${jd.grade?' &middot; '+jd.grade:''}</div>
+      <div style="font-size:11px;opacity:.6;margin-top:4px">Reports to: ${jd.reportsTo}${jd.grade?' · '+jd.grade:''}</div>
     </div>
     <div class="jd-section"><div class="jd-section-title">Job purpose</div><div class="jd-section-content">${jd.purpose}</div></div>
     <div class="jd-section"><div class="jd-section-title">Key responsibilities</div><div class="jd-section-content">${jd.responsibilities.replace(/\n/g,'<br>')}</div></div>
@@ -2378,7 +2378,7 @@ function showIndividualReport(staffId) {
 
       <!-- Sticky action bar -->
       <div style="position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #d0d0d8;padding:10px 20px;display:flex;align-items:center;justify-content:space-between" class="no-print">
-        <div style="font-size:12px;font-weight:600;color:var(--navy)">Appraisal Report &mdash; ${s.name}</div>
+        <div style="font-size:12px;font-weight:600;color:var(--navy)">Appraisal Report — ${s.name}</div>
         <div style="display:flex;gap:8px">
           <button class="btn btn-ghost btn-sm" onclick="printIndividualReport()">&#128424; Print / PDF</button>
           <button class="btn btn-secondary btn-sm" onclick="document.getElementById('report-output').innerHTML=''">Close</button>
@@ -2390,9 +2390,9 @@ function showIndividualReport(staffId) {
 
         <!-- Header -->
         <div style="text-align:center;padding-bottom:16px;border-bottom:2px solid #000;margin-bottom:20px">
-          <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#888;margin-bottom:6px">Simba Group Hotels &mdash; Performance Management System</div>
+          <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#888;margin-bottom:6px">Simba Group Hotels — Performance Management System</div>
           <div style="font-size:22px;font-weight:700;color:#1B2A6B;font-family:'Palatino Linotype',Palatino,Georgia,serif">Employee Appraisal Report</div>
-          <div style="font-size:12px;color:#555;margin-top:4px">H1 2026 &mdash; January to June 2026</div>
+          <div style="font-size:12px;color:#555;margin-top:4px">H1 2026 — January to June 2026</div>
         </div>
 
         <!-- Staff details -->
@@ -2423,7 +2423,7 @@ function showIndividualReport(staffId) {
           </div>
           <div style="padding:10px 14px;border-right:1px solid #000">
             <div style="font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:3px">Appraised by</div>
-            <div style="font-size:12px;color:#333">Kusain Kabugo &mdash; HR Admin</div>
+            <div style="font-size:12px;color:#333">Kusain Kabugo — HR Admin</div>
           </div>
           <div style="padding:10px 14px">
             <div style="font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:3px">Date of appraisal</div>
@@ -2453,7 +2453,7 @@ function showIndividualReport(staffId) {
 
         <!-- Section 1: KPIs -->
         <div style="margin-bottom:20px">
-          <div style="font-family:'Palatino Linotype',Palatino,Georgia,serif;font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:12px">Section 1 &mdash; KPI Performance</div>
+          <div style="font-family:'Palatino Linotype',Palatino,Georgia,serif;font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:12px">Section 1 — KPI Performance</div>
           <table style="width:100%;border-collapse:collapse;font-size:12px">
             <thead>
               <tr style="background:#f0f1f4">
@@ -2470,7 +2470,7 @@ function showIndividualReport(staffId) {
 
         <!-- Section 2: Competencies -->
         <div style="margin-bottom:20px">
-          <div style="font-family:'Palatino Linotype',Palatino,Georgia,serif;font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:12px">Section 2 &mdash; Behavioural Competencies</div>
+          <div style="font-family:'Palatino Linotype',Palatino,Georgia,serif;font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:12px">Section 2 — Behavioural Competencies</div>
           <table style="width:100%;border-collapse:collapse;font-size:12px">
             <thead>
               <tr style="background:#f0f1f4">
@@ -2492,18 +2492,18 @@ function showIndividualReport(staffId) {
 
         <!-- Section 4: Development plan -->
         <div style="margin-bottom:20px">
-          <div style="font-family:'Palatino Linotype',Palatino,Georgia,serif;font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:12px">Section 3 &mdash; Development Plan</div>
+          <div style="font-family:'Palatino Linotype',Palatino,Georgia,serif;font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:12px">Section 3 — Development Plan</div>
           <table style="width:100%;border-collapse:collapse;font-size:12px">
             <tr>
               <td style="padding:10px 12px;border:1px solid #000;background:#f0f1f4;font-weight:600;font-size:11px;width:180px;vertical-align:top">Strong points</td>
               <td style="padding:10px 12px;border:1px solid #000;min-height:50px;vertical-align:top">To be completed during appraisal session.</td>
             </tr>
             <tr>
-              <td style="padding:10px 12px;border:1px solid #000;background:#f0f1f4;font-weight:600;font-size:11px;vertical-align:top">Training &amp; development needs</td>
+              <td style="padding:10px 12px;border:1px solid #000;background:#f0f1f4;font-weight:600;font-size:11px;vertical-align:top">Training & development needs</td>
               <td style="padding:10px 12px;border:1px solid #000;vertical-align:top">To be completed during appraisal session.</td>
             </tr>
             <tr>
-              <td style="padding:10px 12px;border:1px solid #000;background:#f0f1f4;font-weight:600;font-size:11px;vertical-align:top">Career objectives &mdash; next 6 months</td>
+              <td style="padding:10px 12px;border:1px solid #000;background:#f0f1f4;font-weight:600;font-size:11px;vertical-align:top">Career objectives — next 6 months</td>
               <td style="padding:10px 12px;border:1px solid #000;vertical-align:top">To be completed during appraisal session.</td>
             </tr>
           </table>
@@ -2511,7 +2511,7 @@ function showIndividualReport(staffId) {
 
         <!-- Signatures -->
         <div style="margin-bottom:8px">
-          <div style="font-family:'Palatino Linotype',Palatino,Georgia,serif;font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:16px">Acknowledgement &amp; Signatures</div>
+          <div style="font-family:'Palatino Linotype',Palatino,Georgia,serif;font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:16px">Acknowledgement & Signatures</div>
           <div style="font-size:11px;color:#555;margin-bottom:16px;line-height:1.6">I confirm that this appraisal was conducted, the ratings were discussed, and the development plan was agreed upon between the staff member and the appraising HOD.</div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px">
             <div>
@@ -2604,9 +2604,9 @@ function showPropertyReport() {
   document.getElementById('report-output').innerHTML = `
     <div class="card print-area" style="margin-bottom:0">
       <div style="text-align:center;padding:10px 0 14px;border-bottom:2px solid #000;margin-bottom:16px">
-        <div style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);margin-bottom:4px">Simba Group Hotels &mdash; Performance Management System</div>
+        <div style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);margin-bottom:4px">Simba Group Hotels — Performance Management System</div>
         <h2 style="font-family:var(--font-heading);font-size:18px;color:var(--navy)">Property Performance Summary</h2>
-        <div style="font-size:11px;color:var(--text-mid);margin-top:3px">H1 2026 &middot; January to June 2026 &middot; Both Properties</div>
+        <div style="font-size:11px;color:var(--text-mid);margin-top:3px">H1 2026 · January to June 2026 · Both Properties</div>
       </div>
 
       <div class="grid-2" style="margin-bottom:16px">
@@ -2639,16 +2639,16 @@ function showPropertyReport() {
       </div>
 
       <div style="margin-bottom:16px">
-        <div class="card-title">Department performance &mdash; both properties</div>
+        <div class="card-title">Department performance — both properties</div>
         <div class="dept-bar-row"><div class="dept-name">Management</div><div class="bar-track"><div class="bar-fill" style="width:88%"></div></div><div class="bar-pct">88%</div></div>
         <div class="dept-bar-row"><div class="dept-name">IT</div><div class="bar-track"><div class="bar-fill" style="width:80%"></div></div><div class="bar-pct">80%</div></div>
-        <div class="dept-bar-row"><div class="dept-name">Food &amp; Beverage</div><div class="bar-track"><div class="bar-fill" style="width:79%"></div></div><div class="bar-pct">79%</div></div>
+        <div class="dept-bar-row"><div class="dept-name">Food & Beverage</div><div class="bar-track"><div class="bar-fill" style="width:79%"></div></div><div class="bar-pct">79%</div></div>
         <div class="dept-bar-row"><div class="dept-name">Front Office</div><div class="bar-track"><div class="bar-fill" style="width:75%"></div></div><div class="bar-pct">75%</div></div>
         <div class="dept-bar-row"><div class="dept-name">Kitchen</div><div class="bar-track"><div class="bar-fill" style="width:74%"></div></div><div class="bar-pct">74%</div></div>
         <div class="dept-bar-row"><div class="dept-name">Finance</div><div class="bar-track"><div class="bar-fill" style="width:72%"></div></div><div class="bar-pct">72%</div></div>
         <div class="dept-bar-row"><div class="dept-name">Housekeeping</div><div class="bar-track"><div class="bar-fill" style="width:70%"></div></div><div class="bar-pct">70%</div></div>
         <div class="dept-bar-row"><div class="dept-name">HR</div><div class="bar-track"><div class="bar-fill" style="width:68%"></div></div><div class="bar-pct">68%</div></div>
-        <div class="dept-bar-row"><div class="dept-name">Sales &amp; Marketing</div><div class="bar-track"><div class="bar-fill" style="width:65%"></div></div><div class="bar-pct">65%</div></div>
+        <div class="dept-bar-row"><div class="dept-name">Sales & Marketing</div><div class="bar-track"><div class="bar-fill" style="width:65%"></div></div><div class="bar-pct">65%</div></div>
         <div class="dept-bar-row"><div class="dept-name">Maintenance</div><div class="bar-track"><div class="bar-fill bar-fill-warn" style="width:58%"></div></div><div class="bar-pct text-red">58%</div></div>
       </div>
 
@@ -2657,17 +2657,17 @@ function showPropertyReport() {
           <div class="card-title">Common training needs identified</div>
           <div style="font-size:12px;color:var(--text-mid);line-height:1.7">
             The most frequently cited development areas across both properties this cycle are:<br><br>
-            <strong style="color:var(--navy)">1. Customer service and guest handling</strong> &mdash; flagged by 34 HODs across F&amp;B and Front Office, particularly among newer casual staff.<br>
-            <strong style="color:var(--navy)">2. Food safety and hygiene compliance</strong> &mdash; cited in 28 Kitchen appraisals, with stewards and commis chefs most affected.<br>
-            <strong style="color:var(--navy)">3. Upselling and revenue awareness</strong> &mdash; noted in 22 F&amp;B and Sales appraisals as a gap requiring structured coaching.<br>
-            <strong style="color:var(--navy)">4. Equipment handling and maintenance protocols</strong> &mdash; recurring theme in Maintenance department appraisals at both properties.<br>
-            <strong style="color:var(--navy)">5. Report writing and record keeping</strong> &mdash; identified in Finance and supervisory-level appraisals across both properties.
+            <strong style="color:var(--navy)">1. Customer service and guest handling</strong> — flagged by 34 HODs across F&B and Front Office, particularly among newer casual staff.<br>
+            <strong style="color:var(--navy)">2. Food safety and hygiene compliance</strong> — cited in 28 Kitchen appraisals, with stewards and commis chefs most affected.<br>
+            <strong style="color:var(--navy)">3. Upselling and revenue awareness</strong> — noted in 22 F&B and Sales appraisals as a gap requiring structured coaching.<br>
+            <strong style="color:var(--navy)">4. Equipment handling and maintenance protocols</strong> — recurring theme in Maintenance department appraisals at both properties.<br>
+            <strong style="color:var(--navy)">5. Report writing and record keeping</strong> — identified in Finance and supervisory-level appraisals across both properties.
           </div>
         </div>
         <div>
           <div class="card-title">General observations</div>
           <div style="font-size:12px;color:var(--text-mid);line-height:1.7">
-            Overall performance across both properties for H1 2026 is at the Meets Expectations band (71% combined average). Protea Hotel Skyz shows a 4-percentage-point advantage over PHK, driven largely by stronger scores in Management, F&amp;B, and Kitchen departments.<br><br>
+            Overall performance across both properties for H1 2026 is at the Meets Expectations band (71% combined average). Protea Hotel Skyz shows a 4-percentage-point advantage over PHK, driven largely by stronger scores in Management, F&B, and Kitchen departments.<br><br>
             Maintenance remains the weakest department at both properties (58% average), with recurring gaps in preventive maintenance discipline and documentation. This warrants targeted intervention before H2 2026.<br><br>
             Completion rate stands at 72% (301 of 418 staff). The remaining 117 staff are primarily casual operational staff whose assisted appraisals are pending HOD scheduling. HR recommends completing these by 30 June 2026.
           </div>
@@ -2935,7 +2935,7 @@ async function saveCycleSettings() {
       .update({ label, start_date:startDate, end_date:endDate, self_weight:selfW, hod_weight:hodW })
       .eq('is_active', true);
     document.getElementById('cycle-badge').textContent = label + ' Active';
-    document.getElementById('tb-cycle').innerHTML = '&#128197;&nbsp; ' + label + ' &nbsp;&middot;&nbsp; ' + new Date(startDate).toLocaleDateString('en-GB',{month:'short',year:'numeric'}) + ' – ' + new Date(endDate).toLocaleDateString('en-GB',{month:'short',year:'numeric'});
+    document.getElementById('tb-cycle').innerHTML = '&#128197;  ' + label + '  ·  ' + new Date(startDate).toLocaleDateString('en-GB',{month:'short',year:'numeric'}) + ' – ' + new Date(endDate).toLocaleDateString('en-GB',{month:'short',year:'numeric'});
     showToast('Cycle settings saved.');
   } catch(e) {
     showToast('Error saving cycle: ' + e.message);
@@ -3015,7 +3015,7 @@ async function showDeptReport() {
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
             <div style="font-family:var(--font-heading);font-size:14px;font-weight:700;color:var(--navy);border-bottom:2px solid var(--red);padding-bottom:4px">${dname}</div>
             <div style="display:flex;gap:6px;align-items:center">
-              <span style="font-size:11px;color:var(--text-mid)">${staff.length} appraised &nbsp;·&nbsp; Avg:</span>
+              <span style="font-size:11px;color:var(--text-mid)">${staff.length} appraised  ·  Avg:</span>
               <span class="band ${BAND_CLASS(avg)}">${avg}%</span>
             </div>
           </div>
@@ -3339,12 +3339,12 @@ function showIndividualReportFromData(s, a) {
           <div style="font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:12px">Section 3 \u2014 Development Plan</div>
           <table style="width:100%;border-collapse:collapse;font-size:12px">
             <tr><td style="padding:10px 12px;border:1px solid #000;background:#f0f1f4;font-weight:600;font-size:11px;width:200px;vertical-align:top">Strong points</td><td style="padding:10px 12px;border:1px solid #000;vertical-align:top">${a.dev_strong||'Not recorded.'}</td></tr>
-            <tr><td style="padding:10px 12px;border:1px solid #000;background:#f0f1f4;font-weight:600;font-size:11px;vertical-align:top">Training &amp; development needs</td><td style="padding:10px 12px;border:1px solid #000;vertical-align:top">${a.dev_training||'Not recorded.'}</td></tr>
+            <tr><td style="padding:10px 12px;border:1px solid #000;background:#f0f1f4;font-weight:600;font-size:11px;vertical-align:top">Training & development needs</td><td style="padding:10px 12px;border:1px solid #000;vertical-align:top">${a.dev_training||'Not recorded.'}</td></tr>
             <tr><td style="padding:10px 12px;border:1px solid #000;background:#f0f1f4;font-weight:600;font-size:11px;vertical-align:top">Career objectives</td><td style="padding:10px 12px;border:1px solid #000;vertical-align:top">${a.dev_career||'Not recorded.'}</td></tr>
           </table>
         </div>
         <div>
-          <div style="font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:16px">Acknowledgement &amp; Signatures</div>
+          <div style="font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:16px">Acknowledgement & Signatures</div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px">
             <div><div style="border-top:1.5px solid #000;margin-bottom:6px;padding-top:6px"></div><div style="font-size:11px;font-weight:600;color:#1B2A6B">${s.name}</div><div style="font-size:10px;color:#888">${s.role}</div><div style="font-size:10px;color:#aaa;margin-top:2px">Date: _______________</div></div>
             <div><div style="border-top:1.5px solid #000;margin-bottom:6px;padding-top:6px"></div><div style="font-size:11px;font-weight:600;color:#1B2A6B">HOD / Appraiser</div><div style="font-size:10px;color:#888">${s.dept} Department</div><div style="font-size:10px;color:#aaa;margin-top:2px">Date: _______________</div></div>
