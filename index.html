@@ -206,6 +206,17 @@ tr:hover td{background:#fafafa}
 .score-label{font-size:11px;color:var(--text-mid)}
 .score-val{font-family:var(--font-heading);font-size:16px;font-weight:600;color:var(--navy)}
 
+@media print {
+  #sidebar, #topbar, .no-print, .filter-row, .section-header button,
+  .modal-overlay, #toast, .sb-footer, .sb-prop { display:none!important; }
+  #main { overflow:visible!important; }
+  #content { overflow:visible!important; padding:0!important; }
+  .page-view { display:block!important; }
+  .page-view:not(.active) { display:none!important; }
+  body { font-size:11px; }
+  table { page-break-inside:auto; }
+  tr { page-break-inside:avoid; }
+}
 /* TOAST */
 #toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;padding:10px 18px;border-radius:6px;font-size:12px;z-index:3000;opacity:0;transition:opacity .25s;pointer-events:none}
 #toast.show{opacity:1}
@@ -231,7 +242,7 @@ tr:hover td{background:#fafafa}
       <input type="password" id="login-password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
     </div>
     <button class="btn btn-primary" id="login-btn" onclick="doLogin()">Sign in &rarr;</button>
-    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <strong>R6</strong></p>
+    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <strong>R8</strong></p>
   </div>
 </div>
 
@@ -709,6 +720,32 @@ tr:hover td{background:#fafafa}
   </div>
 </div>
 
+
+<!-- MODAL: New Cycle -->
+<div class="modal-overlay hidden" id="modal-new-cycle">
+  <div class="modal" style="width:460px">
+    <div class="modal-header" style="background:#f0f1f4;border-bottom:3px solid #800020">
+      <h3 style="color:#1B2A6B">Start new appraisal cycle</h3>
+      <button class="modal-close" onclick="closeModal('modal-new-cycle')" style="color:#888">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:#555;margin-bottom:14px;line-height:1.6">This will close the current active cycle and start a new one. All existing appraisals are preserved.</div>
+      <div class="form-row">
+        <div class="form-group"><label>Cycle label *</label><input type="text" id="nc-label" placeholder="e.g. H2 2026" /></div>
+        <div class="form-group"><label>Self weight %</label><input type="number" id="nc-self" value="40" min="0" max="100" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Start date *</label><input type="date" id="nc-start" /></div>
+        <div class="form-group"><label>End date *</label><input type="date" id="nc-end" /></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-new-cycle')">Cancel</button>
+      <button class="btn btn-primary" onclick="createNewCycle()">Create cycle</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 
@@ -1181,7 +1218,7 @@ async function loadAppraisalsPage() {
     const { data: cycle, error: ce } = await client.from('appraisal_cycles').select('id,label').eq('is_active', true).single();
     if (ce) throw ce;
     const { data: appraisals, error: ae } = await client.from('appraisals')
-      .select('id,status,self_kpi_score,hod_kpi_score,final_score,rating_band,staff_id,hod_submitted_at')
+      .select('id,status,self_kpi_score,hod_kpi_score,final_score,rating_band,staff_id,hod_submitted_at,review_comments,pro_rated,months_in_cycle')
       .eq('cycle_id', cycle.id)
       .order('hod_submitted_at', { ascending: false, nullsFirst: false });
     if (ae) throw ae;
@@ -1230,7 +1267,8 @@ function renderAppraisalsTable(appraisals) {
       : isSubmitted
       ? '<button class="btn btn-secondary btn-sm" data-action="view-appr" data-appr-id="' + a.id + '">View</button><span style="font-size:10px;color:#854F0B;margin-left:6px">Awaiting approval</span>'
       : isDraft
-        ? '<button class="btn btn-primary btn-sm" data-action="continue-appr" data-appr-id="' + a.id + '" data-staff-id="' + a.staff_id + '">Continue</button>'
+        ? (a.review_comments ? '<div style="font-size:10px;color:#A32D2D;margin-bottom:4px;padding:4px 8px;background:#fcebeb;border-radius:3px;border-left:3px solid #A32D2D">Returned: ' + a.review_comments + '</div>' : '')
+          + '<button class="btn btn-primary btn-sm" data-action="continue-appr" data-appr-id="' + a.id + '" data-staff-id="' + a.staff_id + '">Continue</button>'
           + ' <button class="btn btn-danger btn-sm" data-action="discard-appr" data-appr-id="' + a.id + '" data-staff-name="' + s2Name + '">Discard</button>'
         : '<button class="btn btn-primary btn-sm" data-action="start-appr" data-staff-id="' + a.staff_id + '">Start</button>';
     return '<tr data-appr-id="' + a.id + '" data-prop="' + (s.propCode||'') + '" data-dept="' + (s.deptName||'').toLowerCase() + '" data-status="' + a.status + '">'
@@ -1773,9 +1811,9 @@ async function loadHomeData() {
       appr = appr.filter(function(a) { return propStaffIds.indexOf(a.staff_id) !== -1; });
     }
 
-    const submitted  = appr.filter(function(a) { return a.status === 'complete' || a.status === 'in_progress'; }).length;
-    const pending    = appr.filter(function(a) { return a.status === 'in_progress'; }).length;
-    const completed  = appr.filter(function(a) { return a.status === 'complete'; });
+    const submitted  = appr.filter(function(a) { return ['submitted','approved','complete','draft'].includes(a.status); }).length;
+    const pending    = appr.filter(function(a) { return a.status === 'submitted'; }).length;
+    const completed  = appr.filter(function(a) { return ['approved','complete','submitted'].includes(a.status); });
     const avgScore   = completed.length ? Math.round(completed.reduce(function(s,a) { return s+(a.final_score||0); }, 0) / completed.length) : 0;
     const completion = total ? Math.round(submitted / total * 100) : 0;
 
@@ -1800,15 +1838,36 @@ async function loadHomeData() {
 function renderDeptBars(appr) {
   const el = document.getElementById('dept-bars');
   if (!el) return;
-  if (!appr || appr.length === 0) {
+  if (!appr || appr.length === 0 || _staffCache.length === 0) {
     el.innerHTML = '<div style="font-size:11px;color:var(--text-light)">No appraisal data yet.</div>';
     return;
   }
-  const complete = appr.filter(function(a) { return a.status === 'complete'; });
-  const pct = appr.length ? Math.round(complete.length / appr.length * 100) : 0;
-  el.innerHTML = '<div style="font-size:11px;color:var(--text-mid);margin-bottom:10px">Overall completion</div>'
-    + '<div class="dept-bar-row"><div class="dept-name">Submitted</div><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div><div class="bar-pct">' + pct + '%</div></div>'
-    + '<div style="font-size:10px;color:var(--text-light);margin-top:8px">' + complete.length + ' of ' + appr.length + ' complete. Department breakdown available in Analytics (R3).</div>';
+  // Build dept averages from completed appraisals
+  const depts = {};
+  appr.filter(function(a){ return ['approved','complete','submitted'].includes(a.status) && a.final_score; }).forEach(function(a) {
+    const s  = _staffCache.find(function(x){ return x.id === a.staff_id; }) || {};
+    const dn = s.deptName || 'Unknown';
+    if (!depts[dn]) depts[dn] = [];
+    depts[dn].push(a.final_score);
+  });
+  const deptAvgs = Object.keys(depts).map(function(dn) {
+    const scores = depts[dn];
+    return { name:dn, avg:Math.round(scores.reduce(function(t,s){return t+s;},0)/scores.length) };
+  }).sort(function(a,b){ return b.avg-a.avg; });
+
+  if (deptAvgs.length === 0) {
+    el.innerHTML = '<div style="font-size:11px;color:var(--text-light)">No scores yet. Submit appraisals to see department breakdown.</div>';
+    return;
+  }
+  el.innerHTML = '<div style="font-size:11px;font-weight:600;color:var(--navy);margin-bottom:10px">Department scores — ' + propLabel(currentProp) + '</div>'
+    + deptAvgs.map(function(d) {
+        const col = d.avg>=90?'var(--green)':d.avg>=75?'#185FA5':d.avg>=60?'var(--navy)':d.avg>=40?'var(--amber)':'var(--red)';
+        return '<div class="dept-bar-row">'
+          + '<div class="dept-name" style="font-size:11px">' + d.name + '</div>'
+          + '<div class="bar-track"><div class="bar-fill" style="width:' + d.avg + '%;background:' + col + '"></div></div>'
+          + '<div class="bar-pct" style="font-size:11px;font-weight:600;color:' + col + '">' + d.avg + '%</div>'
+          + '</div>';
+      }).join('');
 }
 
 function renderRatingDist(completed) {
@@ -1929,7 +1988,7 @@ function reportHeader(title, subtitle) {
   return '<div style="text-align:center;padding-bottom:14px;border-bottom:2px solid #000;margin-bottom:20px">'
     + '<div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#888;margin-bottom:6px">Simba Group Hotels — Performance Management System</div>'
     + '<div style="font-size:22px;font-weight:700;color:#1B2A6B;font-family:\'Palatino Linotype\',Palatino,Georgia,serif">' + title + '</div>'
-    + '<div style="font-size:12px;color:#555;margin-top:4px">' + subtitle + '</div>'
+    + '<div style="font-size:12px;color:#555;margin-top:4px">' + subtitle + (typeof proRatedFlag !== 'undefined' ? proRatedFlag : '') + '</div>'
     + '</div>';
 }
 function sectionHead(text) {
@@ -1953,6 +2012,7 @@ async function showIndividualReport(appraisalId) {
     var a = res.data;
     var s = _staffCache.find(function(x) { return x.id === a.staff_id; }) || {};
     var propName = s.propCode === 'skyz' ? 'Protea Hotel Skyz Kampala' : 'Protea Hotel Kampala';
+    var proRatedFlag = a.pro_rated ? '<span style="background:#faeeda;color:#854F0B;font-size:10px;font-weight:600;padding:2px 8px;border-radius:3px;margin-left:8px">Pro-rated</span>' : '';
     var kpis = a.kpi_responses || [];
     var comps = a.comp_responses || [];
     var mgmt  = a.mgmt_responses || [];
@@ -2499,345 +2559,418 @@ async function showOutstandingList() {
 
 // ── R4: ANALYTICS ─────────────────────────────────────────
 
+// ══════════════════════════════════════════════════════════
+// R8: PERFORMANCE INTELLIGENCE REPORT — ANALYTICS
+// Three views: Group (CEO), Property (GM), Department (HOD)
+// Printable, professional, Palatino/navy/red
+// ══════════════════════════════════════════════════════════
+
 async function loadAnalyticsPage() {
   var page = document.getElementById('page-analytics');
   if (!page) return;
-  page.innerHTML = '<div style="text-align:center;padding:40px;color:#888;font-size:12px">Loading analytics...</div>';
+  page.innerHTML = '<div style="text-align:center;padding:40px;color:#888;font-size:12px">Loading performance data...</div>';
+
   try {
     if (_staffCache.length === 0) await loadStaffPage();
     var cl = getClient();
-    var cr = await cl.from('appraisal_cycles').select('id,label,start_date,end_date').eq('is_active',true).single();
+
+    var cr = await cl.from('appraisal_cycles').select('id,label,start_date,end_date,self_weight,hod_weight').eq('is_active',true).single();
     if (cr.error) throw cr.error;
     var cycle = cr.data;
 
     var ar = await cl.from('appraisals')
-      .select('id,status,final_score,self_kpi_score,hod_kpi_score,rating_band,staff_id,dev_training')
+      .select('id,status,final_score,self_kpi_score,hod_kpi_score,self_competency_score,hod_competency_score,rating_band,staff_id,hod_submitted_at,dev_training,review_comments,pro_rated')
       .eq('cycle_id', cycle.id);
     if (ar.error) throw ar.error;
-    var all = ar.data || [];
+    var allAppraisals = ar.data || [];
 
-    // Filter by property
-    var appraisals = all;
-    if (currentProp !== 'both') {
-      appraisals = all.filter(function(a) {
-        var s = _staffCache.find(function(x){ return x.id === a.staff_id; }) || {};
-        return s.propCode === currentProp;
+    // Enrich with staff data
+    var enriched = allAppraisals.map(function(a) {
+      var s = _staffCache.find(function(x){ return x.id === a.staff_id; }) || {};
+      return Object.assign({}, a, {
+        staffName: s.full_name || '',
+        deptName:  s.deptName  || 'Unknown',
+        roleTitle: s.roleTitle || '',
+        propCode:  s.propCode  || '',
+        isMgmt:    s.isMgmt    || false,
+        empNo:     s.employee_no || '',
+        doj:       s.date_of_joining || ''
       });
-    }
+    });
 
-    var completed = appraisals.filter(function(a){ return a.status === 'complete'; });
+    var completed = enriched.filter(function(a){ return ['approved','submitted','complete'].includes(a.status) && a.final_score; });
+
+    // Filter by currentProp
+    var viewData = currentProp !== 'both'
+      ? completed.filter(function(a){ return a.propCode === currentProp; })
+      : completed;
+
     var totalStaff = currentProp !== 'both'
       ? _staffCache.filter(function(s){ return s.propCode === currentProp; }).length
       : _staffCache.length;
-    var compRate = totalStaff ? Math.round(completed.length / totalStaff * 100) : 0;
-    var avgScore = completed.length ? Math.round(completed.reduce(function(t,a){ return t+(a.final_score||0); },0)/completed.length) : 0;
 
-    // Rating distribution
-    var dist = { exc:0, exceeds:0, meets:0, needs:0, unsat:0 };
-    completed.forEach(function(a) {
-      var sc = a.final_score||0;
-      if(sc>=90) dist.exc++; else if(sc>=75) dist.exceeds++; else if(sc>=60) dist.meets++; else if(sc>=40) dist.needs++; else dist.unsat++;
-    });
+    page.innerHTML = buildAnalyticsPage(cycle, enriched, viewData, totalStaff);
 
-    // Department averages
-    var depts = {};
-    completed.forEach(function(a) {
-      var s = _staffCache.find(function(x){ return x.id===a.staff_id; })||{};
-      var dn = s.deptName || 'Unknown';
-      if (!depts[dn]) depts[dn] = [];
-      depts[dn].push(a.final_score||0);
-    });
-    var deptAvgs = Object.keys(depts).map(function(dn) {
-      var scores = depts[dn];
-      return { name:dn, avg:Math.round(scores.reduce(function(t,s){return t+s;},0)/scores.length), count:scores.length };
-    }).sort(function(a,b){ return b.avg - a.avg; });
-
-    // Property comparison
-    var skyzCompleted = all.filter(function(a){ var s=_staffCache.find(function(x){return x.id===a.staff_id;})||{}; return s.propCode==='skyz'&&a.status==='complete'; });
-    var phkCompleted  = all.filter(function(a){ var s=_staffCache.find(function(x){return x.id===a.staff_id;})||{}; return s.propCode==='phk' &&a.status==='complete'; });
-    var skyzAvg = skyzCompleted.length ? Math.round(skyzCompleted.reduce(function(t,a){return t+(a.final_score||0);},0)/skyzCompleted.length) : 0;
-    var phkAvg  = phkCompleted.length  ? Math.round(phkCompleted.reduce(function(t,a){return t+(a.final_score||0);},0)/phkCompleted.length)  : 0;
-    var skyzTotal = _staffCache.filter(function(s){return s.propCode==='skyz';}).length;
-    var phkTotal  = _staffCache.filter(function(s){return s.propCode==='phk';}).length;
-    var skyzRate  = skyzTotal ? Math.round(skyzCompleted.length/skyzTotal*100) : 0;
-    var phkRate   = phkTotal  ? Math.round(phkCompleted.length/phkTotal*100)   : 0;
-
-    // Training themes from dev_training field
-    var trainingTexts = completed.filter(function(a){ return a.dev_training && a.dev_training.trim(); }).map(function(a){ return a.dev_training.trim(); });
-
-    // Build page
-    var sd = new Date(cycle.start_date).toLocaleDateString('en-GB',{month:'short',year:'numeric'});
-    var ed = new Date(cycle.end_date).toLocaleDateString('en-GB',{month:'short',year:'numeric'});
-
-    page.innerHTML = buildAnalyticsHTML(cycle, completed, totalStaff, compRate, avgScore, dist, deptAvgs, skyzAvg, phkAvg, skyzCompleted.length, phkCompleted.length, skyzTotal, phkTotal, skyzRate, phkRate, trainingTexts, sd, ed);
-
-    // Draw charts after DOM is ready
-    setTimeout(function() {
-      drawDistributionChart(dist);
-      drawDeptChart(deptAvgs);
-      drawPropertyChart(skyzAvg, phkAvg, skyzRate, phkRate, skyzCompleted.length, phkCompleted.length);
-      drawCompletionChart();
-    }, 50);
-
-    // Load AI narrative
-    if (completed.length > 0) {
-      loadAINarrative(completed, deptAvgs, skyzAvg, phkAvg, compRate, avgScore, cycle.label);
+    // Load AI narrative async
+    if (viewData.length > 0) {
+      generateAINarrative(cycle, viewData, totalStaff);
+    } else {
+      var el = document.getElementById('ai-narrative-text');
+      if (el) el.textContent = 'No completed appraisals yet for this cycle. Submit and approve appraisals to generate the performance narrative.';
     }
 
   } catch(e) {
-    var page2 = document.getElementById('page-analytics');
-    if (page2) page2.innerHTML = '<div style="padding:20px;color:#A32D2D;font-size:12px">Error loading analytics: ' + e.message + '</div>';
+    var p = document.getElementById('page-analytics');
+    if (p) p.innerHTML = '<div style="padding:20px;color:#A32D2D;font-size:12px">Error: ' + e.message + '</div>';
     console.error('loadAnalyticsPage:', e);
   }
 }
 
-function buildAnalyticsHTML(cycle, completed, totalStaff, compRate, avgScore, dist, deptAvgs, skyzAvg, phkAvg, skyzCount, phkCount, skyzTotal, phkTotal, skyzRate, phkRate, trainingTexts, sd, ed) {
-  var bandCls = avgScore>=90?'band-exc':avgScore>=75?'band-exceeds':avgScore>=60?'band-meets':avgScore>=40?'band-needs':'band-unsat';
-  var bandLbl = avgScore>=90?'Exceptional':avgScore>=75?'Exceeds expectations':avgScore>=60?'Meets expectations':avgScore>=40?'Needs improvement':'Unsatisfactory';
+function buildAnalyticsPage(cycle, allAppraisals, viewData, totalStaff) {
+  var completed   = viewData;
+  var drafted     = allAppraisals.filter(function(a){ return a.status === 'draft' && (currentProp === 'both' || a.propCode === currentProp); });
+  var submitted   = allAppraisals.filter(function(a){ return a.status === 'submitted' && (currentProp === 'both' || a.propCode === currentProp); });
+  var notStarted  = totalStaff - completed.length - drafted.length - submitted.length;
+  var compRate    = totalStaff ? Math.round(completed.length / totalStaff * 100) : 0;
+  var avgScore    = completed.length ? Math.round(completed.reduce(function(t,a){ return t+(a.final_score||0); },0)/completed.length) : 0;
+  var sd = new Date(cycle.start_date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  var ed = new Date(cycle.end_date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  var today = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+  // Department breakdown
+  var depts = {};
+  completed.forEach(function(a) {
+    if (!depts[a.deptName]) depts[a.deptName] = [];
+    depts[a.deptName].push(a);
+  });
+  var deptAvgs = Object.keys(depts).map(function(dn) {
+    var arr = depts[dn];
+    var avg = Math.round(arr.reduce(function(t,a){ return t+(a.final_score||0); },0)/arr.length);
+    var dist = {exc:0,exceeds:0,meets:0,needs:0,unsat:0};
+    arr.forEach(function(a){ var s=a.final_score||0; if(s>=90)dist.exc++; else if(s>=75)dist.exceeds++; else if(s>=60)dist.meets++; else if(s>=40)dist.needs++; else dist.unsat++; });
+    var staff = allAppraisals.filter(function(a){ return a.deptName===dn && (currentProp==='both'||a.propCode===currentProp); });
+    return { name:dn, avg:avg, count:arr.length, totalStaff:staff.length, dist:dist, items:arr };
+  }).sort(function(a,b){ return b.avg-a.avg; });
+
+  // Property breakdown
+  var skyzData = completed.filter(function(a){ return a.propCode==='skyz'; });
+  var phkData  = completed.filter(function(a){ return a.propCode==='phk'; });
+  var skyzAvg  = skyzData.length ? Math.round(skyzData.reduce(function(t,a){ return t+(a.final_score||0); },0)/skyzData.length) : 0;
+  var phkAvg   = phkData.length  ? Math.round(phkData.reduce(function(t,a){ return t+(a.final_score||0); },0)/phkData.length)  : 0;
+  var skyzTotal= _staffCache.filter(function(s){ return s.propCode==='skyz'; }).length;
+  var phkTotal = _staffCache.filter(function(s){ return s.propCode==='phk'; }).length;
+
+  // Rating distribution
+  var dist = {exc:0,exceeds:0,meets:0,needs:0,unsat:0};
+  completed.forEach(function(a){ var s=a.final_score||0; if(s>=90)dist.exc++; else if(s>=75)dist.exceeds++; else if(s>=60)dist.meets++; else if(s>=40)dist.needs++; else dist.unsat++; });
+
+  // Bias detection — HOD vs self rating gap
+  var biasData = completed.filter(function(a){ return a.self_kpi_score && a.hod_kpi_score; }).map(function(a) {
+    return { name:a.staffName, dept:a.deptName, self:Math.round(a.self_kpi_score), hod:Math.round(a.hod_kpi_score), gap:Math.round(a.hod_kpi_score - a.self_kpi_score) };
+  }).sort(function(a,b){ return Math.abs(b.gap)-Math.abs(a.gap); }).slice(0,10);
+
+  // Top and bottom performers
+  var ranked   = completed.slice().sort(function(a,b){ return (b.final_score||0)-(a.final_score||0); });
+  var topPerf  = ranked.slice(0,5);
+  var flagged  = ranked.filter(function(a){ return (a.final_score||0) < 60; });
+
+  // Training themes
+  var trainingTexts = completed.filter(function(a){ return a.dev_training && a.dev_training.trim(); }).map(function(a){ return a.dev_training.trim(); });
+  var wordCount = {};
+  var stopWords = new Set(['and','the','to','of','in','for','a','is','with','on','at','by','an','be','this','that','their','from','as','or','have','are','will','also','more','need','needs','should','training','further','improvement','development','staff','skills','ability','work']);
+  trainingTexts.forEach(function(t) {
+    t.toLowerCase().replace(/[^a-z\s]/g,' ').split(/\s+/).forEach(function(w) {
+      if (w.length > 3 && !stopWords.has(w)) wordCount[w] = (wordCount[w]||0)+1;
+    });
+  });
+  var themes = Object.keys(wordCount).sort(function(a,b){ return wordCount[b]-wordCount[a]; }).slice(0,10);
+
+  function bandC(s){ return s>=90?'band-exc':s>=75?'band-exceeds':s>=60?'band-meets':s>=40?'band-needs':'band-unsat'; }
+  function bandL(s){ return s>=90?'Exceptional':s>=75?'Exceeds expectations':s>=60?'Meets expectations':s>=40?'Needs improvement':'Unsatisfactory'; }
+  function propPill(p){ return p==='skyz'?'<span class="pill pill-skyz">SKYZ</span>':'<span class="pill pill-phk">PHK</span>'; }
 
   return '<div style="font-family:\'Segoe UI\',system-ui,sans-serif">'
 
-    // AI narrative box
-    + '<div id="ai-narrative-box" style="background:#f0f1f4;border-left:4px solid #1B2A6B;border-radius:0 6px 6px 0;padding:12px 16px;margin-bottom:20px;display:flex;align-items:flex-start;gap:12px">'
-    + '<div style="flex-shrink:0;width:28px;height:28px;background:#1B2A6B;border-radius:50%;display:flex;align-items:center;justify-content:center">'
-    + '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
-    + '</div>'
-    + '<div><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#1B2A6B;margin-bottom:4px">HR Insight — ' + cycle.label + '</div>'
-    + '<div id="ai-narrative-text" style="font-size:12px;color:#333;line-height:1.6;font-style:italic">Generating narrative...</div></div>'
-    + '</div>'
+    // ── TOOLBAR ──
+    + '<div class="section-header no-print" style="margin-bottom:16px">'
+    + '<div class="section-title">Performance Intelligence Report</div>'
+    + '<div class="filter-row">'
+    + '<select class="filter-select" onchange="switchProperty(this.value)" id="analytics-prop-filter">'
+    + '<option value="both"' + (currentProp==='both'?' selected':'') + '>Both properties</option>'
+    + '<option value="skyz"' + (currentProp==='skyz'?' selected':'') + '>Protea Hotel Skyz</option>'
+    + '<option value="phk"'  + (currentProp==='phk' ?' selected':'') + '>Protea Hotel Kampala</option>'
+    + '</select>'
+    + '<button class="btn btn-primary btn-sm" onclick="printAnalytics()">Print / PDF</button>'
+    + '</div></div>'
 
-    // Metric cards
-    + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">'
-    + metricCard('Total appraised', completed.length + ' of ' + totalStaff, compRate + '% completion')
-    + metricCard('Overall average', avgScore + '%', bandLbl)
-    + metricCard('Highest department', deptAvgs.length ? deptAvgs[0].avg + '%' : '--', deptAvgs.length ? deptAvgs[0].name : '')
-    + metricCard('Lowest department', deptAvgs.length ? deptAvgs[deptAvgs.length-1].avg + '%' : '--', deptAvgs.length ? deptAvgs[deptAvgs.length-1].name : '')
-    + '</div>'
+    // ── PRINTABLE REPORT ──
+    + '<div id="analytics-printable">'
 
-    // Row 1: Distribution + Property comparison
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">'
-    + '<div class="card"><div class="card-title">Score distribution</div><canvas id="chart-dist" height="180"></canvas></div>'
-    + '<div class="card"><div class="card-title">Property comparison</div><canvas id="chart-prop" height="180"></canvas></div>'
-    + '</div>'
-
-    // Row 2: Department chart (full width)
-    + '<div class="card" style="margin-bottom:16px"><div class="card-title">Department average scores</div><canvas id="chart-dept" height="200"></canvas></div>'
-
-    // Row 3: Completion by dept
-    + '<div class="card" style="margin-bottom:16px">'
-    + '<div class="card-title">Completion by department</div>'
-    + '<div id="completion-bars"></div>'
+    // Cover header
+    + '<div style="text-align:center;padding-bottom:16px;border-bottom:2px solid #000;margin-bottom:24px">'
+    + '<div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#888;margin-bottom:6px">Simba Group Hotels \u2014 Confidential</div>'
+    + '<div style="font-family:\'Palatino Linotype\',Palatino,Georgia,serif;font-size:24px;font-weight:700;color:#1B2A6B">Performance Intelligence Report</div>'
+    + '<div style="font-size:13px;color:#555;margin-top:6px">' + cycle.label + ' \u00B7 ' + sd + ' to ' + ed + '</div>'
+    + '<div style="font-size:11px;color:#888;margin-top:3px">Prepared by: Kusain Kabugo, Head of Human Resources \u00B7 Generated ' + today + '</div>'
     + '</div>'
 
-    // Row 4: Training needs
-    + '<div class="card" style="margin-bottom:16px">'
-    + '<div class="card-title">Training needs summary</div>'
-    + buildTrainingNeeds(trainingTexts)
+    // AI Executive Summary
+    + '<div style="background:#f0f1f4;border-left:4px solid #1B2A6B;border-radius:0 6px 6px 0;padding:14px 18px;margin-bottom:24px">'
+    + '<div style="font-family:\'Palatino Linotype\',Palatino,Georgia,serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#1B2A6B;margin-bottom:6px">Executive Summary</div>'
+    + '<div id="ai-narrative-text" style="font-size:13px;color:#333;line-height:1.7;font-family:\'Palatino Linotype\',Palatino,Georgia,serif;font-style:italic">Generating narrative...</div>'
     + '</div>'
 
+    // ── SECTION 1: KEY METRICS ──
+    + '<div style="font-family:\'Palatino Linotype\',Palatino,Georgia,serif;font-size:14px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:14px">1. Cycle Overview</div>'
+    + '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:24px">'
+    + analyticsMetric('Total staff', totalStaff, '')
+    + analyticsMetric('Appraised', completed.length, compRate + '% completion')
+    + analyticsMetric('Awaiting approval', submitted.length, 'Submitted by HOD')
+    + analyticsMetric('In progress', drafted.length, 'Draft stage')
+    + analyticsMetric('Not started', Math.max(0,notStarted), 'Action required')
+    + '</div>'
+
+    // ── SECTION 2: OVERALL SCORE + DISTRIBUTION ──
+    + '<div style="font-family:\'Palatino Linotype\',Palatino,Georgia,serif;font-size:14px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:14px">2. Overall Performance</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 2fr;gap:16px;margin-bottom:24px">'
+    + '<div style="background:#f0f1f4;border-radius:8px;padding:20px;text-align:center;border-bottom:3px solid #1B2A6B">'
+    + '<div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:8px">Group average score</div>'
+    + '<div style="font-family:\'Palatino Linotype\',Palatino,Georgia,serif;font-size:48px;font-weight:700;color:#1B2A6B;line-height:1">' + (avgScore||'--') + '<span style="font-size:20px">%</span></div>'
+    + '<div style="margin-top:8px"><span class="band ' + bandC(avgScore) + '" style="font-size:12px">' + bandL(avgScore) + '</span></div>'
+    + '</div>'
+    + '<div style="background:#f0f1f4;border-radius:8px;padding:16px">'
+    + '<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:10px">Rating band distribution (' + completed.length + ' appraised)</div>'
+    + '<div style="display:flex;flex-direction:column;gap:6px">'
+    + distBar('Exceptional',        dist.exc,     completed.length, '#3B6D11', '#eaf3de')
+    + distBar('Exceeds expectations', dist.exceeds, completed.length, '#185FA5', '#e6f1fb')
+    + distBar('Meets expectations',   dist.meets,   completed.length, '#1B2A6B', '#f0f1f4')
+    + distBar('Needs improvement',    dist.needs,   completed.length, '#854F0B', '#faeeda')
+    + distBar('Unsatisfactory',       dist.unsat,   completed.length, '#A32D2D', '#fcebeb')
+    + '</div></div>'
+    + '</div>'
+
+    // ── SECTION 3: PROPERTY COMPARISON ──
+    + (currentProp === 'both' ? (
+        '<div style="font-family:\'Palatino Linotype\',Palatino,Georgia,serif;font-size:14px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:14px">3. Property Comparison</div>'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">'
+        + propCard('Protea Hotel Skyz Kampala', skyzAvg, skyzData.length, skyzTotal, skyzData, '#1B2A6B')
+        + propCard('Protea Hotel Kampala', phkAvg, phkData.length, phkTotal, phkData, '#800020')
+        + '</div>'
+    ) : '')
+
+    // ── SECTION 4: DEPARTMENT BREAKDOWN ──
+    + '<div style="font-family:\'Palatino Linotype\',Palatino,Georgia,serif;font-size:14px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:14px">' + (currentProp === 'both' ? '4' : '3') + '. Department Performance</div>'
+    + '<div style="margin-bottom:24px">'
+    + '<table style="width:100%;border-collapse:collapse;font-size:12px">'
+    + '<thead><tr style="background:#f0f1f4">'
+    + '<th style="padding:8px 10px;text-align:left;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Department</th>'
+    + '<th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Appraised</th>'
+    + '<th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Avg score</th>'
+    + '<th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Rating</th>'
+    + '<th style="padding:8px 10px;text-align:left;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Score bar</th>'
+    + '<th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Exc</th>'
+    + '<th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Exceeds</th>'
+    + '<th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Meets</th>'
+    + '<th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Needs</th>'
+    + '<th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Unsat</th>'
+    + '</tr></thead><tbody>'
+    + deptAvgs.map(function(d) {
+        var col = d.avg>=90?'#3B6D11':d.avg>=75?'#185FA5':d.avg>=60?'#1B2A6B':d.avg>=40?'#854F0B':'#A32D2D';
+        var compPct = d.totalStaff ? Math.round(d.count/d.totalStaff*100) : 0;
+        return '<tr>'
+          +'<td style="padding:8px 10px;border-bottom:.5px solid #eee;font-weight:600">' + d.name + '<div style="font-size:9px;color:#888;font-weight:400">' + d.count + ' of ' + d.totalStaff + ' appraised (' + compPct + '%)</div></td>'
+          +'<td style="padding:8px 10px;border-bottom:.5px solid #eee;text-align:center">' + d.count + '</td>'
+          +'<td style="padding:8px 10px;border-bottom:.5px solid #eee;text-align:center;font-weight:700;color:' + col + '">' + d.avg + '%</td>'
+          +'<td style="padding:8px 10px;border-bottom:.5px solid #eee;text-align:center"><span class="band ' + bandC(d.avg) + '">' + bandL(d.avg) + '</span></td>'
+          +'<td style="padding:8px 10px;border-bottom:.5px solid #eee"><div style="background:#eee;border-radius:2px;height:8px;width:100%"><div style="width:' + d.avg + '%;background:' + col + ';height:8px;border-radius:2px"></div></div></td>'
+          +'<td style="padding:8px 10px;border-bottom:.5px solid #eee;text-align:center;color:#3B6D11;font-weight:600">' + d.dist.exc + '</td>'
+          +'<td style="padding:8px 10px;border-bottom:.5px solid #eee;text-align:center;color:#185FA5">' + d.dist.exceeds + '</td>'
+          +'<td style="padding:8px 10px;border-bottom:.5px solid #eee;text-align:center;color:#1B2A6B">' + d.dist.meets + '</td>'
+          +'<td style="padding:8px 10px;border-bottom:.5px solid #eee;text-align:center;color:#854F0B">' + d.dist.needs + '</td>'
+          +'<td style="padding:8px 10px;border-bottom:.5px solid #eee;text-align:center;color:#A32D2D">' + d.dist.unsat + '</td>'
+          +'</tr>';
+      }).join('')
+    + '</tbody></table></div>'
+
+    // ── SECTION 5: TOP PERFORMERS ──
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">'
+    + '<div><div style="font-family:\'Palatino Linotype\',Palatino,Georgia,serif;font-size:14px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:12px">' + (currentProp === 'both' ? '5' : '4') + '. Top performers</div>'
+    + '<table style="width:100%;border-collapse:collapse;font-size:11px">'
+    + '<thead><tr style="background:#f0f1f4"><th style="padding:7px 10px;text-align:left;border-bottom:1.5px solid #000;font-size:9px;text-transform:uppercase">Name</th><th style="padding:7px 10px;border-bottom:1.5px solid #000;font-size:9px;text-transform:uppercase">Dept</th><th style="padding:7px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:9px;text-transform:uppercase">Score</th></tr></thead><tbody>'
+    + topPerf.map(function(a,i) {
+        return '<tr><td style="padding:6px 10px;border-bottom:.5px solid #eee"><strong>' + (i+1) + '. ' + a.staffName + '</strong></td>'
+          +'<td style="padding:6px 10px;border-bottom:.5px solid #eee;font-size:10px;color:#555">' + a.deptName + '</td>'
+          +'<td style="padding:6px 10px;border-bottom:.5px solid #eee;text-align:center"><strong>' + Math.round(a.final_score) + '%</strong> <span class="band ' + bandC(a.final_score) + '" style="font-size:9px">' + bandL(a.final_score) + '</span></td></tr>';
+      }).join('')
+    + '</tbody></table></div>'
+
+    // ── SECTION 6: FLAGGED STAFF ──
+    + '<div><div style="font-family:\'Palatino Linotype\',Palatino,Georgia,serif;font-size:14px;font-weight:700;color:#A32D2D;border-bottom:2px solid #A32D2D;padding-bottom:4px;display:inline-block;margin-bottom:12px">' + (currentProp === 'both' ? '6' : '5') + '. Flagged for improvement</div>'
+    + (flagged.length === 0
+        ? '<div style="font-size:12px;color:#3B6D11;padding:16px;background:#eaf3de;border-radius:6px">No staff below 60% this cycle.</div>'
+        : '<table style="width:100%;border-collapse:collapse;font-size:11px">'
+        + '<thead><tr style="background:#fcebeb"><th style="padding:7px 10px;text-align:left;border-bottom:1.5px solid #000;font-size:9px;text-transform:uppercase">Name</th><th style="padding:7px 10px;border-bottom:1.5px solid #000;font-size:9px;text-transform:uppercase">Dept</th><th style="padding:7px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:9px;text-transform:uppercase">Score</th></tr></thead><tbody>'
+        + flagged.map(function(a) {
+            return '<tr><td style="padding:6px 10px;border-bottom:.5px solid #eee"><strong>' + a.staffName + '</strong></td>'
+              +'<td style="padding:6px 10px;border-bottom:.5px solid #eee;font-size:10px;color:#555">' + a.deptName + '</td>'
+              +'<td style="padding:6px 10px;border-bottom:.5px solid #eee;text-align:center"><strong style="color:#A32D2D">' + Math.round(a.final_score) + '%</strong></td></tr>';
+          }).join('')
+        + '</tbody></table>'
+    )
+    + '</div></div>'
+
+    // ── SECTION 7: RATING BIAS ──
+    + (biasData.length > 0 ? (
+        '<div style="font-family:\'Palatino Linotype\',Palatino,Georgia,serif;font-size:14px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:12px">' + (currentProp === 'both' ? '7' : '6') + '. Rating gap analysis (Self vs HOD)</div>'
+        + '<div style="font-size:11px;color:#555;margin-bottom:8px;line-height:1.5">Largest gaps between staff self-rating and HOD rating. Positive gap = HOD rated higher. Negative gap = HOD rated lower than staff self-assessment.</div>'
+        + '<table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:24px">'
+        + '<thead><tr style="background:#f0f1f4"><th style="padding:7px 10px;text-align:left;border-bottom:1.5px solid #000;font-size:9px;text-transform:uppercase">Name</th><th style="padding:7px 10px;border-bottom:1.5px solid #000;font-size:9px;text-transform:uppercase">Department</th><th style="padding:7px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:9px;text-transform:uppercase">Self KPI</th><th style="padding:7px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:9px;text-transform:uppercase">HOD KPI</th><th style="padding:7px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:9px;text-transform:uppercase">Gap</th></tr></thead><tbody>'
+        + biasData.map(function(b) {
+            var gapCol = b.gap > 15 ? '#185FA5' : b.gap < -15 ? '#A32D2D' : '#854F0B';
+            var gapLbl = b.gap > 0 ? '+' + b.gap + '%' : b.gap + '%';
+            return '<tr><td style="padding:6px 10px;border-bottom:.5px solid #eee"><strong>' + b.name + '</strong></td>'
+              +'<td style="padding:6px 10px;border-bottom:.5px solid #eee;font-size:10px;color:#555">' + b.dept + '</td>'
+              +'<td style="padding:6px 10px;border-bottom:.5px solid #eee;text-align:center">' + b.self + '%</td>'
+              +'<td style="padding:6px 10px;border-bottom:.5px solid #eee;text-align:center">' + b.hod + '%</td>'
+              +'<td style="padding:6px 10px;border-bottom:.5px solid #eee;text-align:center;font-weight:700;color:' + gapCol + '">' + gapLbl + '</td></tr>';
+          }).join('')
+        + '</tbody></table>'
+    ) : '')
+
+    // ── SECTION 8: TRAINING NEEDS ──
+    + '<div style="font-family:\'Palatino Linotype\',Palatino,Georgia,serif;font-size:14px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:12px">' + (currentProp === 'both' ? '8' : '7') + '. Training needs summary</div>'
+    + '<div style="margin-bottom:24px">'
+    + (themes.length === 0
+        ? '<div style="font-size:12px;color:#888">No training needs recorded yet.</div>'
+        : '<div style="font-size:11px;color:#555;margin-bottom:8px">Most frequently cited across ' + trainingTexts.length + ' development plans:</div>'
+        + '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">'
+        + themes.map(function(w){ return '<span style="background:#e6f1fb;color:#185FA5;font-size:11px;font-weight:600;padding:4px 10px;border-radius:3px">' + w.charAt(0).toUpperCase()+w.slice(1) + ' (' + wordCount[w] + ')</span>'; }).join('')
+        + '</div>'
+        + (trainingTexts.length > 0 ? '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#888;margin-bottom:6px">Sample entries</div>'
+        + trainingTexts.slice(0,3).map(function(t){ return '<div style="font-size:11px;color:#333;padding:7px 10px;background:#f7f7f9;border-left:3px solid #d0d0d8;margin-bottom:5px;border-radius:0 4px 4px 0;line-height:1.5">' + t.substring(0,200) + (t.length>200?'...':'') + '</div>'; }).join('')
+        : '')
+    )
+    + '</div>'
+
+    // Footer
+    + '<div style="border-top:1.5px solid #000;padding-top:10px;display:flex;justify-content:space-between;align-items:center">'
+    + '<div style="font-size:10px;color:#888">Simba Group Hotels \u2014 Performance Management System \u00B7 ' + cycle.label + ' \u00B7 Confidential</div>'
+    + '<div style="font-size:10px;color:#888">Generated ' + today + ' by Kusain Kabugo, Head of Human Resources</div>'
+    + '</div>'
+
+    + '</div></div>'; // end analytics-printable, end page
+}
+
+function analyticsMetric(label, value, sub) {
+  return '<div style="background:#f0f1f4;border-radius:6px;padding:12px;text-align:center">'
+    + '<div style="font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:4px">' + label + '</div>'
+    + '<div style="font-family:\'Palatino Linotype\',Palatino,Georgia,serif;font-size:24px;font-weight:700;color:#1B2A6B;line-height:1">' + value + '</div>'
+    + (sub ? '<div style="font-size:10px;color:#888;margin-top:3px">' + sub + '</div>' : '')
     + '</div>';
 }
 
-function metricCard(label, value, sub) {
-  return '<div class="metric-card"><div class="metric-label">' + label + '</div>'
-    + '<div class="metric-value text-navy" style="font-size:22px">' + value + '</div>'
-    + '<div class="metric-sub">' + sub + '</div></div>';
-}
-
-function buildTrainingNeeds(texts) {
-  if (!texts || texts.length === 0) {
-    return '<div style="font-size:12px;color:#888;padding:8px 0">No training needs recorded yet. These are drawn from the development plan section of completed appraisals.</div>';
-  }
-  // Extract keywords/themes by splitting and counting common words
-  var stopWords = new Set(['and','the','to','of','in','for','a','is','with','on','at','by','an','be','this','that','their','from','as','or','have','are','will','also','more','need','needs','should','training','further','improvement','development','staff']);
-  var wordCount = {};
-  texts.forEach(function(t) {
-    t.toLowerCase().replace(/[^a-z\s]/g,' ').split(/\s+/).forEach(function(w) {
-      if (w.length > 3 && !stopWords.has(w)) {
-        wordCount[w] = (wordCount[w]||0) + 1;
-      }
-    });
-  });
-  var themes = Object.keys(wordCount).sort(function(a,b){ return wordCount[b]-wordCount[a]; }).slice(0,12);
-
-  var raw = '<div style="margin-bottom:12px">'
-    + '<div style="font-size:11px;color:#555;margin-bottom:8px">Most frequently cited training needs across ' + texts.length + ' appraisal' + (texts.length!==1?'s':'') + ':</div>'
-    + '<div style="display:flex;flex-wrap:wrap;gap:6px">'
-    + themes.map(function(w) {
-        return '<span style="background:#e6f1fb;color:#185FA5;font-size:11px;font-weight:600;padding:3px 10px;border-radius:3px">' + w.charAt(0).toUpperCase() + w.slice(1) + ' <span style="opacity:.6">(' + wordCount[w] + ')</span></span>';
-      }).join('')
-    + '</div></div>';
-
-  var sample = '<div>'
-    + '<div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:6px">Sample entries from HOD development plans</div>'
-    + texts.slice(0,3).map(function(t) {
-        return '<div style="font-size:11px;color:#333;padding:6px 10px;background:#f7f7f9;border-left:3px solid #d0d0d8;margin-bottom:5px;border-radius:0 4px 4px 0;line-height:1.5">' + t.substring(0,180) + (t.length>180?'...':'') + '</div>';
-      }).join('')
+function distBar(label, count, total, color, bg) {
+  var pct = total ? Math.round(count/total*100) : 0;
+  return '<div style="display:flex;align-items:center;gap:8px">'
+    + '<div style="font-size:10px;min-width:130px;color:#333">' + label + '</div>'
+    + '<div style="flex:1;background:#eee;border-radius:2px;height:10px"><div style="width:' + pct + '%;background:' + color + ';height:10px;border-radius:2px"></div></div>'
+    + '<div style="font-size:11px;font-weight:700;min-width:50px;color:' + color + '">' + count + ' (' + pct + '%)</div>'
     + '</div>';
-
-  return raw + sample;
 }
 
-// ── CHARTS ────────────────────────────────────────────────
-function drawDistributionChart(dist) {
-  var canvas = document.getElementById('chart-dist');
-  if (!canvas) return;
-  var ctx = canvas.getContext('2d');
-  var labels = ['Exceptional','Exceeds','Meets','Needs impr.','Unsatisfactory'];
-  var data   = [dist.exc, dist.exceeds, dist.meets, dist.needs, dist.unsat];
-  var colors = ['#3B6D11','#185FA5','#1B2A6B','#854F0B','#A32D2D'];
-  var max    = Math.max.apply(null, data) || 1;
-  var W = canvas.width = canvas.offsetWidth;
-  var H = canvas.height = 180;
-  ctx.clearRect(0,0,W,H);
-  var barW = Math.floor((W - 60) / data.length) - 8;
-  var padL = 30; var padB = 36; var chartH = H - padB - 10;
-  data.forEach(function(v, i) {
-    var bh  = Math.round(v / max * chartH);
-    var x   = padL + i * (barW + 8);
-    var y   = H - padB - bh;
-    ctx.fillStyle = colors[i];
-    ctx.fillRect(x, y, barW, bh);
-    ctx.fillStyle = '#333';
-    ctx.font = '11px Segoe UI, system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    if (v > 0) ctx.fillText(v, x + barW/2, y - 4);
-    ctx.fillStyle = '#888';
-    ctx.font = '10px Segoe UI, system-ui, sans-serif';
-    var lbl = labels[i];
-    ctx.fillText(lbl.length > 8 ? lbl.substring(0,8) : lbl, x + barW/2, H - padB + 14);
-  });
+function propCard(name, avg, count, total, data, color) {
+  var compRate = total ? Math.round(count/total*100) : 0;
+  var dist = {exc:0,exceeds:0,meets:0,needs:0,unsat:0};
+  data.forEach(function(a){ var s=a.final_score||0; if(s>=90)dist.exc++; else if(s>=75)dist.exceeds++; else if(s>=60)dist.meets++; else if(s>=40)dist.needs++; else dist.unsat++; });
+  function bandC(s){ return s>=90?'band-exc':s>=75?'band-exceeds':s>=60?'band-meets':s>=40?'band-needs':'band-unsat'; }
+  function bandL(s){ return s>=90?'Exceptional':s>=75?'Exceeds expectations':s>=60?'Meets expectations':s>=40?'Needs improvement':'Unsatisfactory'; }
+  return '<div style="background:#f0f1f4;border-radius:8px;padding:16px;border-bottom:3px solid ' + color + '">'
+    + '<div style="font-family:\'Palatino Linotype\',Palatino,Georgia,serif;font-size:12px;font-weight:700;color:' + color + ';margin-bottom:12px">' + name + '</div>'
+    + '<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">'
+    + '<div style="text-align:center"><div style="font-family:\'Palatino Linotype\',Palatino,Georgia,serif;font-size:36px;font-weight:700;color:#1B2A6B;line-height:1">' + (avg||'--') + '<span style="font-size:16px">%</span></div><div style="margin-top:4px"><span class="band ' + bandC(avg) + '">' + bandL(avg) + '</span></div></div>'
+    + '<div style="flex:1;font-size:11px;color:#555">'
+    + '<div>' + count + ' of ' + total + ' staff appraised (' + compRate + '%)</div>'
+    + '<div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">'
+    + '<span style="background:#eaf3de;color:#3B6D11;font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px">' + dist.exc + ' Exc</span>'
+    + '<span style="background:#e6f1fb;color:#185FA5;font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px">' + dist.exceeds + ' Exceeds</span>'
+    + '<span style="background:#f0f1f4;color:#1B2A6B;font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px">' + dist.meets + ' Meets</span>'
+    + '<span style="background:#faeeda;color:#854F0B;font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px">' + dist.needs + ' Needs</span>'
+    + '<span style="background:#fcebeb;color:#A32D2D;font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px">' + dist.unsat + ' Unsat</span>'
+    + '</div></div></div></div>';
 }
 
-function drawDeptChart(deptAvgs) {
-  var canvas = document.getElementById('chart-dept');
-  if (!canvas || !deptAvgs.length) return;
-  var ctx = canvas.getContext('2d');
-  var W = canvas.width = canvas.offsetWidth;
-  var H = canvas.height = 200;
-  ctx.clearRect(0,0,W,H);
-  var padL = 130; var padR = 50; var padT = 10; var padB = 20;
-  var chartW = W - padL - padR;
-  var barH   = Math.floor((H - padT - padB) / deptAvgs.length) - 4;
-  deptAvgs.forEach(function(d, i) {
-    var y   = padT + i * (barH + 4);
-    var bw  = Math.round(d.avg / 100 * chartW);
-    var col = d.avg>=90?'#3B6D11':d.avg>=75?'#185FA5':d.avg>=60?'#1B2A6B':d.avg>=40?'#854F0B':'#A32D2D';
-    ctx.fillStyle = col;
-    ctx.fillRect(padL, y, bw, barH);
-    ctx.fillStyle = '#333';
-    ctx.font = '11px Segoe UI, system-ui, sans-serif';
-    ctx.textAlign = 'right';
-    ctx.fillText(d.name, padL - 6, y + barH/2 + 4);
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#fff';
-    if (bw > 35) ctx.fillText(d.avg + '%', padL + bw - 30, y + barH/2 + 4);
-    else { ctx.fillStyle = '#333'; ctx.fillText(d.avg + '%', padL + bw + 4, y + barH/2 + 4); }
-  });
+function printAnalytics() {
+  var body = document.getElementById('analytics-printable');
+  if (!body) return;
+  var w = window.open('', '_blank', 'width=1000,height=700');
+  var css = '<style>'
+    + 'body{font-family:"Palatino Linotype",Palatino,Georgia,serif;padding:20px;color:#1a1a2e;font-size:11px;line-height:1.6}'
+    + 'table{width:100%;border-collapse:collapse}'
+    + 'th{background:#f0f1f4;padding:7px 10px;text-align:left;border-bottom:1.5px solid #000;font-size:9px;text-transform:uppercase;letter-spacing:.04em}'
+    + 'td{padding:6px 10px;border-bottom:.5px solid #ccc}'
+    + '.band{display:inline-block;font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px}'
+    + '.band-exc{background:#eaf3de;color:#3B6D11}'
+    + '.band-exceeds{background:#e6f1fb;color:#185FA5}'
+    + '.band-meets{background:#f0f1f4;color:#1B2A6B}'
+    + '.band-needs{background:#faeeda;color:#854F0B}'
+    + '.band-unsat{background:#fcebeb;color:#A32D2D}'
+    + '.pill-skyz{background:#e6f1fb;color:#185FA5;display:inline-block;font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px}'
+    + '.pill-phk{background:#faeeda;color:#854F0B;display:inline-block;font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px}'
+    + '@media print{@page{margin:10mm}}'
+    + '</style>';
+  w.document.write('<!DOCTYPE html><html><head><title>Performance Intelligence Report</title>' + css + '</head><body>');
+  w.document.write(body.innerHTML);
+  w.document.write('</body></html>');
+  w.document.close();
+  setTimeout(function(){ w.print(); }, 500);
 }
 
-function drawPropertyChart(skyzAvg, phkAvg, skyzRate, phkRate, skyzCount, phkCount) {
-  var canvas = document.getElementById('chart-prop');
-  if (!canvas) return;
-  var ctx = canvas.getContext('2d');
-  var W = canvas.width = canvas.offsetWidth;
-  var H = canvas.height = 180;
-  ctx.clearRect(0,0,W,H);
-  var props  = ['Protea Skyz', 'Protea PHK'];
-  var scores = [skyzAvg, phkAvg];
-  var counts = [skyzCount, phkCount];
-  var rates  = [skyzRate, phkRate];
-  var colors = ['#1B2A6B','#800020'];
-  var barW   = Math.floor((W - 80) / 2) - 10;
-  var padB   = 50; var chartH = H - padB - 10;
-  scores.forEach(function(v, i) {
-    var bh = Math.round(v / 100 * chartH);
-    var x  = 40 + i * (barW + 10);
-    var y  = H - padB - bh;
-    ctx.fillStyle = colors[i];
-    ctx.fillRect(x, y, barW, bh);
-    ctx.fillStyle = '#333';
-    ctx.font = 'bold 13px Segoe UI, system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    if (v > 0) ctx.fillText(v + '%', x + barW/2, y - 6);
-    ctx.font = '11px Segoe UI, system-ui, sans-serif';
-    ctx.fillText(props[i], x + barW/2, H - padB + 14);
-    ctx.fillStyle = '#888';
-    ctx.font = '10px Segoe UI, system-ui, sans-serif';
-    ctx.fillText(counts[i] + ' appraised (' + rates[i] + '%)', x + barW/2, H - padB + 28);
-  });
-}
-
-function drawCompletionChart() {
-  var el = document.getElementById('completion-bars');
-  if (!el || _staffCache.length === 0) return;
-  var apprMap = {};
-  if (window._appraisalsCache) {
-    window._appraisalsCache.forEach(function(a){ apprMap[a.staff_id] = a.status; });
-  }
-  var depts = {};
-  _staffCache.forEach(function(s) {
-    if (currentProp !== 'both' && s.propCode !== currentProp) return;
-    var dn = s.deptName||'Unknown';
-    if (!depts[dn]) depts[dn] = { total:0, complete:0 };
-    depts[dn].total++;
-    if (apprMap[s.id] === 'complete') depts[dn].complete++;
-  });
-  el.innerHTML = Object.keys(depts).sort().map(function(dn) {
-    var d   = depts[dn];
-    var pct = d.total ? Math.round(d.complete/d.total*100) : 0;
-    var col = pct>=80?'#3B6D11':pct>=50?'#854F0B':'#A32D2D';
-    return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
-      +'<div style="font-size:11px;color:#333;min-width:140px;text-align:right">' + dn + '</div>'
-      +'<div style="flex:1;background:#eee;border-radius:2px;height:10px"><div style="width:' + pct + '%;background:' + col + ';height:10px;border-radius:2px;transition:width .4s"></div></div>'
-      +'<div style="font-size:11px;font-weight:600;min-width:50px;color:' + col + '">' + d.complete + '/' + d.total + ' (' + pct + '%)</div>'
-      +'</div>';
-  }).join('');
-}
-
-// ── AI NARRATIVE ──────────────────────────────────────────
-async function loadAINarrative(completed, deptAvgs, skyzAvg, phkAvg, compRate, avgScore, cycleLabel) {
+async function generateAINarrative(cycle, viewData, totalStaff) {
   var el = document.getElementById('ai-narrative-text');
   if (!el) return;
   try {
-    var topDept    = deptAvgs.length ? deptAvgs[0].name + ' (' + deptAvgs[0].avg + '%)' : 'N/A';
-    var bottomDept = deptAvgs.length ? deptAvgs[deptAvgs.length-1].name + ' (' + deptAvgs[deptAvgs.length-1].avg + '%)' : 'N/A';
-    var bandLabel  = avgScore>=90?'Exceptional':avgScore>=75?'Exceeds Expectations':avgScore>=60?'Meets Expectations':avgScore>=40?'Needs Improvement':'Unsatisfactory';
+    var avgScore = Math.round(viewData.reduce(function(t,a){ return t+(a.final_score||0); },0)/viewData.length);
+    var compRate = totalStaff ? Math.round(viewData.length/totalStaff*100) : 0;
+    var depts    = {};
+    viewData.forEach(function(a){ if(!depts[a.deptName])depts[a.deptName]=[];depts[a.deptName].push(a.final_score||0); });
+    var deptAvgs = Object.keys(depts).map(function(d){ var arr=depts[d]; return {name:d,avg:Math.round(arr.reduce(function(t,s){return t+s;},0)/arr.length)}; }).sort(function(a,b){return b.avg-a.avg;});
+    var top    = deptAvgs[0];
+    var bottom = deptAvgs[deptAvgs.length-1];
+    var flagged= viewData.filter(function(a){ return (a.final_score||0)<60; }).length;
+    var skyzAvg= Math.round((viewData.filter(function(a){return a.propCode==='skyz';}).reduce(function(t,a){return t+(a.final_score||0);},0)||0) / (viewData.filter(function(a){return a.propCode==='skyz';}).length||1));
+    var phkAvg = Math.round((viewData.filter(function(a){return a.propCode==='phk';}).reduce(function(t,a){return t+(a.final_score||0);},0)||0)  / (viewData.filter(function(a){return a.propCode==='phk';}).length||1));
 
-    var prompt = 'You are Kusain Kabugo, Head of Human Resources at Simba Group Hotels, Kampala. '
-      + 'Write exactly 2 sentences summarising the ' + cycleLabel + ' appraisal cycle performance data below. '
-      + 'Write as an experienced HR professional, not a computer. No motivational language. No bullet points. Factual and direct.\n\n'
+    function bandL(s){ return s>=90?'Exceptional':s>=75?'Exceeds Expectations':s>=60?'Meets Expectations':s>=40?'Needs Improvement':'Unsatisfactory'; }
+
+    var prompt = 'You are Kusain Kabugo, Head of Human Resources at Simba Group Hotels, Kampala, Uganda. '
+      + 'Write a 3-sentence executive summary of the ' + cycle.label + ' appraisal cycle results for distribution to the CEO, GMs, and HODs. '
+      + 'Tone: experienced HR professional. Direct, factual, no motivational language. No bullet points. No heading.\n\n'
       + 'Data:\n'
-      + '- Overall average score: ' + avgScore + '% (' + bandLabel + ')\n'
-      + '- Completion rate: ' + compRate + '%\n'
+      + '- Cycle: ' + cycle.label + ' (' + new Date(cycle.start_date).toLocaleDateString('en-GB',{month:'long',year:'numeric'}) + ' to ' + new Date(cycle.end_date).toLocaleDateString('en-GB',{month:'long',year:'numeric'}) + ')\n'
+      + '- Staff appraised: ' + viewData.length + ' of ' + totalStaff + ' (' + compRate + '% completion)\n'
+      + '- Group average score: ' + avgScore + '% (' + bandL(avgScore) + ')\n'
       + '- Protea Hotel Skyz average: ' + skyzAvg + '%\n'
       + '- Protea Hotel Kampala average: ' + phkAvg + '%\n'
-      + '- Highest performing department: ' + topDept + '\n'
-      + '- Department needing most attention: ' + bottomDept + '\n'
-      + '- Total appraisals completed: ' + completed.length + '\n\n'
-      + 'Write exactly 2 sentences. No heading. No label. Just the 2 sentences.';
+      + '- Best performing department: ' + (top ? top.name + ' at ' + top.avg + '%' : 'N/A') + '\n'
+      + '- Department needing most attention: ' + (bottom ? bottom.name + ' at ' + bottom.avg + '%' : 'N/A') + '\n'
+      + '- Staff scoring below 60% (flagged): ' + flagged + '\n'
+      + '- Write 3 sentences only. No labels. No heading.';
 
     var res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 120,
-        messages: [{ role: 'user', content: prompt }]
-      })
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 180, messages: [{ role:'user', content:prompt }] })
     });
     var data = await res.json();
     var text = data.content && data.content[0] ? data.content[0].text : null;
     if (text && el) el.textContent = text.trim();
-    else if (el) el.textContent = avgScore + '% overall average across ' + completed.length + ' completed appraisals for ' + cycleLabel + '. Completion rate stands at ' + compRate + '%.';
+    else if (el) el.textContent = 'The ' + cycle.label + ' appraisal cycle closed with ' + viewData.length + ' of ' + totalStaff + ' staff appraised, achieving a group average score of ' + avgScore + '% (' + bandL(avgScore) + '). Completion rate stands at ' + compRate + '%. Full department breakdown is provided in the sections below.';
   } catch(e) {
-    if (el) el.textContent = avgScore + '% overall average across ' + completed.length + ' completed appraisals for ' + cycleLabel + '. Completion rate stands at ' + compRate + '%.';
-    console.warn('AI narrative:', e.message);
+    if (el) el.textContent = 'Performance data loaded. AI narrative unavailable. Group average: ' + Math.round(viewData.reduce(function(t,a){return t+(a.final_score||0);},0)/viewData.length) + '%.';
+    console.warn('generateAINarrative:', e.message);
   }
 }
 
-
-// ══════════════════════════════════════════════════════════
 // R5: KPI SETUP, JOB DESCRIPTIONS, APPROVAL WORKFLOW
 // ══════════════════════════════════════════════════════════
 
@@ -3547,6 +3680,7 @@ async function loadSettingsPage() {
     + '<div class="card">'
     + '<div class="card-title">Active appraisal cycle</div>'
     + '<div id="settings-cycle-content"><div style="font-size:11px;color:#888">Loading...</div></div>'
+    + (currentUser && currentUser.role === 'hr_admin' ? '<button class="btn btn-secondary btn-sm" onclick="openNewCycleModal()" style="margin-top:12px">+ Start new cycle</button>' : '')
     + '</div>'
     // User access
     + '<div class="card">'
@@ -3619,6 +3753,45 @@ async function loadSettingsPage() {
   }
 }
 
+
+
+function openNewCycleModal() {
+  var today = new Date();
+  var y = today.getFullYear();
+  var m = today.getMonth();
+  // Suggest H2 if current month > 6, else H1 of next year
+  var label, start, end;
+  if (m >= 6) { label = 'H2 ' + y; start = y + '-07-01'; end = y + '-12-31'; }
+  else         { label = 'H1 ' + y; start = y + '-01-01'; end = y + '-06-30'; }
+  document.getElementById('nc-label').value = label;
+  document.getElementById('nc-start').value = start;
+  document.getElementById('nc-end').value   = end;
+  document.getElementById('nc-self').value  = '40';
+  document.getElementById('modal-new-cycle').classList.remove('hidden');
+}
+
+async function createNewCycle() {
+  var label = (document.getElementById('nc-label')||{value:''}).value.trim();
+  var start = (document.getElementById('nc-start')||{value:''}).value;
+  var end   = (document.getElementById('nc-end')  ||{value:''}).value;
+  var self  = parseInt((document.getElementById('nc-self')||{value:'40'}).value)||40;
+  if (!label || !start || !end) { showToast('Label, start date and end date are required.'); return; }
+  try {
+    var cl = getClient();
+    // Deactivate current cycle
+    await cl.from('appraisal_cycles').update({ is_active: false }).eq('is_active', true);
+    // Create new cycle
+    var res = await cl.from('appraisal_cycles').insert({
+      label: label, start_date: start, end_date: end,
+      self_weight: self, hod_weight: 100 - self, is_active: true
+    });
+    if (res.error) throw res.error;
+    closeModal('modal-new-cycle');
+    showToast('New cycle started: ' + label);
+    loadHomeData();
+    loadSettingsPage();
+  } catch(e) { showToast('Error: ' + e.message); console.error('createNewCycle:', e); }
+}
 
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('login-password').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
