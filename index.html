@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simba Group — Performance Management System</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ── RESET & BASE ───────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1B2A6B;
+  --red:#800020;
+  --grey-bg:#f0f1f4;
+  --grey-border:#d0d0d8;
+  --grey-mid:#888;
+  --grey-light:#f7f7f9;
+  --white:#ffffff;
+  --text-dark:#1a1a2e;
+  --text-mid:#555;
+  --text-light:#999;
+  --green:#3B6D11;
+  --amber:#854F0B;
+  --blue-light:#e6f1fb;
+  --font-heading:'Palatino Linotype',Palatino,Georgia,serif;
+  --font-ui:'Segoe UI',system-ui,sans-serif;
+  --sidebar-w:230px;
+  --topbar-h:56px;
+}
+body{font-family:var(--font-ui);background:var(--grey-bg);color:var(--text-dark);font-size:13px;line-height:1.5}
+a{text-decoration:none;color:inherit}
+button{font-family:var(--font-ui);cursor:pointer}
+input,select,textarea{font-family:var(--font-ui)}
+h1,h2,h3,h4{font-family:var(--font-heading)}
+
+/* ── LAYOUT ─────────────────────────────────────────────── */
+#app{display:flex;height:100vh;overflow:hidden}
+#sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--grey-bg);border-right:1px solid var(--grey-border);display:flex;flex-direction:column;overflow-y:auto;transition:width .2s}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#topbar{height:var(--topbar-h);min-height:var(--topbar-h);background:var(--white);border-bottom:1px solid var(--grey-border);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+#content{flex:1;overflow-y:auto;padding:24px}
+
+/* ── SIDEBAR ─────────────────────────────────────────────── */
+.sb-logo{padding:16px 16px 12px;border-bottom:1px solid var(--grey-border)}
+.sb-logo-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.sb-icon{width:30px;height:30px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-icon img{width:22px;height:22px;object-fit:contain;border-radius:50%}
+.sb-icon-text{color:#fff;font-size:10px;font-weight:700}
+.sb-title{font-family:var(--font-heading);font-size:13px;font-weight:600;color:var(--navy)}
+.sb-sub{font-size:10px;color:var(--grey-mid);margin-top:1px}
+.sb-badge{display:inline-block;background:var(--red);color:#fff;font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px;margin-top:5px;letter-spacing:.04em;text-transform:uppercase}
+
+.sb-prop{padding:10px 12px 4px}
+.sb-prop-label{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-light);margin-bottom:4px}
+.sb-prop select{width:100%;background:var(--white);border:1px solid var(--grey-border);border-radius:5px;font-size:11px;padding:6px 8px;color:var(--navy);font-family:var(--font-ui);font-weight:500;cursor:pointer}
+
+.sb-section{padding:10px 0 2px}
+.sb-section-label{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-light);padding:0 14px 5px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:7px 14px;color:var(--text-mid);font-size:12px;cursor:pointer;border-left:3px solid transparent;transition:all .12s;user-select:none}
+.sb-item:hover{background:#e8e9ed;color:var(--navy)}
+.sb-item.active{background:var(--white);color:var(--navy);border-left-color:var(--red);font-weight:600;box-shadow:inset 0 0 0 .5px var(--grey-border)}
+.sb-item svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+.sb-footer{margin-top:auto;padding:12px 14px;border-top:1px solid var(--grey-border)}
+.sb-user{display:flex;align-items:center;gap:9px}
+.sb-avatar{width:28px;height:28px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:600;flex-shrink:0}
+.sb-user-name{font-size:11px;font-weight:600;color:var(--text-dark)}
+.sb-user-role{font-size:10px;color:var(--text-light)}
+.sb-logout{margin-left:auto;background:none;border:none;color:var(--text-light);font-size:11px;cursor:pointer;padding:2px 4px}
+.sb-logout:hover{color:var(--red)}
+
+/* ── TOPBAR ──────────────────────────────────────────────── */
+.tb-left h1{font-family:var(--font-heading);font-size:15px;font-weight:600;color:var(--navy)}
+.tb-left p{font-size:11px;color:var(--grey-mid);margin-top:1px}
+.tb-right{display:flex;align-items:center;gap:10px}
+.cycle-badge{background:var(--grey-bg);color:var(--navy);font-size:11px;font-weight:500;padding:5px 11px;border-radius:4px;border:1px solid var(--grey-border)}
+
+/* ── BUTTONS ─────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:5px;font-size:12px;font-weight:500;border:none;cursor:pointer;font-family:var(--font-ui);transition:opacity .15s}
+.btn:hover{opacity:.88}
+.btn-primary{background:var(--red);color:#fff}
+.btn-secondary{background:var(--white);color:var(--navy);border:1px solid var(--grey-border)}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-ghost{background:transparent;color:var(--navy);border:1px solid var(--grey-border)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-danger{background:#fcebeb;color:#A32D2D;border:1px solid #f7c1c1}
+
+/* ── CARDS ───────────────────────────────────────────────── */
+.card{background:var(--white);border:1px solid var(--grey-border);border-radius:8px;padding:16px}
+.card-title{font-family:var(--font-heading);font-size:13px;font-weight:600;color:var(--navy);padding-bottom:5px;border-bottom:2px solid var(--red);display:inline-block;margin-bottom:14px}
+.metric-card{background:var(--grey-bg);border-radius:8px;padding:14px 16px}
+.metric-label{font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.06em}
+.metric-value{font-size:26px;font-weight:600;margin-top:4px;line-height:1;font-family:var(--font-heading)}
+.metric-sub{font-size:10px;color:var(--text-light);margin-top:4px}
+
+/* ── WELCOME BANNER ──────────────────────────────────────── */
+.welcome-banner{background:var(--white);border-left:4px solid var(--red);border-radius:8px;padding:18px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--grey-border);border-right:1px solid var(--grey-border);border-bottom:1px solid var(--grey-border)}
+.welcome-banner h2{font-family:var(--font-heading);font-size:16px;font-weight:600;color:var(--navy)}
+.welcome-banner p{font-size:12px;color:var(--text-mid);margin-top:4px;max-width:460px}
+.welcome-actions{display:flex;gap:8px;flex-shrink:0}
+
+/* ── GRIDS ───────────────────────────────────────────────── */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.grid-2-3{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px}
+
+/* ── NAV CARDS (home) ────────────────────────────────────── */
+.nav-card{display:flex;align-items:center;gap:12px;padding:14px;background:var(--white);border:1px solid var(--grey-border);border-radius:8px;cursor:pointer;transition:all .12s}
+.nav-card:hover{border-color:var(--navy);background:#f8f8fc}
+.nav-card-icon{width:38px;height:38px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-card-icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nc-blue{background:var(--blue-light);color:var(--navy)}
+.nc-red{background:#fcebeb;color:#A32D2D}
+.nc-green{background:#eaf3de;color:var(--green)}
+.nc-amber{background:#faeeda;color:var(--amber)}
+.nc-purple{background:#EEEDFE;color:#534AB7}
+.nc-teal{background:#E1F5EE;color:#0F6E56}
+.nav-card-title{font-size:12px;font-weight:600;color:var(--navy)}
+.nav-card-sub{font-size:10px;color:var(--text-light);margin-top:2px}
+.nav-card-arrow{margin-left:auto;color:var(--grey-border)}
+.nav-card-arrow svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* ── TABLES ──────────────────────────────────────────────── */
+.table-wrap{background:var(--white);border:1px solid var(--grey-border);border-radius:8px;overflow:hidden;margin-bottom:20px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--grey-bg);color:var(--text-dark);font-weight:600;padding:9px 12px;text-align:left;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase;letter-spacing:.04em}
+td{padding:9px 12px;border-bottom:.5px solid #e8e8ec;color:var(--text-dark);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+.table-actions{display:flex;gap:5px}
+
+/* ── PILLS & BADGES ──────────────────────────────────────── */
+.pill{display:inline-block;font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px;letter-spacing:.02em}
+.pill-skyz{background:#e6f1fb;color:#185FA5}
+.pill-phk{background:#faeeda;color:#854F0B}
+.pill-both{background:#EEEDFE;color:#534AB7}
+.band{display:inline-block;font-size:9px;font-weight:600;padding:2px 8px;border-radius:3px}
+.band-exc{background:#eaf3de;color:var(--green)}
+.band-exceeds{background:#e6f1fb;color:#185FA5}
+.band-meets{background:var(--grey-bg);color:var(--navy)}
+.band-needs{background:#faeeda;color:var(--amber)}
+.band-unsat{background:#fcebeb;color:#A32D2D}
+.status-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500}
+.status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot-open{background:var(--red)}
+.dot-prog{background:var(--amber)}
+.dot-done{background:var(--green)}
+.dot-pending{background:#BA7517}
+
+/* ── FORM ELEMENTS ───────────────────────────────────────── */
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:11px;font-weight:600;color:var(--navy);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:8px 10px;border:1px solid var(--grey-border);border-radius:5px;font-size:12px;font-family:var(--font-ui);color:var(--text-dark);background:var(--white);transition:border .15s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--navy)}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.form-section-title{font-family:var(--font-heading);font-size:13px;font-weight:600;color:var(--navy);border-bottom:2px solid var(--red);padding-bottom:4px;margin-bottom:14px;display:inline-block}
+
+/* ── SECTION HEADER ──────────────────────────────────────── */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.section-title{font-family:var(--font-heading);font-size:13px;font-weight:600;color:var(--navy);border-bottom:2px solid var(--red);padding-bottom:4px;display:inline-block}
+.filter-row{display:flex;gap:8px;align-items:center}
+.filter-select{font-size:11px;padding:5px 9px;border-radius:4px;border:1px solid var(--grey-border);background:var(--white);color:var(--text-dark);font-family:var(--font-ui)}
+
+/* ── BAR CHART ───────────────────────────────────────────── */
+.dept-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.dept-name{font-size:10px;color:var(--text-mid);min-width:120px}
+.bar-track{flex:1;background:var(--grey-bg);border-radius:2px;height:8px}
+.bar-fill{height:8px;border-radius:2px;background:var(--navy);transition:width .4s}
+.bar-fill-warn{background:var(--red)}
+.bar-pct{font-size:10px;color:var(--text-mid);min-width:30px;text-align:right}
+
+/* ── ACTIVITY ────────────────────────────────────────────── */
+.activity-row{display:flex;gap:10px;padding:7px 0;border-bottom:.5px solid #eee}
+.activity-row:last-child{border-bottom:none}
+.act-dot{width:8px;height:8px;border-radius:50%;margin-top:3px;flex-shrink:0}
+.act-text{font-size:11px;color:var(--text-mid);line-height:1.4}
+.act-time{font-size:10px;color:var(--text-light);margin-top:1px}
+
+/* ── RATING DIST ─────────────────────────────────────────── */
+.rating-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px}
+.rating-box{border-radius:5px;padding:9px 10px}
+.rating-num{font-size:20px;font-weight:600;font-family:var(--font-heading)}
+.rating-name{font-size:9px;text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
+
+/* ── APPRAISAL FORM ──────────────────────────────────────── */
+.appraisal-form{background:var(--white);border:1px solid var(--grey-border);border-radius:8px;overflow:hidden;margin-bottom:20px}
+.appraisal-form-header{background:var(--navy);color:#fff;padding:14px 18px}
+.appraisal-form-header h3{font-family:var(--font-heading);font-size:14px;font-weight:600}
+.appraisal-form-header p{font-size:11px;opacity:.7;margin-top:2px}
+.appraisal-form-body{padding:18px}
+.kpi-row{display:grid;grid-template-columns:2fr 1.2fr 1.4fr .5fr;gap:10px;align-items:start;padding:10px 0;border-bottom:.5px solid #eee}
+.kpi-row:last-child{border-bottom:none}
+.kpi-name{font-size:12px;font-weight:500;color:var(--text-dark)}
+.kpi-target{font-size:10px;color:var(--text-light);margin-top:2px}
+.kpi-rating-select{font-size:11px;padding:5px 7px;border:1px solid var(--grey-border);border-radius:4px;background:var(--white);width:100%;font-family:var(--font-ui);color:var(--text-dark)}
+.kpi-weight-badge{font-size:10px;font-weight:600;color:var(--red);text-align:right;padding-top:5px}
+.kpi-comment{grid-column:1/-1;margin-top:4px}
+.kpi-comment textarea{width:100%;padding:6px 8px;border:1px solid var(--grey-border);border-radius:4px;font-size:11px;font-family:var(--font-ui);resize:vertical;min-height:52px}
+.competency-row{display:grid;grid-template-columns:1.5fr 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:.5px solid #eee}
+.competency-row:last-child{border-bottom:none}
+.comp-label{font-size:12px;color:var(--text-dark)}
+.comp-desc{font-size:10px;color:var(--text-light);margin-top:1px}
+.rating-selector{display:flex;gap:4px}
+.rating-btn{width:28px;height:28px;border-radius:4px;border:1px solid var(--grey-border);background:var(--white);font-size:11px;font-weight:600;cursor:pointer;color:var(--text-mid);transition:all .12s;display:flex;align-items:center;justify-content:center}
+.rating-btn:hover{background:var(--grey-bg)}
+.rating-btn.selected-1{background:#fcebeb;border-color:#f7c1c1;color:#A32D2D}
+.rating-btn.selected-2{background:#faeeda;border-color:#FAC775;color:#854F0B}
+.rating-btn.selected-3{background:var(--grey-bg);border-color:var(--grey-border);color:var(--navy)}
+.rating-btn.selected-4{background:#e6f1fb;border-color:#B5D4F4;color:#185FA5}
+.rating-btn.selected-5{background:#eaf3de;border-color:#C0DD97;color:var(--green)}
+.score-footer{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--grey-bg);border-top:1.5px solid #000}
+.score-label{font-size:11px;color:var(--text-mid)}
+.score-val{font-family:var(--font-heading);font-size:16px;font-weight:600;color:var(--navy)}
+.score-val span{color:var(--red)}
+
+/* ── JD FORM ─────────────────────────────────────────────── */
+.jd-preview{background:var(--white);border:1px solid var(--grey-border);border-radius:8px;overflow:hidden}
+.jd-preview-header{background:var(--navy);color:#fff;padding:16px 20px;text-align:center}
+.jd-preview-header h2{font-family:var(--font-heading);font-size:16px;font-weight:600}
+.jd-preview-header p{font-size:11px;opacity:.65;margin-top:3px}
+.jd-preview-body{padding:20px}
+.jd-section{margin-bottom:16px}
+.jd-section-title{font-family:var(--font-heading);font-size:12px;font-weight:600;color:var(--navy);text-transform:uppercase;letter-spacing:.05em;border-left:3px solid var(--red);padding-left:8px;margin-bottom:6px}
+.jd-section-content{font-size:12px;color:var(--text-mid);line-height:1.7;padding-left:11px}
+
+/* ── ANALYTICS ───────────────────────────────────────────── */
+.analytics-chart{background:var(--white);border:1px solid var(--grey-border);border-radius:8px;padding:16px}
+.donut-wrap{display:flex;align-items:center;gap:20px}
+.donut-legend{flex:1}
+.legend-item{display:flex;align-items:center;gap:7px;margin-bottom:7px;font-size:11px;color:var(--text-mid)}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* ── MODAL / OVERLAY ─────────────────────────────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:flex;align-items:center;justify-content:center}
+.modal{background:var(--white);border-radius:10px;width:580px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 4px 32px rgba(0,0,0,.18)}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--grey-border);display:flex;align-items:center;justify-content:space-between}
+.modal-header h3{font-family:var(--font-heading);font-size:14px;font-weight:600;color:var(--navy)}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--text-light);font-size:18px;line-height:1;padding:2px 5px}
+.modal-close:hover{color:var(--red)}
+.modal-body{padding:20px}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--grey-border);display:flex;justify-content:flex-end;gap:8px}
+
+/* ── LOGIN ───────────────────────────────────────────────── */
+#login-screen{position:fixed;inset:0;background:var(--grey-bg);display:flex;align-items:center;justify-content:center;z-index:2000}
+.login-card{background:var(--white);border:1px solid var(--grey-border);border-radius:10px;width:380px;padding:36px 32px;text-align:center}
+.login-logo-wrap{display:flex;justify-content:center;margin-bottom:8px}
+.login-logo{width:48px;height:48px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.login-logo span{color:#fff;font-size:16px;font-weight:700}
+.login-title{font-family:var(--font-heading);font-size:18px;font-weight:600;color:var(--navy);margin-bottom:2px}
+.login-sub{font-size:11px;color:var(--text-light);margin-bottom:24px}
+.login-card .form-group label{text-align:left}
+.login-error{background:#fcebeb;color:#A32D2D;border:1px solid #f7c1c1;border-radius:5px;padding:8px 12px;font-size:12px;margin-bottom:12px;display:none}
+.login-card .btn{width:100%;justify-content:center;margin-top:4px}
+
+/* ── TOAST ───────────────────────────────────────────────── */
+#toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;padding:10px 18px;border-radius:6px;font-size:12px;z-index:3000;opacity:0;transition:opacity .25s;pointer-events:none}
+#toast.show{opacity:1}
+
+/* ── PRINT ───────────────────────────────────────────────── */
+@media print{
+  #sidebar,#topbar,.no-print{display:none!important}
+  #content{padding:0}
+  .print-area{font-family:'Palatino Linotype',Palatino,Georgia,serif}
+  .print-header{text-align:center;padding:20px 0 12px;border-bottom:2px solid #000;margin-bottom:16px}
+  .print-header h1{font-size:18px;color:#1B2A6B}
+  .print-header p{font-size:11px;color:#555;margin-top:3px}
+}
+
+/* ── MISC ────────────────────────────────────────────────── */
+.hidden{display:none!important}
+.text-red{color:var(--red)}
+.text-navy{color:var(--navy)}
+.text-green{color:var(--green)}
+.text-amber{color:var(--amber)}
+.divider{border:none;border-top:.5px solid var(--grey-border);margin:12px 0}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-light)}
+.empty-state svg{width:40px;height:40px;stroke:var(--grey-border);fill:none;stroke-width:1.5;margin-bottom:10px}
+.empty-state p{font-size:12px}
+.page-view{display:none}
+.page-view.active{display:block}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo-wrap">
+      <div class="login-logo"><span>SG</span></div>
+    </div>
+    <div class="login-title">Performance Management</div>
+    <div class="login-sub">Simba Group Hotels &mdash; Skyz &amp; PHK</div>
+    <div class="login-error" id="login-error">Invalid email or password.</div>
+    <div class="form-group">
+      <label>Email address</label>
+      <input type="email" id="login-email" placeholder="yourname@thesimbagroup.com" />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" />
+    </div>
+    <button class="btn btn-primary" onclick="doLogin()">Sign in &rarr;</button>
+    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026</p>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none">
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-row">
+        <div class="sb-icon"><span class="sb-icon-text">SG</span></div>
+        <div>
+          <div class="sb-title">Simba Group</div>
+          <div class="sb-sub">Performance Management</div>
+        </div>
+      </div>
+      <div class="sb-badge" id="cycle-badge">H1 2026 Active</div>
+    </div>
+
+    <div class="sb-prop">
+      <div class="sb-prop-label">Viewing</div>
+      <select id="prop-switcher" onchange="switchProperty(this.value)">
+        <option value="both">&#127970; Both properties</option>
+        <option value="skyz">Protea Hotel Skyz</option>
+        <option value="phk">Protea Hotel Kampala</option>
+      </select>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-label">Main</div>
+      <div class="sb-item active" onclick="navigate('home')" data-page="home">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </div>
+      <div class="sb-item" onclick="navigate('appraisals')" data-page="appraisals">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Appraisals
+      </div>
+      <div class="sb-item" onclick="navigate('analytics')" data-page="analytics">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Analytics
+      </div>
+      <div class="sb-item" onclick="navigate('reports')" data-page="reports">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Reports
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-label">Setup</div>
+      <div class="sb-item" onclick="navigate('staff')" data-page="staff">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Staff &amp; Roles
+      </div>
+      <div class="sb-item" onclick="navigate('kpis')" data-page="kpis">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        KPI Setup
+      </div>
+      <div class="sb-item" onclick="navigate('jds')" data-page="jds">
+        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Job Descriptions
+      </div>
+      <div class="sb-item" onclick="navigate('departments')" data-page="departments">
+        <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        Departments
+      </div>
+      <div class="sb-item" onclick="navigate('settings')" data-page="settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </div>
+    </div>
+
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar" id="sb-avatar">KK</div>
+        <div>
+          <div class="sb-user-name" id="sb-user-name">Kusain Kabugo</div>
+          <div class="sb-user-role" id="sb-user-role">HR Admin</div>
+        </div>
+        <button class="sb-logout" onclick="doLogout()" title="Sign out">&#8594;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+    <div id="topbar">
+      <div class="tb-left">
+        <h1 id="tb-title">Home</h1>
+        <p id="tb-sub">Both properties &mdash; Wednesday, 27 May 2026</p>
+      </div>
+      <div class="tb-right">
+        <div class="cycle-badge" id="tb-cycle">&#128197;&nbsp; H1 2026 &nbsp;&middot;&nbsp; Jan &ndash; Jun 2026</div>
+      </div>
+    </div>
+
+    <div id="content">
+
+      <!-- HOME PAGE -->
+      <div class="page-view active" id="page-home">
+        <div class="welcome-banner">
+          <div>
+            <h2 id="welcome-msg">Good morning, Kusain</h2>
+            <p id="welcome-sub">H1 2026 appraisal cycle is open. 97 forms are pending HOD review across both properties.</p>
+          </div>
+          <div class="welcome-actions no-print">
+            <button class="btn btn-secondary" onclick="navigate('appraisals')">View pending</button>
+            <button class="btn btn-primary" onclick="openNewAppraisalModal()">+ New appraisal</button>
+          </div>
+        </div>
+
+        <div class="grid-4">
+          <div class="metric-card">
+            <div class="metric-label">Total staff</div>
+            <div class="metric-value text-navy">431</div>
+            <div class="metric-sub">Skyz 285 &middot; PHK 146</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Forms submitted</div>
+            <div class="metric-value text-green">284</div>
+            <div class="metric-sub">66% completion rate</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Pending HOD review</div>
+            <div class="metric-value text-amber">97</div>
+            <div class="metric-sub">Across 10 departments</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Avg. score (to date)</div>
+            <div class="metric-value text-navy">71<span style="font-size:15px">%</span></div>
+            <div class="metric-sub"><span class="band band-meets">Meets expectations</span></div>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="nav-card" onclick="navigate('appraisals')">
+            <div class="nav-card-icon nc-blue">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="nav-card-title">Appraisals</div>
+              <div class="nav-card-sub">View, start, or track all forms</div>
+            </div>
+            <div class="nav-card-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+          <div class="nav-card" onclick="navigate('analytics')">
+            <div class="nav-card-icon nc-purple">
+              <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="nav-card-title">Analytics</div>
+              <div class="nav-card-sub">Scores, trends, rating bands</div>
+            </div>
+            <div class="nav-card-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+          <div class="nav-card" onclick="navigate('reports')">
+            <div class="nav-card-icon nc-green">
+              <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="nav-card-title">Reports</div>
+              <div class="nav-card-sub">Individual, department, property</div>
+            </div>
+            <div class="nav-card-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+          <div class="nav-card" onclick="navigate('staff')">
+            <div class="nav-card-icon nc-red">
+              <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="nav-card-title">Staff &amp; Roles</div>
+              <div class="nav-card-sub">Manage staff, assign roles</div>
+            </div>
+            <div class="nav-card-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+          <div class="nav-card" onclick="navigate('kpis')">
+            <div class="nav-card-icon nc-amber">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="nav-card-title">KPI Setup</div>
+              <div class="nav-card-sub">BSC-linked KPIs per role</div>
+            </div>
+            <div class="nav-card-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+          <div class="nav-card" onclick="navigate('jds')">
+            <div class="nav-card-icon nc-teal">
+              <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="nav-card-title">Job Descriptions</div>
+              <div class="nav-card-sub">Create and manage JDs per role</div>
+            </div>
+            <div class="nav-card-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">Department scores &mdash; both properties</div>
+            <div class="dept-bar-row"><div class="dept-name">Management</div><div class="bar-track"><div class="bar-fill" style="width:88%"></div></div><div class="bar-pct">88%</div></div>
+            <div class="dept-bar-row"><div class="dept-name">Food &amp; Beverage</div><div class="bar-track"><div class="bar-fill" style="width:79%"></div></div><div class="bar-pct">79%</div></div>
+            <div class="dept-bar-row"><div class="dept-name">Kitchen</div><div class="bar-track"><div class="bar-fill" style="width:74%"></div></div><div class="bar-pct">74%</div></div>
+            <div class="dept-bar-row"><div class="dept-name">Finance</div><div class="bar-track"><div class="bar-fill" style="width:72%"></div></div><div class="bar-pct">72%</div></div>
+            <div class="dept-bar-row"><div class="dept-name">Housekeeping</div><div class="bar-track"><div class="bar-fill" style="width:70%"></div></div><div class="bar-pct">70%</div></div>
+            <div class="dept-bar-row"><div class="dept-name">Front Office</div><div class="bar-track"><div class="bar-fill" style="width:75%"></div></div><div class="bar-pct">75%</div></div>
+            <div class="dept-bar-row"><div class="dept-name">Sales &amp; Marketing</div><div class="bar-track"><div class="bar-fill" style="width:65%"></div></div><div class="bar-pct">65%</div></div>
+            <div class="dept-bar-row"><div class="dept-name">Maintenance</div><div class="bar-track"><div class="bar-fill bar-fill-warn" style="width:58%"></div></div><div class="bar-pct text-red">58%</div></div>
+            <div class="dept-bar-row"><div class="dept-name">IT</div><div class="bar-track"><div class="bar-fill" style="width:80%"></div></div><div class="bar-pct">80%</div></div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card" style="flex:1">
+              <div class="card-title">Recent activity</div>
+              <div class="activity-row">
+                <div class="act-dot" style="background:var(--green)"></div>
+                <div><div class="act-text">David Omondi (F&amp;B Manager, PHK) &mdash; appraisal completed</div><div class="act-time">Today, 09:14</div></div>
+              </div>
+              <div class="activity-row">
+                <div class="act-dot" style="background:var(--amber)"></div>
+                <div><div class="act-text">Mandal Monoranjan (Exec. Chef, PHK) &mdash; HOD review in progress</div><div class="act-time">Today, 08:40</div></div>
+              </div>
+              <div class="activity-row">
+                <div class="act-dot" style="background:var(--red)"></div>
+                <div><div class="act-text">Hope Kugonza (Floor Supervisor, PHK) &mdash; self-appraisal not started</div><div class="act-time">Yesterday</div></div>
+              </div>
+              <div class="activity-row">
+                <div class="act-dot" style="background:var(--green)"></div>
+                <div><div class="act-text">Abel Asingwiire (Sales Manager, PHK) &mdash; appraisal completed, 65%</div><div class="act-time">Yesterday</div></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Rating distribution &mdash; completed forms</div>
+              <div class="rating-grid">
+                <div class="rating-box" style="background:#eaf3de"><div class="rating-num" style="color:var(--green)">12</div><div class="rating-name" style="color:var(--green)">Exceptional</div></div>
+                <div class="rating-box" style="background:#e6f1fb"><div class="rating-num" style="color:#185FA5">67</div><div class="rating-name" style="color:#185FA5">Exceeds</div></div>
+                <div class="rating-box" style="background:var(--grey-bg)"><div class="rating-num" style="color:var(--navy)">148</div><div class="rating-name" style="color:var(--navy)">Meets</div></div>
+                <div class="rating-box" style="background:#faeeda"><div class="rating-num" style="color:var(--amber)">41</div><div class="rating-name" style="color:var(--amber)">Needs improvement</div></div>
+                <div class="rating-box" style="background:#fcebeb;grid-column:1/-1"><div class="rating-num" style="color:#A32D2D">16</div><div class="rating-name" style="color:#A32D2D">Unsatisfactory</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- APPRAISALS PAGE -->
+      <div class="page-view" id="page-appraisals">
+        <div class="section-header">
+          <div class="section-title">Appraisals &mdash; H1 2026</div>
+          <div class="filter-row">
+            <select class="filter-select" id="filter-prop"><option value="">Both properties</option><option value="skyz">Skyz</option><option value="phk">PHK</option></select>
+            <select class="filter-select" id="filter-dept"><option value="">All departments</option><option>Kitchen</option><option>Food &amp; Beverage</option><option>Front Office</option><option>Housekeeping</option><option>Finance</option><option>Sales &amp; Marketing</option><option>Maintenance</option><option>Management</option><option>IT</option><option>HR</option></select>
+            <select class="filter-select" id="filter-status"><option value="">All statuses</option><option>Not started</option><option>Self submitted</option><option>HOD in progress</option><option>Complete</option></select>
+            <button class="btn btn-primary btn-sm" onclick="openNewAppraisalModal()">+ New</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="appraisals-table">
+            <thead><tr>
+              <th>Employee</th><th>Property</th><th>Department</th><th>Role</th>
+              <th>Self-appraisal</th><th>HOD appraisal</th><th>Final score</th><th>Rating</th><th class="no-print">Actions</th>
+            </tr></thead>
+            <tbody id="appraisals-tbody">
+              <tr><td><strong>Davis Mugabi</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Management</td><td>General Manager</td><td><span class="status-badge"><span class="status-dot dot-done"></span>Submitted</span></td><td><span class="status-badge"><span class="status-dot dot-done"></span>Complete</span></td><td><strong>88%</strong></td><td><span class="band band-exceeds">Exceeds</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="openAppraisalForm('Davis Mugabi','PHK','Management','General Manager')">View</button><button class="btn btn-ghost btn-sm" onclick="printReport()">Print</button></div></td></tr>
+              <tr><td><strong>Mandal Monoranjan</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Kitchen</td><td>Executive Chef</td><td><span class="status-badge"><span class="status-dot dot-done"></span>Submitted</span></td><td><span class="status-badge"><span class="status-dot dot-prog"></span>In progress</span></td><td>&mdash;</td><td><span style="color:var(--text-light);font-size:10px">Pending</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-primary btn-sm" onclick="openAppraisalForm('Mandal Monoranjan','PHK','Kitchen','Executive Chef')">HOD review</button></div></td></tr>
+              <tr><td><strong>David Omondi</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Food &amp; Beverage</td><td>F&amp;B Manager</td><td><span class="status-badge"><span class="status-dot dot-done"></span>Submitted</span></td><td><span class="status-badge"><span class="status-dot dot-done"></span>Complete</span></td><td><strong>79%</strong></td><td><span class="band band-exceeds">Exceeds</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="openAppraisalForm('David Omondi','PHK','F&B','F&B Manager')">View</button><button class="btn btn-ghost btn-sm" onclick="printReport()">Print</button></div></td></tr>
+              <tr><td><strong>Hope Kugonza</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Housekeeping</td><td>Floor Supervisor</td><td><span class="status-badge"><span class="status-dot dot-open"></span>Not started</span></td><td><span class="status-badge"><span class="status-dot dot-open"></span>Awaiting self</span></td><td>&mdash;</td><td><span style="color:var(--text-light);font-size:10px">Pending</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="openAppraisalForm('Hope Kugonza','PHK','Housekeeping','Floor Supervisor')">Start</button></div></td></tr>
+              <tr><td><strong>Abel Asingwiire</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Sales &amp; Marketing</td><td>Sales Manager</td><td><span class="status-badge"><span class="status-dot dot-done"></span>Submitted</span></td><td><span class="status-badge"><span class="status-dot dot-done"></span>Complete</span></td><td><strong>65%</strong></td><td><span class="band band-meets">Meets</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="openAppraisalForm('Abel Asingwiire','PHK','Sales','Sales Manager')">View</button><button class="btn btn-ghost btn-sm" onclick="printReport()">Print</button></div></td></tr>
+              <tr><td><strong>Phillip Wandera</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Maintenance</td><td>Maintenance Supervisor</td><td><span class="status-badge"><span class="status-dot dot-done"></span>Submitted</span></td><td><span class="status-badge"><span class="status-dot dot-open"></span>Not started</span></td><td>&mdash;</td><td><span style="color:var(--text-light);font-size:10px">Pending</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-primary btn-sm" onclick="openAppraisalForm('Phillip Wandera','PHK','Maintenance','Maintenance Supervisor')">HOD review</button></div></td></tr>
+              <tr><td><strong>Gerald Mugumya</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Finance</td><td>Senior Accountant</td><td><span class="status-badge"><span class="status-dot dot-open"></span>Not started</span></td><td><span class="status-badge"><span class="status-dot dot-open"></span>Awaiting self</span></td><td>&mdash;</td><td><span style="color:var(--text-light);font-size:10px">Pending</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="openAppraisalForm('Gerald Mugumya','PHK','Finance','Senior Accountant')">Start</button></div></td></tr>
+              <tr><td><strong>Annet Nabude</strong></td><td><span class="pill pill-phk">PHK</span></td><td>HR</td><td>HR Manager</td><td><span class="status-badge"><span class="status-dot dot-done"></span>Submitted</span></td><td><span class="status-badge"><span class="status-dot dot-done"></span>Complete</span></td><td><strong>82%</strong></td><td><span class="band band-exceeds">Exceeds</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="openAppraisalForm('Annet Nabude','PHK','HR','HR Manager')">View</button><button class="btn btn-ghost btn-sm" onclick="printReport()">Print</button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ANALYTICS PAGE -->
+      <div class="page-view" id="page-analytics">
+        <div class="section-header">
+          <div class="section-title">Analytics &mdash; H1 2026</div>
+          <div class="filter-row">
+            <select class="filter-select"><option>Both properties</option><option>Skyz</option><option>PHK</option></select>
+            <select class="filter-select"><option>All departments</option><option>Kitchen</option><option>F&amp;B</option><option>Housekeeping</option></select>
+          </div>
+        </div>
+        <div class="grid-4">
+          <div class="metric-card"><div class="metric-label">Completion rate</div><div class="metric-value text-navy">66%</div><div class="metric-sub">284 of 431 staff</div></div>
+          <div class="metric-card"><div class="metric-label">Avg. final score</div><div class="metric-value text-navy">71%</div><div class="metric-sub"><span class="band band-meets">Meets expectations</span></div></div>
+          <div class="metric-card"><div class="metric-label">Highest dept.</div><div class="metric-value text-green">88%</div><div class="metric-sub">Management</div></div>
+          <div class="metric-card"><div class="metric-label">Needs attention</div><div class="metric-value text-red">58%</div><div class="metric-sub">Maintenance dept.</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">Score by department</div>
+            <div class="dept-bar-row"><div class="dept-name">Management</div><div class="bar-track"><div class="bar-fill" style="width:88%"></div></div><div class="bar-pct">88%</div></div>
+            <div class="dept-bar-row"><div class="dept-name">IT</div><div class="bar-track"><div class="bar-fill" style="width:80%"></div></div><div class="bar-pct">80%</div></div>
+            <div class="dept-bar-row"><div class="dept-name">Food &amp; Beverage</div><div class="bar-track"><div class="bar-fill" style="width:79%"></div></div><div class="bar-pct">79%</div></div>
+            <div class="dept-bar-row"><div class="dept-name">Front Office</div><div class="bar-track"><div class="bar-fill" style="width:75%"></div></div><div class="bar-pct">75%</div></div>
+            <div class="dept-bar-row"><div class="dept-name">Kitchen</div><div class="bar-track"><div class="bar-fill" style="width:74%"></div></div><div class="bar-pct">74%</div></div>
+            <div class="dept-bar-row"><div class="dept-name">Finance</div><div class="bar-track"><div class="bar-fill" style="width:72%"></div></div><div class="bar-pct">72%</div></div>
+            <div class="dept-bar-row"><div class="dept-name">Housekeeping</div><div class="bar-track"><div class="bar-fill" style="width:70%"></div></div><div class="bar-pct">70%</div></div>
+            <div class="dept-bar-row"><div class="dept-name">HR</div><div class="bar-track"><div class="bar-fill" style="width:68%"></div></div><div class="bar-pct">68%</div></div>
+            <div class="dept-bar-row"><div class="dept-name">Sales &amp; Marketing</div><div class="bar-track"><div class="bar-fill" style="width:65%"></div></div><div class="bar-pct">65%</div></div>
+            <div class="dept-bar-row"><div class="dept-name">Maintenance</div><div class="bar-track"><div class="bar-fill bar-fill-warn" style="width:58%"></div></div><div class="bar-pct text-red">58%</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <div class="card-title">Rating distribution</div>
+              <div class="rating-grid">
+                <div class="rating-box" style="background:#eaf3de"><div class="rating-num" style="color:var(--green)">12</div><div class="rating-name" style="color:var(--green)">Exceptional (90%+)</div></div>
+                <div class="rating-box" style="background:#e6f1fb"><div class="rating-num" style="color:#185FA5">67</div><div class="rating-name" style="color:#185FA5">Exceeds (75&ndash;89%)</div></div>
+                <div class="rating-box" style="background:var(--grey-bg)"><div class="rating-num" style="color:var(--navy)">148</div><div class="rating-name" style="color:var(--navy)">Meets (60&ndash;74%)</div></div>
+                <div class="rating-box" style="background:#faeeda"><div class="rating-num" style="color:var(--amber)">41</div><div class="rating-name" style="color:var(--amber)">Needs improvement</div></div>
+                <div class="rating-box" style="background:#fcebeb;grid-column:1/-1"><div class="rating-num" style="color:#A32D2D">16</div><div class="rating-name" style="color:#A32D2D">Unsatisfactory (below 40%)</div></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Property comparison</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+                <div style="text-align:center;padding:12px;background:var(--grey-bg);border-radius:6px">
+                  <div style="font-size:22px;font-weight:600;color:var(--navy);font-family:var(--font-heading)">73%</div>
+                  <div style="font-size:10px;color:var(--text-light);margin-top:3px">Protea Skyz</div>
+                  <div style="margin-top:5px"><span class="band band-meets">Meets</span></div>
+                </div>
+                <div style="text-align:center;padding:12px;background:var(--grey-bg);border-radius:6px">
+                  <div style="font-size:22px;font-weight:600;color:var(--navy);font-family:var(--font-heading)">69%</div>
+                  <div style="font-size:10px;color:var(--text-light);margin-top:3px">Protea PHK</div>
+                  <div style="margin-top:5px"><span class="band band-meets">Meets</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORTS PAGE -->
+      <div class="page-view" id="page-reports">
+        <div class="section-header">
+          <div class="section-title">Reports</div>
+          <div class="filter-row">
+            <select class="filter-select"><option>H1 2026</option><option>H2 2025</option><option>H1 2025</option></select>
+            <select class="filter-select"><option>Both properties</option><option>Skyz</option><option>PHK</option></select>
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="nav-card" onclick="showIndividualReport()">
+            <div class="nav-card-icon nc-blue">
+              <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div style="flex:1"><div class="nav-card-title">Individual report</div><div class="nav-card-sub">Full appraisal per employee</div></div>
+            <div class="nav-card-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+          <div class="nav-card" onclick="showDeptReport()">
+            <div class="nav-card-icon nc-purple">
+              <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            </div>
+            <div style="flex:1"><div class="nav-card-title">Department summary</div><div class="nav-card-sub">Avg. scores per department</div></div>
+            <div class="nav-card-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+          <div class="nav-card" onclick="showPropertyReport()">
+            <div class="nav-card-icon nc-green">
+              <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            </div>
+            <div style="flex:1"><div class="nav-card-title">Property summary</div><div class="nav-card-sub">GM-level aggregated view</div></div>
+            <div class="nav-card-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+        </div>
+
+        <div id="report-output"></div>
+      </div>
+
+      <!-- STAFF PAGE -->
+      <div class="page-view" id="page-staff">
+        <div class="section-header">
+          <div class="section-title">Staff &amp; Roles</div>
+          <div class="filter-row">
+            <select class="filter-select"><option>Both properties</option><option>Skyz</option><option>PHK</option></select>
+            <select class="filter-select"><option>All departments</option><option>Kitchen</option><option>F&amp;B</option><option>Housekeeping</option><option>Front Office</option><option>Finance</option><option>Sales &amp; Marketing</option><option>Maintenance</option><option>Management</option><option>IT</option><option>HR</option></select>
+            <button class="btn btn-primary btn-sm" onclick="openAddStaffModal()">+ Add staff</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Property</th><th>Department</th><th>Role</th><th>DOJ</th><th>Status</th><th class="no-print">Actions</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Davis Mugabi</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Management</td><td>General Manager</td><td>6 Apr 2021</td><td><span class="band band-exc">Active</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button><button class="btn btn-danger btn-sm">Remove</button></div></td></tr>
+              <tr><td><strong>Annet Nabude</strong></td><td><span class="pill pill-phk">PHK</span></td><td>HR</td><td>HR Manager</td><td>15 Jun 2020</td><td><span class="band band-exc">Active</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button><button class="btn btn-danger btn-sm">Remove</button></div></td></tr>
+              <tr><td><strong>Mandal Monoranjan</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Kitchen</td><td>Executive Chef</td><td>9 Apr 2018</td><td><span class="band band-exc">Active</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button><button class="btn btn-danger btn-sm">Remove</button></div></td></tr>
+              <tr><td><strong>David Omondi</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Food &amp; Beverage</td><td>F&amp;B Manager</td><td>1 Apr 2018</td><td><span class="band band-exc">Active</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button><button class="btn btn-danger btn-sm">Remove</button></div></td></tr>
+              <tr><td><strong>Venkat Narayana</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Finance</td><td>Finance Manager</td><td>30 Nov 2020</td><td><span class="band band-exc">Active</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button><button class="btn btn-danger btn-sm">Remove</button></div></td></tr>
+              <tr><td><strong>Hope Kugonza</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Housekeeping</td><td>Floor Supervisor</td><td>12 Dec 2017</td><td><span class="band band-exc">Active</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button><button class="btn btn-danger btn-sm">Remove</button></div></td></tr>
+              <tr><td><strong>Abel Asingwiire</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Sales &amp; Marketing</td><td>Sales Manager</td><td>1 Nov 2022</td><td><span class="band band-exc">Active</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button><button class="btn btn-danger btn-sm">Remove</button></div></td></tr>
+              <tr><td><strong>Phillip Wandera</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Maintenance</td><td>Maintenance Supervisor</td><td>21 Dec 2022</td><td><span class="band band-exc">Active</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button><button class="btn btn-danger btn-sm">Remove</button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- KPI PAGE -->
+      <div class="page-view" id="page-kpis">
+        <div class="section-header">
+          <div class="section-title">KPI Setup</div>
+          <div class="filter-row">
+            <select class="filter-select"><option>All departments</option><option>Kitchen</option><option>F&amp;B</option><option>Housekeeping</option><option>Front Office</option><option>Finance</option></select>
+            <button class="btn btn-primary btn-sm" onclick="openAddKPIModal()">+ Add KPI</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>KPI / Measure</th><th>BSC Perspective</th><th>Department</th><th>Target &mdash; Skyz</th><th>Target &mdash; PHK</th><th>Frequency</th><th>Weight</th><th class="no-print">Actions</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Food waste reduction</strong></td><td><span class="band band-meets">Internal Processes</span></td><td>Kitchen</td><td>30% YoY</td><td>30% YoY</td><td>Quarterly</td><td class="text-red">25%</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button></div></td></tr>
+              <tr><td><strong>Kitchen hygiene audit pass rate</strong></td><td><span class="band band-meets">Internal Processes</span></td><td>Kitchen</td><td>Pass every audit</td><td>Pass every audit</td><td>Quarterly</td><td class="text-red">20%</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button></div></td></tr>
+              <tr><td><strong>Upselling training completion</strong></td><td><span class="band band-exc">Learning &amp; Growth</span></td><td>Kitchen / F&amp;B</td><td>100% of team</td><td>100% of team</td><td>Bi-annual</td><td class="text-red">15%</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button></div></td></tr>
+              <tr><td><strong>Marriott guest satisfaction score</strong></td><td><span class="band band-exceeds">Guest Experience</span></td><td>Front Office / F&amp;B</td><td>90% and above</td><td>90% and above</td><td>Monthly</td><td class="text-red">30%</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button></div></td></tr>
+              <tr><td><strong>Room cleanliness inspection pass rate</strong></td><td><span class="band band-meets">Internal Processes</span></td><td>Housekeeping</td><td>95% and above</td><td>95% and above</td><td>Monthly</td><td class="text-red">30%</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button></div></td></tr>
+              <tr><td><strong>Room turnaround time</strong></td><td><span class="band band-meets">Internal Processes</span></td><td>Housekeeping</td><td>30 min or less</td><td>30 min or less</td><td>Weekly</td><td class="text-red">20%</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button></div></td></tr>
+              <tr><td><strong>RevPAR growth</strong></td><td><span class="band band-needs">Financial</span></td><td>Management / Front Office</td><td>15% YoY</td><td>15% YoY</td><td>Monthly</td><td class="text-red">25%</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button></div></td></tr>
+              <tr><td><strong>Regrettable attrition reduction</strong></td><td><span class="band band-exc">Learning &amp; Growth</span></td><td>HR</td><td>50% YoY</td><td>50% YoY</td><td>Quarterly</td><td class="text-red">20%</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- JD PAGE -->
+      <div class="page-view" id="page-jds">
+        <div class="section-header">
+          <div class="section-title">Job Descriptions</div>
+          <div class="filter-row">
+            <select class="filter-select"><option>Both properties</option><option>Skyz</option><option>PHK</option></select>
+            <select class="filter-select"><option>All departments</option><option>Kitchen</option><option>F&amp;B</option><option>Housekeeping</option></select>
+            <button class="btn btn-primary btn-sm" onclick="openAddJDModal()">+ New JD</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Job title</th><th>Department</th><th>Property</th><th>Reports to</th><th>KPIs linked</th><th>Last updated</th><th class="no-print">Actions</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Executive Chef</strong></td><td>Kitchen</td><td><span class="pill pill-both">Both</span></td><td>General Manager</td><td><span class="band band-exc">3 KPIs</span></td><td>Jan 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD()">View</button><button class="btn btn-ghost btn-sm" onclick="printReport()">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
+              <tr><td><strong>F&amp;B Manager</strong></td><td>Food &amp; Beverage</td><td><span class="pill pill-both">Both</span></td><td>General Manager</td><td><span class="band band-exc">4 KPIs</span></td><td>Jan 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD()">View</button><button class="btn btn-ghost btn-sm" onclick="printReport()">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
+              <tr><td><strong>HR Manager</strong></td><td>HR</td><td><span class="pill pill-both">Both</span></td><td>General Manager / Group HR</td><td><span class="band band-exc">5 KPIs</span></td><td>Jan 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD()">View</button><button class="btn btn-ghost btn-sm" onclick="printReport()">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
+              <tr><td><strong>Floor Supervisor</strong></td><td>Housekeeping</td><td><span class="pill pill-both">Both</span></td><td>Executive Housekeeper</td><td><span class="band band-exc">3 KPIs</span></td><td>Feb 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD()">View</button><button class="btn btn-ghost btn-sm" onclick="printReport()">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
+              <tr><td><strong>Sales Manager</strong></td><td>Sales &amp; Marketing</td><td><span class="pill pill-both">Both</span></td><td>General Manager</td><td><span class="band band-exc">4 KPIs</span></td><td>Feb 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD()">View</button><button class="btn btn-ghost btn-sm" onclick="printReport()">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- DEPARTMENTS PAGE -->
+      <div class="page-view" id="page-departments">
+        <div class="section-header">
+          <div class="section-title">Departments</div>
+          <button class="btn btn-primary btn-sm">+ Add department</button>
+        </div>
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-title">Management</div>
+            <p style="font-size:11px;color:var(--text-mid);margin-bottom:8px">2 roles &middot; Both properties</p>
+            <div style="font-size:11px;color:var(--text-light)">General Manager, Assistant GM</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Front Office</div>
+            <p style="font-size:11px;color:var(--text-mid);margin-bottom:8px">5 roles &middot; Both properties</p>
+            <div style="font-size:11px;color:var(--text-light)">FO Manager, Asst. Guest Relations Manager, FO Agent, Driver, Concierge</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Housekeeping</div>
+            <p style="font-size:11px;color:var(--text-mid);margin-bottom:8px">8 roles &middot; Both properties</p>
+            <div style="font-size:11px;color:var(--text-light)">Exec. Housekeeper, HK Coordinator, Floor Supervisor, Room Attendant, PA Supervisor, PA Attendant, Laundry Supervisor, Laundry Attendant</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Kitchen</div>
+            <p style="font-size:11px;color:var(--text-mid);margin-bottom:8px">11 roles &middot; Both properties</p>
+            <div style="font-size:11px;color:var(--text-light)">Executive Chef, Pastry Chef, Junior Sous Chef, Senior Chef de Partie, Chef de Partie, Junior CDP, Commis Chef, Baker, Still Room Cook, Staff Cook, Steward</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Food &amp; Beverage</div>
+            <p style="font-size:11px;color:var(--text-mid);margin-bottom:8px">13 roles &middot; Both properties</p>
+            <div style="font-size:11px;color:var(--text-light)">F&amp;B Manager, Asst. F&amp;B Manager, Restaurant Manager, Asst. Restaurant Manager, Supervisor, Head Waiter/Waitress, Waiter/Waitress, Room Service Supervisor, Mixologist, Barman, Hostess, Banquet Manager, F&amp;B Controller</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Finance</div>
+            <p style="font-size:11px;color:var(--text-mid);margin-bottom:8px">6 roles &middot; Both properties</p>
+            <div style="font-size:11px;color:var(--text-light)">Finance Manager, Senior Accountant, Accounts Assistant, Accounts Assistant (Creditors), Receiving Clerk, Storekeeper</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Sales &amp; Marketing</div>
+            <p style="font-size:11px;color:var(--text-mid);margin-bottom:8px">2 roles &middot; Both properties</p>
+            <div style="font-size:11px;color:var(--text-light)">Sales Manager, Sales Coordinator</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Maintenance</div>
+            <p style="font-size:11px;color:var(--text-mid);margin-bottom:8px">5 roles &middot; Both properties</p>
+            <div style="font-size:11px;color:var(--text-light)">Maintenance Supervisor, Plumber, Mason, Pool Attendant, Gardener</div>
+          </div>
+          <div class="card">
+            <div class="card-title">IT</div>
+            <p style="font-size:11px;color:var(--text-mid);margin-bottom:8px">3 roles &middot; Both properties</p>
+            <div style="font-size:11px;color:var(--text-light)">IT Manager, IT Assistant, Surveillance Officer</div>
+          </div>
+          <div class="card">
+            <div class="card-title">HR</div>
+            <p style="font-size:11px;color:var(--text-mid);margin-bottom:8px">1 role &middot; Both properties</p>
+            <div style="font-size:11px;color:var(--text-light)">HR Manager</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS PAGE -->
+      <div class="page-view" id="page-settings">
+        <div class="section-title" style="margin-bottom:20px">Settings</div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="form-section-title">Appraisal cycle</div>
+            <div class="form-group"><label>Current cycle</label><input type="text" value="H1 2026" /></div>
+            <div class="form-row">
+              <div class="form-group"><label>Cycle start</label><input type="date" value="2026-01-01" /></div>
+              <div class="form-group"><label>Cycle end</label><input type="date" value="2026-06-30" /></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Self-appraisal weight</label><input type="number" value="40" min="0" max="100" /> <span style="font-size:10px;color:var(--text-light)">%</span></div>
+              <div class="form-group"><label>HOD appraisal weight</label><input type="number" value="60" min="0" max="100" /></div>
+            </div>
+            <button class="btn btn-primary btn-sm">Save cycle settings</button>
+          </div>
+          <div class="card">
+            <div class="form-section-title">Rating bands</div>
+            <div style="font-size:11px;color:var(--text-mid);margin-bottom:12px">Configure score thresholds for each rating band.</div>
+            <div class="form-row">
+              <div class="form-group"><label>Exceptional (min %)</label><input type="number" value="90" /></div>
+              <div class="form-group"><label>Exceeds expectations</label><input type="number" value="75" /></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Meets expectations</label><input type="number" value="60" /></div>
+              <div class="form-group"><label>Needs improvement</label><input type="number" value="40" /></div>
+            </div>
+            <div class="form-group"><label>Unsatisfactory (below)</label><input type="number" value="40" /></div>
+            <button class="btn btn-primary btn-sm">Save rating bands</button>
+          </div>
+          <div class="card">
+            <div class="form-section-title">User access</div>
+            <div class="table-wrap" style="margin-bottom:10px">
+              <table>
+                <thead><tr><th>Email</th><th>Role</th><th>Property</th><th>Actions</th></tr></thead>
+                <tbody>
+                  <tr><td>kusain@thesimbagroup.com</td><td><span class="band band-exc">HR Admin</span></td><td><span class="pill pill-both">Both</span></td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+                  <tr><td>gm.skyz@thesimbagroup.com</td><td><span class="band band-exceeds">GM</span></td><td><span class="pill pill-skyz">Skyz</span></td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+                  <tr><td>gm.phk@thesimbagroup.com</td><td><span class="band band-exceeds">GM</span></td><td><span class="pill pill-phk">PHK</span></td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+                  <tr><td>hr@phkmarriottskyz.com</td><td><span class="band band-meets">HR Manager</span></td><td><span class="pill pill-both">Both</span></td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <button class="btn btn-primary btn-sm">+ Add user</button>
+          </div>
+          <div class="card">
+            <div class="form-section-title">Supabase connection</div>
+            <div class="form-group"><label>Project URL</label><input type="text" value="https://iyxgdzukzltlqisdfeoq.supabase.co" /></div>
+            <div class="form-group"><label>Anon key</label><input type="password" value="••••••••••••••••••••••••••••••••" /></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+              <span class="band band-exc" style="font-size:10px">&#10003; Connected</span>
+              <span style="font-size:10px;color:var(--text-light)">Last synced: today, 09:02</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- MODAL: Appraisal Form -->
+<div class="modal-overlay hidden" id="modal-appraisal">
+  <div class="modal" style="width:680px">
+    <div class="modal-header">
+      <h3 id="appraisal-modal-title">Appraisal &mdash; Executive Chef &middot; PHK &middot; H1 2026</h3>
+      <button class="modal-close" onclick="closeModal('modal-appraisal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="appraisal-form-header" style="background:var(--navy);color:#fff;padding:12px 16px;border-radius:6px;margin-bottom:16px">
+        <h3 style="font-family:var(--font-heading);font-size:13px;font-weight:600" id="appraisal-staff-name">Mandal Monoranjan</h3>
+        <p style="font-size:10px;opacity:.7;margin-top:2px">Executive Chef &middot; Kitchen &middot; Protea Hotel Kampala &middot; H1 2026</p>
+      </div>
+
+      <div class="form-section-title">Section 1 &mdash; KPI performance</div>
+      <div style="margin-bottom:16px">
+        <div class="kpi-row" style="background:var(--grey-bg);padding:6px 10px;border-radius:5px;font-size:10px;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">
+          <div>KPI / measure</div><div>Target</div><div>Rating</div><div style="text-align:right">Weight</div>
+        </div>
+        <div class="kpi-row">
+          <div><div class="kpi-name">Food waste reduction</div><div class="kpi-target">30% down year on year</div></div>
+          <div><div class="kpi-target">30% YoY</div></div>
+          <div><select class="kpi-rating-select"><option value="">Select rating</option><option>Exceptional</option><option>Exceeds expectations</option><option selected>Meets expectations</option><option>Needs improvement</option><option>Unsatisfactory</option></select>
+          <div class="kpi-comment"><textarea placeholder="Comments or evidence..."></textarea></div></div>
+          <div class="kpi-weight-badge">25%</div>
+        </div>
+        <div class="kpi-row">
+          <div><div class="kpi-name">Kitchen hygiene audit pass rate</div><div class="kpi-target">Pass every audit</div></div>
+          <div><div class="kpi-target">Pass every audit</div></div>
+          <div><select class="kpi-rating-select"><option value="">Select rating</option><option>Exceptional</option><option selected>Exceeds expectations</option><option>Meets expectations</option><option>Needs improvement</option><option>Unsatisfactory</option></select>
+          <div class="kpi-comment"><textarea placeholder="Comments or evidence..."></textarea></div></div>
+          <div class="kpi-weight-badge">20%</div>
+        </div>
+        <div class="kpi-row">
+          <div><div class="kpi-name">Upselling training completion</div><div class="kpi-target">100% of kitchen team</div></div>
+          <div><div class="kpi-target">100% team</div></div>
+          <div><select class="kpi-rating-select"><option value="">Select rating</option><option>Exceptional</option><option>Exceeds expectations</option><option>Meets expectations</option><option>Needs improvement</option><option>Unsatisfactory</option></select>
+          <div class="kpi-comment"><textarea placeholder="Comments or evidence..."></textarea></div></div>
+          <div class="kpi-weight-badge">15%</div>
+        </div>
+      </div>
+
+      <div class="form-section-title">Section 2 &mdash; Behavioural competencies</div>
+      <div style="margin-bottom:16px">
+        <div class="competency-row">
+          <div><div class="comp-label">Time management</div><div class="comp-desc">Punctuality and reliability in reporting for duty</div></div>
+          <div class="rating-selector">
+            <button class="rating-btn" onclick="selectRating(this,1)">1</button>
+            <button class="rating-btn" onclick="selectRating(this,2)">2</button>
+            <button class="rating-btn selected-4" onclick="selectRating(this,3)">3</button>
+            <button class="rating-btn" onclick="selectRating(this,4)">4</button>
+            <button class="rating-btn" onclick="selectRating(this,5)">5</button>
+          </div>
+        </div>
+        <div class="competency-row">
+          <div><div class="comp-label">Dependability</div><div class="comp-desc">Attendance and consistency</div></div>
+          <div class="rating-selector">
+            <button class="rating-btn" onclick="selectRating(this,1)">1</button>
+            <button class="rating-btn" onclick="selectRating(this,2)">2</button>
+            <button class="rating-btn" onclick="selectRating(this,3)">3</button>
+            <button class="rating-btn selected-5" onclick="selectRating(this,4)">4</button>
+            <button class="rating-btn" onclick="selectRating(this,5)">5</button>
+          </div>
+        </div>
+        <div class="competency-row">
+          <div><div class="comp-label">Quality of work</div><div class="comp-desc">Standards and accuracy of output</div></div>
+          <div class="rating-selector">
+            <button class="rating-btn" onclick="selectRating(this,1)">1</button>
+            <button class="rating-btn" onclick="selectRating(this,2)">2</button>
+            <button class="rating-btn" onclick="selectRating(this,3)">3</button>
+            <button class="rating-btn" onclick="selectRating(this,4)">4</button>
+            <button class="rating-btn selected-5" onclick="selectRating(this,5)">5</button>
+          </div>
+        </div>
+        <div class="competency-row">
+          <div><div class="comp-label">Initiative</div><div class="comp-desc">Proactiveness and self-direction</div></div>
+          <div class="rating-selector">
+            <button class="rating-btn" onclick="selectRating(this,1)">1</button>
+            <button class="rating-btn" onclick="selectRating(this,2)">2</button>
+            <button class="rating-btn" onclick="selectRating(this,3)">3</button>
+            <button class="rating-btn selected-4" onclick="selectRating(this,4)">4</button>
+            <button class="rating-btn" onclick="selectRating(this,5)">5</button>
+          </div>
+        </div>
+        <div class="competency-row">
+          <div><div class="comp-label">Knowledge &amp; skill</div><div class="comp-desc">Role-specific expertise</div></div>
+          <div class="rating-selector">
+            <button class="rating-btn" onclick="selectRating(this,1)">1</button>
+            <button class="rating-btn" onclick="selectRating(this,2)">2</button>
+            <button class="rating-btn" onclick="selectRating(this,3)">3</button>
+            <button class="rating-btn" onclick="selectRating(this,4)">4</button>
+            <button class="rating-btn selected-5" onclick="selectRating(this,5)">5</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section-title">Section 3 &mdash; Management factors <span style="font-size:10px;color:var(--green);font-weight:400">(HOD and above only)</span></div>
+      <div style="margin-bottom:16px">
+        <div class="competency-row">
+          <div><div class="comp-label">Planning</div><div class="comp-desc">Ability to plan and organise work in advance</div></div>
+          <div class="rating-selector">
+            <button class="rating-btn" onclick="selectRating(this,1)">1</button>
+            <button class="rating-btn" onclick="selectRating(this,2)">2</button>
+            <button class="rating-btn" onclick="selectRating(this,3)">3</button>
+            <button class="rating-btn selected-4" onclick="selectRating(this,4)">4</button>
+            <button class="rating-btn" onclick="selectRating(this,5)">5</button>
+          </div>
+        </div>
+        <div class="competency-row">
+          <div><div class="comp-label">Leading</div><div class="comp-desc">Ability to motivate and guide team members</div></div>
+          <div class="rating-selector">
+            <button class="rating-btn" onclick="selectRating(this,1)">1</button>
+            <button class="rating-btn" onclick="selectRating(this,2)">2</button>
+            <button class="rating-btn" onclick="selectRating(this,3)">3</button>
+            <button class="rating-btn selected-5" onclick="selectRating(this,4)">4</button>
+            <button class="rating-btn" onclick="selectRating(this,5)">5</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section-title">Section 4 &mdash; Development plan</div>
+      <div class="form-group"><label>Strong points</label><textarea placeholder="List the employee's key strengths observed during this period..."></textarea></div>
+      <div class="form-group"><label>Training and development needs</label><textarea placeholder="Identify any training gaps or development areas for the next cycle..."></textarea></div>
+      <div class="form-group"><label>Career objectives &mdash; next 6 months</label><textarea placeholder="Agree on career development goals for the next half-year..."></textarea></div>
+    </div>
+    <div class="score-footer">
+      <div><div class="score-label">Estimated score (KPI section)</div><div class="score-val">Self 40% + HOD 60% = <span class="text-red">Pending</span></div></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary" onclick="closeModal('modal-appraisal')">Save draft</button>
+        <button class="btn btn-primary" onclick="submitAppraisal()">Submit appraisal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: JD Preview -->
+<div class="modal-overlay hidden" id="modal-jd">
+  <div class="modal" style="width:620px">
+    <div class="modal-header">
+      <h3>Job Description &mdash; Executive Chef</h3>
+      <button class="modal-close" onclick="closeModal('modal-jd')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="jd-preview-header" style="background:var(--navy);color:#fff;text-align:center;padding:16px;border-radius:6px;margin-bottom:16px">
+        <div style="font-size:11px;letter-spacing:.05em;text-transform:uppercase;opacity:.6;margin-bottom:4px">Protea Hotel Kampala &middot; Kitchen Department</div>
+        <div style="font-family:var(--font-heading);font-size:18px;font-weight:600">Executive Chef</div>
+        <div style="font-size:11px;opacity:.6;margin-top:4px">Reports to: General Manager</div>
+      </div>
+      <div class="jd-section"><div class="jd-section-title">Job purpose</div><div class="jd-section-content">To lead and manage all kitchen operations across the property, ensuring the consistent delivery of high-quality food products that meet Marriott brand standards, guest expectations, and the Group's financial targets. The Executive Chef is accountable for food cost control, hygiene compliance, team development, and kitchen performance against the Balanced Scorecard.</div></div>
+      <div class="jd-section"><div class="jd-section-title">Key responsibilities</div><div class="jd-section-content">
+        1. Oversee daily kitchen operations including preparation, presentation, and service across all food outlets.<br>
+        2. Manage food cost within the approved budget and drive a 30% reduction in food waste year on year.<br>
+        3. Ensure 100% pass rate on all kitchen hygiene and food safety audits.<br>
+        4. Lead, mentor, and develop all kitchen staff; build succession depth in key positions.<br>
+        5. Design, review, and update menus seasonally in line with guest feedback and revenue targets.<br>
+        6. Maintain full compliance with Marriott brand standards for food quality and presentation.<br>
+        7. Collaborate with the F&amp;B Manager on covers growth, event catering, and upselling initiatives.<br>
+        8. Submit weekly kitchen reports covering waste, staffing, training, and cost performance.
+      </div></div>
+      <div class="jd-section"><div class="jd-section-title">Required qualifications</div><div class="jd-section-content">Diploma or degree in Culinary Arts, Hotel Management, or a related field. A professional certification in food safety and hygiene (e.g. HACCP) is required.</div></div>
+      <div class="jd-section"><div class="jd-section-title">Experience</div><div class="jd-section-content">Minimum 7 years of progressive kitchen experience, with at least 3 years in an Executive Chef or Sous Chef role in a 4-star or 5-star hotel environment. Experience in a Marriott or international hotel brand is an added advantage.</div></div>
+      <div class="jd-section"><div class="jd-section-title">Key competencies</div><div class="jd-section-content">Leadership and team development &middot; Food cost management and financial discipline &middot; Creativity and menu innovation &middot; Hygiene and food safety standards &middot; Attention to detail &middot; Communication and guest orientation &middot; Resilience under pressure</div></div>
+      <div class="jd-section"><div class="jd-section-title">Linked KPIs</div><div class="jd-section-content">
+        <span class="band band-meets" style="margin-right:5px">Food waste reduction &mdash; 30% YoY</span>
+        <span class="band band-meets" style="margin-right:5px">Kitchen hygiene audit pass rate &mdash; 100%</span>
+        <span class="band band-meets">Upselling training completion &mdash; 100% of team</span>
+      </div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-jd')">Close</button>
+      <button class="btn btn-ghost" onclick="printReport()">Print / PDF</button>
+      <button class="btn btn-primary">Edit JD</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://iyxgdzukzltlqisdfeoq.supabase.co';
+const SUPABASE_KEY = 'YOUR_ANON_KEY_HERE';
+
+let sbClient = null;
+let currentUser = null;
+let currentProp = 'both';
+
+const DEMO_USERS = {
+  'kusain@thesimbagroup.com': { password: 'simba2026', name: 'Kusain Kabugo', role: 'hr', initials: 'KK', property: 'both' },
+  'gm.skyz@thesimbagroup.com': { password: 'simba2026', name: 'GM Skyz', role: 'gm', initials: 'GS', property: 'skyz' },
+  'gm.phk@thesimbagroup.com': { password: 'simba2026', name: 'GM PHK', role: 'gm', initials: 'GP', property: 'phk' },
+  'hr@phkmarriottskyz.com': { password: 'simba2026', name: 'HR Manager', role: 'hod', initials: 'HM', property: 'both' },
+};
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pwd = document.getElementById('login-password').value;
+  const err = document.getElementById('login-error');
+  const user = DEMO_USERS[email];
+  if (!user || user.password !== pwd) {
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+  currentUser = { ...user, email };
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('sb-avatar').textContent = user.initials;
+  document.getElementById('sb-user-name').textContent = user.name;
+  document.getElementById('sb-user-role').textContent = user.role === 'hr' ? 'HR Admin' : user.role === 'gm' ? 'General Manager' : 'HOD';
+  setWelcome();
+  applyRoleAccess();
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-password').value = '';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+function setWelcome() {
+  const h = new Date().getHours();
+  const greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('welcome-msg').textContent = greeting + ', ' + currentUser.name.split(' ')[0];
+}
+
+function applyRoleAccess() {
+  if (!currentUser) return;
+  const propSwitcher = document.getElementById('prop-switcher');
+  if (currentUser.role === 'gm') {
+    propSwitcher.innerHTML = currentUser.property === 'skyz'
+      ? '<option value="skyz">Protea Hotel Skyz</option>'
+      : '<option value="phk">Protea Hotel Kampala</option>';
+    document.querySelectorAll('[data-page="settings"],[data-page="kpis"],[data-page="jds"],[data-page="departments"]').forEach(el => el.style.display = 'none');
+  }
+}
+
+function navigate(page) {
+  document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  const el = document.getElementById('page-' + page);
+  if (el) el.classList.add('active');
+  const nav = document.querySelector('[data-page="' + page + '"]');
+  if (nav) nav.classList.add('active');
+  const titles = { home:'Home', appraisals:'Appraisals', analytics:'Analytics', reports:'Reports', staff:'Staff & Roles', kpis:'KPI Setup', jds:'Job Descriptions', departments:'Departments', settings:'Settings' };
+  document.getElementById('tb-title').textContent = titles[page] || page;
+  document.getElementById('tb-sub').textContent = (currentProp === 'both' ? 'Both properties' : currentProp === 'skyz' ? 'Protea Hotel Skyz' : 'Protea Hotel Kampala') + ' \u2014 ' + new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+
+function switchProperty(val) {
+  currentProp = val;
+  const label = val === 'both' ? 'Both properties' : val === 'skyz' ? 'Protea Hotel Skyz' : 'Protea Hotel Kampala';
+  document.getElementById('tb-sub').textContent = label + ' \u2014 ' + new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+
+function openAppraisalForm(name, prop, dept, role) {
+  document.getElementById('appraisal-modal-title').textContent = 'Appraisal \u2014 ' + role + ' \u00B7 ' + prop + ' \u00B7 H1 2026';
+  document.getElementById('appraisal-staff-name').textContent = name;
+  document.getElementById('modal-appraisal').classList.remove('hidden');
+}
+
+function openNewAppraisalModal() { openAppraisalForm('New staff member', 'PHK', 'Department', 'Role'); }
+
+function openAddStaffModal() { showToast('Add staff form — connect Supabase to enable'); }
+function openAddKPIModal() { showToast('Add KPI form — connect Supabase to enable'); }
+function openAddJDModal() { showToast('New JD form — connect Supabase to enable'); }
+
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+function previewJD() { document.getElementById('modal-jd').classList.remove('hidden'); }
+
+function submitAppraisal() { closeModal('modal-appraisal'); showToast('Appraisal submitted successfully.'); }
+
+function selectRating(btn, val) {
+  const siblings = btn.parentElement.querySelectorAll('.rating-btn');
+  siblings.forEach(b => { b.className = 'rating-btn'; });
+  btn.classList.add('selected-' + val);
+}
+
+function printReport() { window.print(); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function showIndividualReport() {
+  document.getElementById('report-output').innerHTML = `
+    <div class="card print-area" style="margin-bottom:0">
+      <div style="text-align:center;padding:10px 0 16px;border-bottom:2px solid #000;margin-bottom:16px">
+        <div style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);margin-bottom:4px">Simba Group Hotels &mdash; Performance Management System</div>
+        <h2 style="font-family:var(--font-heading);font-size:18px;color:var(--navy)">Individual Appraisal Report</h2>
+        <div style="font-size:11px;color:var(--text-mid);margin-top:3px">Mandal Monoranjan &middot; Executive Chef &middot; Kitchen &middot; PHK &middot; H1 2026</div>
+      </div>
+      <div class="grid-4" style="margin-bottom:16px">
+        <div class="metric-card"><div class="metric-label">KPI score</div><div class="metric-value text-navy">74%</div></div>
+        <div class="metric-card"><div class="metric-label">Competency score</div><div class="metric-value text-navy">82%</div></div>
+        <div class="metric-card"><div class="metric-label">Final score</div><div class="metric-value text-navy">77%</div></div>
+        <div class="metric-card"><div class="metric-label">Rating</div><div class="metric-value" style="font-size:13px"><span class="band band-exceeds">Exceeds</span></div></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px" class="no-print">
+        <button class="btn btn-ghost btn-sm" onclick="printReport()">Print / PDF</button>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('report-output').innerHTML=''">Close</button>
+      </div>
+    </div>`;
+}
+
+function showDeptReport() {
+  document.getElementById('report-output').innerHTML = `
+    <div class="card" style="margin-bottom:0">
+      <div class="card-title">Department summary &mdash; H1 2026 &middot; Both properties</div>
+      <div class="table-wrap" style="margin-bottom:10px">
+        <table>
+          <thead><tr><th>Department</th><th>Property</th><th>Staff appraised</th><th>Avg. score</th><th>Rating</th></tr></thead>
+          <tbody>
+            <tr><td>Management</td><td><span class="pill pill-both">Both</span></td><td>4 / 4</td><td><strong>88%</strong></td><td><span class="band band-exceeds">Exceeds</span></td></tr>
+            <tr><td>Food &amp; Beverage</td><td><span class="pill pill-both">Both</span></td><td>38 / 55</td><td><strong>79%</strong></td><td><span class="band band-exceeds">Exceeds</span></td></tr>
+            <tr><td>Kitchen</td><td><span class="pill pill-both">Both</span></td><td>24 / 30</td><td><strong>74%</strong></td><td><span class="band band-meets">Meets</span></td></tr>
+            <tr><td>Maintenance</td><td><span class="pill pill-both">Both</span></td><td>6 / 7</td><td><strong>58%</strong></td><td><span class="band band-needs">Needs improvement</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px" class="no-print">
+        <button class="btn btn-ghost btn-sm" onclick="printReport()">Print / PDF</button>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('report-output').innerHTML=''">Close</button>
+      </div>
+    </div>`;
+}
+
+function showPropertyReport() {
+  document.getElementById('report-output').innerHTML = `
+    <div class="card" style="margin-bottom:0">
+      <div class="card-title">Property summary &mdash; H1 2026 &middot; GM view</div>
+      <div class="grid-2" style="margin-bottom:0">
+        <div style="text-align:center;padding:16px;background:var(--grey-bg);border-radius:8px">
+          <div style="font-size:11px;color:var(--text-light);margin-bottom:4px">Protea Hotel Skyz Kampala</div>
+          <div style="font-size:32px;font-weight:600;color:var(--navy);font-family:var(--font-heading)">73%</div>
+          <div style="margin-top:6px"><span class="band band-meets">Meets expectations</span></div>
+          <div style="font-size:10px;color:var(--text-light);margin-top:6px">197 of 285 staff appraised</div>
+        </div>
+        <div style="text-align:center;padding:16px;background:var(--grey-bg);border-radius:8px">
+          <div style="font-size:11px;color:var(--text-light);margin-bottom:4px">Protea Hotel Kampala</div>
+          <div style="font-size:32px;font-weight:600;color:var(--navy);font-family:var(--font-heading)">69%</div>
+          <div style="margin-top:6px"><span class="band band-meets">Meets expectations</span></div>
+          <div style="font-size:10px;color:var(--text-light);margin-top:6px">87 of 146 staff appraised</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px" class="no-print">
+        <button class="btn btn-ghost btn-sm" onclick="printReport()">Print / PDF</button>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('report-output').innerHTML=''">Close</button>
+      </div>
+    </div>`;
+}
+
+document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+</script>
+</body>
+</html>
