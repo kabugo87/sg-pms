@@ -2050,25 +2050,240 @@ function openAddStaffModal()  { showToast('Connect Supabase to enable live staff
 function openAddKPIModal()    { showToast('Connect Supabase to enable live KPI management.'); }
 
 // ── REPORTS ────────────────────────────────────────────────
-function showIndividualReport() {
+function showIndividualReport(staffId) {
+  // Use passed staffId or default to first demo staff
+  const s = staffId ? ALL_STAFF.find(x=>x.id===staffId) : ALL_STAFF[0];
+  if (!s) { showToast('No staff record found.'); return; }
+
+  // Demo appraisal data - will be replaced with live Supabase data when wired
+  const kpis = getKPIsForRole(s.role);
+  const RATINGS = {
+    'Exceptional':5, 'Exceeds Expectations':4, 'Meets Expectations':3,
+    'Needs Improvement':2, 'Unsatisfactory':1
+  };
+
+  // Demo filled scores
+  const demoSelfRatings  = kpis.map((_,i) => ['Meets Expectations','Exceeds Expectations','Meets Expectations','Exceptional'][i%4]);
+  const demoHODRatings   = kpis.map((_,i) => ['Exceeds Expectations','Meets Expectations','Meets Expectations','Exceeds Expectations'][i%4]);
+  const demoCompSelf  = [4,4,3,4,5,4,4,3,4,5];
+  const demoCompHOD   = [4,5,4,4,5,4,5,4,4,5];
+  const compLabels    = ['Time management','Dependability','Appearance','Cooperation','Responsibility','Accuracy','Quality of work','Quantity of work','Initiative','Knowledge & skill'];
+
+  // Calculate scores
+  let selfKPI=0, hodKPI=0, totalWeight=0;
+  kpis.forEach((k,i)=>{
+    const sw = (RATINGS[demoSelfRatings[i]]||3)/5 * k.weight;
+    const hw = (RATINGS[demoHODRatings[i]]||3)/5 * k.weight;
+    selfKPI += sw; hodKPI += hw; totalWeight += k.weight;
+  });
+  selfKPI = totalWeight>0 ? Math.round(selfKPI/totalWeight*100) : 0;
+  hodKPI  = totalWeight>0 ? Math.round(hodKPI/totalWeight*100)  : 0;
+
+  const selfComp = Math.round(demoCompSelf.reduce((a,b)=>a+b,0)/demoCompSelf.length/5*100);
+  const hodComp  = Math.round(demoCompHOD.reduce((a,b)=>a+b,0)/demoCompHOD.length/5*100);
+
+  const finalScore = Math.round((selfKPI*0.4)+(hodKPI*0.6));
+  const band = finalScore>=90?'Exceptional':finalScore>=75?'Exceeds Expectations':finalScore>=60?'Meets Expectations':finalScore>=40?'Needs Improvement':'Unsatisfactory';
+  const bandClass = finalScore>=90?'band-exc':finalScore>=75?'band-exceeds':finalScore>=60?'band-meets':finalScore>=40?'band-needs':'band-unsat';
+
+  const propName = s.property==='skyz'?'Protea Hotel Skyz Kampala':'Protea Hotel Kampala';
+  const today = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+  const kpiRows = kpis.map((k,i) => {
+    const sr = demoSelfRatings[i];
+    const hr = demoHODRatings[i];
+    const ws = Math.round((RATINGS[hr]||3)/5*100);
+    return `<tr>
+      <td style="padding:8px 10px;border-bottom:.5px solid #eee;font-size:12px"><strong>${k.kpi}</strong><br><span style="font-size:10px;color:#888">Target: ${k.target}</span></td>
+      <td style="padding:8px 10px;border-bottom:.5px solid #eee;font-size:11px;text-align:center">${sr}</td>
+      <td style="padding:8px 10px;border-bottom:.5px solid #eee;font-size:11px;text-align:center">${hr}</td>
+      <td style="padding:8px 10px;border-bottom:.5px solid #eee;font-size:11px;text-align:center;color:#800020;font-weight:600">${k.weight}%</td>
+      <td style="padding:8px 10px;border-bottom:.5px solid #eee;font-size:11px;text-align:center;font-weight:600">${ws}%</td>
+    </tr>`;
+  }).join('');
+
+  const compRows = compLabels.map((label,i) => `<tr>
+    <td style="padding:7px 10px;border-bottom:.5px solid #eee;font-size:12px">${label}</td>
+    <td style="padding:7px 10px;border-bottom:.5px solid #eee;font-size:11px;text-align:center">${demoCompSelf[i]} / 5</td>
+    <td style="padding:7px 10px;border-bottom:.5px solid #eee;font-size:11px;text-align:center">${demoCompHOD[i]} / 5</td>
+  </tr>`).join('');
+
   document.getElementById('report-output').innerHTML = `
-    <div class="card print-area" style="margin-bottom:0">
-      <div style="text-align:center;padding:10px 0 16px;border-bottom:2px solid #000;margin-bottom:16px">
-        <div style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);margin-bottom:4px">Simba Group Hotels &mdash; Performance Management System</div>
-        <h2 style="font-family:var(--font-heading);font-size:18px;color:var(--navy)">Individual Appraisal Report</h2>
-        <div style="font-size:11px;color:var(--text-mid);margin-top:3px">Mandal Monoranjan &middot; Executive Chef &middot; Kitchen &middot; PHK &middot; H1 2026</div>
+    <div style="background:#fff;border:1px solid #d0d0d8;border-radius:8px;overflow:hidden;margin-bottom:20px">
+
+      <!-- Sticky action bar -->
+      <div style="position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #d0d0d8;padding:10px 20px;display:flex;align-items:center;justify-content:space-between" class="no-print">
+        <div style="font-size:12px;font-weight:600;color:var(--navy)">Appraisal Report &mdash; ${s.name}</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="printIndividualReport()">&#128424; Print / PDF</button>
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('report-output').innerHTML=''">Close</button>
+        </div>
       </div>
-      <div class="grid-4" style="margin-bottom:16px">
-        <div class="metric-card"><div class="metric-label">KPI score</div><div class="metric-value text-navy">74%</div></div>
-        <div class="metric-card"><div class="metric-label">Competency score</div><div class="metric-value text-navy">82%</div></div>
-        <div class="metric-card"><div class="metric-label">Final score</div><div class="metric-value text-navy">77%</div></div>
-        <div class="metric-card"><div class="metric-label">Rating</div><div class="metric-value" style="font-size:13px"><span class="band band-exceeds">Exceeds</span></div></div>
-      </div>
-      <div style="display:flex;justify-content:flex-end;gap:8px" class="no-print">
-        <button class="btn btn-ghost btn-sm" onclick="printReport()">Print / PDF</button>
-        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('report-output').innerHTML=''">Close</button>
-      </div>
+
+      <!-- Report body -->
+      <div id="individual-report-print" style="padding:28px 32px;font-family:'Palatino Linotype',Palatino,Georgia,serif">
+
+        <!-- Header -->
+        <div style="text-align:center;padding-bottom:16px;border-bottom:2px solid #000;margin-bottom:20px">
+          <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#888;margin-bottom:6px">Simba Group Hotels &mdash; Performance Management System</div>
+          <div style="font-size:22px;font-weight:700;color:#1B2A6B;font-family:'Palatino Linotype',Palatino,Georgia,serif">Employee Appraisal Report</div>
+          <div style="font-size:12px;color:#555;margin-top:4px">H1 2026 &mdash; January to June 2026</div>
+        </div>
+
+        <!-- Staff details -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:20px;border:1px solid #000;border-radius:4px;overflow:hidden">
+          <div style="padding:10px 14px;border-right:1px solid #000;border-bottom:1px solid #000;background:#f0f1f4">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:3px">Full name</div>
+            <div style="font-size:13px;font-weight:600;color:#1B2A6B">${s.name}</div>
+          </div>
+          <div style="padding:10px 14px;border-bottom:1px solid #000;background:#f0f1f4">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:3px">Employee number</div>
+            <div style="font-size:13px;font-weight:600;color:#1B2A6B">${s.emp||'—'}</div>
+          </div>
+          <div style="padding:10px 14px;border-right:1px solid #000;border-bottom:1px solid #000">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:3px">Position</div>
+            <div style="font-size:12px;color:#333">${s.role}</div>
+          </div>
+          <div style="padding:10px 14px;border-bottom:1px solid #000">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:3px">Department</div>
+            <div style="font-size:12px;color:#333">${s.dept}</div>
+          </div>
+          <div style="padding:10px 14px;border-right:1px solid #000;border-bottom:1px solid #000">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:3px">Property</div>
+            <div style="font-size:12px;color:#333">${propName}</div>
+          </div>
+          <div style="padding:10px 14px;border-bottom:1px solid #000">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:3px">Date of joining</div>
+            <div style="font-size:12px;color:#333">${s.doj}</div>
+          </div>
+          <div style="padding:10px 14px;border-right:1px solid #000">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:3px">Appraised by</div>
+            <div style="font-size:12px;color:#333">Kusain Kabugo &mdash; HR Admin</div>
+          </div>
+          <div style="padding:10px 14px">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:3px">Date of appraisal</div>
+            <div style="font-size:12px;color:#333">${today}</div>
+          </div>
+        </div>
+
+        <!-- Score summary -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+          <div style="background:#f0f1f4;border-radius:6px;padding:12px;text-align:center">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#888;margin-bottom:4px">KPI score (self)</div>
+            <div style="font-size:24px;font-weight:700;color:#1B2A6B;font-family:'Palatino Linotype',Palatino,Georgia,serif">${selfKPI}%</div>
+          </div>
+          <div style="background:#f0f1f4;border-radius:6px;padding:12px;text-align:center">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#888;margin-bottom:4px">KPI score (HOD)</div>
+            <div style="font-size:24px;font-weight:700;color:#1B2A6B;font-family:'Palatino Linotype',Palatino,Georgia,serif">${hodKPI}%</div>
+          </div>
+          <div style="background:#f0f1f4;border-radius:6px;padding:12px;text-align:center">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#888;margin-bottom:4px">Final score (40/60)</div>
+            <div style="font-size:24px;font-weight:700;color:#800020;font-family:'Palatino Linotype',Palatino,Georgia,serif">${finalScore}%</div>
+          </div>
+          <div style="background:#f0f1f4;border-radius:6px;padding:12px;text-align:center">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#888;margin-bottom:4px">Rating</div>
+            <div style="margin-top:6px"><span class="band ${bandClass}" style="font-size:11px">${band}</span></div>
+          </div>
+        </div>
+
+        <!-- Section 1: KPIs -->
+        <div style="margin-bottom:20px">
+          <div style="font-family:'Palatino Linotype',Palatino,Georgia,serif;font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:12px">Section 1 &mdash; KPI Performance</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <thead>
+              <tr style="background:#f0f1f4">
+                <th style="padding:8px 10px;text-align:left;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase;letter-spacing:.04em">KPI / Measure</th>
+                <th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase;letter-spacing:.04em">Staff response</th>
+                <th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase;letter-spacing:.04em">HOD rating</th>
+                <th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase;letter-spacing:.04em">Weight</th>
+                <th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase;letter-spacing:.04em">Weighted score</th>
+              </tr>
+            </thead>
+            <tbody>${kpiRows}</tbody>
+          </table>
+        </div>
+
+        <!-- Section 2: Competencies -->
+        <div style="margin-bottom:20px">
+          <div style="font-family:'Palatino Linotype',Palatino,Georgia,serif;font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:12px">Section 2 &mdash; Behavioural Competencies</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <thead>
+              <tr style="background:#f0f1f4">
+                <th style="padding:8px 10px;text-align:left;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase;letter-spacing:.04em">Competency</th>
+                <th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase;letter-spacing:.04em">Staff score</th>
+                <th style="padding:8px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase;letter-spacing:.04em">HOD score</th>
+              </tr>
+            </thead>
+            <tbody>${compRows}</tbody>
+            <tfoot>
+              <tr style="background:#f0f1f4">
+                <td style="padding:8px 10px;font-weight:600;font-size:11px;border-top:1.5px solid #000">Average competency score</td>
+                <td style="padding:8px 10px;text-align:center;font-weight:600;border-top:1.5px solid #000">${selfComp}%</td>
+                <td style="padding:8px 10px;text-align:center;font-weight:600;border-top:1.5px solid #000">${hodComp}%</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Section 4: Development plan -->
+        <div style="margin-bottom:20px">
+          <div style="font-family:'Palatino Linotype',Palatino,Georgia,serif;font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:12px">Section 3 &mdash; Development Plan</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <tr>
+              <td style="padding:10px 12px;border:1px solid #000;background:#f0f1f4;font-weight:600;font-size:11px;width:180px;vertical-align:top">Strong points</td>
+              <td style="padding:10px 12px;border:1px solid #000;min-height:50px;vertical-align:top">To be completed during appraisal session.</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 12px;border:1px solid #000;background:#f0f1f4;font-weight:600;font-size:11px;vertical-align:top">Training &amp; development needs</td>
+              <td style="padding:10px 12px;border:1px solid #000;vertical-align:top">To be completed during appraisal session.</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 12px;border:1px solid #000;background:#f0f1f4;font-weight:600;font-size:11px;vertical-align:top">Career objectives &mdash; next 6 months</td>
+              <td style="padding:10px 12px;border:1px solid #000;vertical-align:top">To be completed during appraisal session.</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Signatures -->
+        <div style="margin-bottom:8px">
+          <div style="font-family:'Palatino Linotype',Palatino,Georgia,serif;font-size:13px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:4px;display:inline-block;margin-bottom:16px">Acknowledgement &amp; Signatures</div>
+          <div style="font-size:11px;color:#555;margin-bottom:16px;line-height:1.6">I confirm that this appraisal was conducted, the ratings were discussed, and the development plan was agreed upon between the staff member and the appraising HOD.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px">
+            <div>
+              <div style="border-top:1.5px solid #000;margin-bottom:6px;padding-top:6px"></div>
+              <div style="font-size:11px;font-weight:600;color:#1B2A6B">${s.name}</div>
+              <div style="font-size:10px;color:#888">${s.role}</div>
+              <div style="font-size:10px;color:#aaa;margin-top:2px">Date: _______________</div>
+            </div>
+            <div>
+              <div style="border-top:1.5px solid #000;margin-bottom:6px;padding-top:6px"></div>
+              <div style="font-size:11px;font-weight:600;color:#1B2A6B">HOD / Appraiser</div>
+              <div style="font-size:10px;color:#888">${s.dept} Department</div>
+              <div style="font-size:10px;color:#aaa;margin-top:2px">Date: _______________</div>
+            </div>
+            <div>
+              <div style="border-top:1.5px solid #000;margin-bottom:6px;padding-top:6px"></div>
+              <div style="font-size:11px;font-weight:600;color:#1B2A6B">Kusain Kabugo</div>
+              <div style="font-size:10px;color:#888">Head of Human Resources</div>
+              <div style="font-size:10px;color:#aaa;margin-top:2px">Date: _______________</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /report body -->
     </div>`;
+}
+
+function printIndividualReport() {
+  const body = document.getElementById('individual-report-print');
+  if (!body) { window.print(); return; }
+  const w = window.open('','_blank','width=900,height=700');
+  const printCSS = '<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:"Palatino Linotype",Palatino,Georgia,serif;padding:32px;color:#1a1a2e;font-size:12px;line-height:1.5}table{width:100%;border-collapse:collapse}th,td{padding:7px 10px}.band{display:inline-block;font-size:10px;font-weight:600;padding:3px 8px;border-radius:3px}.band-exc{background:#eaf3de;color:#3B6D11}.band-exceeds{background:#e6f1fb;color:#185FA5}.band-meets{background:#f0f1f4;color:#1B2A6B}.band-needs{background:#faeeda;color:#854F0B}.band-unsat{background:#fcebeb;color:#A32D2D}@media print{body{padding:16px}}</style>';
+  w.document.write('<!DOCTYPE html><html><head><title>Appraisal Report</title>' + printCSS + '</head><body>');
+  w.document.write(body.innerHTML);
+  w.document.write('</body></html>');
+  w.document.close();
+  setTimeout(()=>w.print(), 500);
 }
 
 function showDeptReport() {
