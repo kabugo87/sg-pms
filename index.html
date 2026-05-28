@@ -1105,14 +1105,7 @@ function initSupabase() { if (!sbClient && window.supabase) { sbClient = window.
 let currentUser = null;
 let currentProp = 'both';
 
-// ── USERS ──────────────────────────────────────────────────
-const USERS = {
-  'kusain@thesimbagroup.com':   { password:'simba2026', name:'Kusain Kabugo', role:'hr_admin', initials:'KK', property:'both' },
-  'hr@phkmarriottskyz.com':     { password:'simba2026', name:'Annet Nabude',  role:'hr',       initials:'AN', property:'skyz' },
-  'hr@proteakla.co.ug':         { password:'simba2026', name:'Laura Namayega',role:'hr',       initials:'LN', property:'phk'  },
-  'gm@phkmarriottskyz.com':     { password:'simba2026', name:'Davis Mugabi',  role:'gm',       initials:'DM', property:'skyz' },
-  'info@proteakla.co.ug':       { password:'simba2026', name:'Phionah',       role:'gm',       initials:'PH', property:'phk'  },
-};
+// User profiles loaded from Supabase Auth (user_profiles table)
 
 // Roles that can appraise anyone (within their property scope)
 const CAN_APPRAISE = ['hr_admin','hr','gm','hod'];
@@ -1556,29 +1549,47 @@ function getKPIsForRole(role) {
 }
 
 // ── LOGIN ──────────────────────────────────────────────────
-function doLogin() {
+async function doLogin() {
   const email = document.getElementById('login-email').value.trim().toLowerCase();
   const pwd   = document.getElementById('login-password').value;
   const err   = document.getElementById('login-error');
-  const user  = USERS[email];
-  if (!user || user.password !== pwd) { err.style.display='block'; return; }
   err.style.display = 'none';
-  currentUser = { ...user, email };
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
-  document.getElementById('sb-avatar').textContent    = user.initials;
-  document.getElementById('sb-user-name').textContent = user.name;
-  document.getElementById('sb-user-role').textContent = roleLabel(user.role);
-  setWelcome();
-  applyRoleAccess();
-  renderStaffTable();
+  const btn = document.querySelector('#login-screen .btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Signing in…'; }
+  try {
+    const sb = initSupabase();
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pwd });
+    if (error) throw error;
+    const { data: profile, error: profErr } = await sb
+      .from('user_profiles')
+      .select('name, role, property, initials')
+      .eq('id', data.user.id)
+      .single();
+    if (profErr || !profile) throw new Error('User profile not found. Contact HR Admin.');
+    currentUser = { ...profile, email, id: data.user.id };
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('sb-avatar').textContent    = profile.initials || email[0].toUpperCase();
+    document.getElementById('sb-user-name').textContent = profile.name;
+    document.getElementById('sb-user-role').textContent = roleLabel(profile.role);
+    setWelcome();
+    applyRoleAccess();
+    loadStaffPage();
+  } catch(e) {
+    err.textContent = e.message || 'Invalid email or password.';
+    err.style.display = 'block';
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Sign in →'; }
+  }
 }
 
 function roleLabel(r) {
   return r==='hr_admin'?'HR Admin': r==='hr'?'HR Manager': r==='gm'?'General Manager': r==='hod'?'HOD':'Staff';
 }
 
-function doLogout() {
+async function doLogout() {
+  const sb = initSupabase();
+  await sb.auth.signOut();
   currentUser = null;
   document.getElementById('login-email').value = '';
   document.getElementById('login-password').value = '';
@@ -1639,36 +1650,30 @@ function switchProperty(val) {
   document.getElementById('tb-sub').textContent = propLabel(val)+' \u2014 '+dateStr();
 }
 
-// ── STAFF TABLE ────────────────────────────────────────────
-function renderStaffTable(filter) {
-  const dept  = document.getElementById('filter-staff-dept')  ? document.getElementById('filter-staff-dept').value  : '';
-  const prop  = document.getElementById('filter-staff-prop')  ? document.getElementById('filter-staff-prop').value  : '';
-  const search= document.getElementById('filter-staff-search')? document.getElementById('filter-staff-search').value.toLowerCase(): '';
+// -- STAFF LOADER & TABLE -------------------------------------------
+let _staffCache = [];
 
-  let staff = ALL_STAFF.filter(s => {
-    if (currentUser.role !== 'hr_admin' && s.property !== currentUser.property) return false;
-    if (prop && s.property !== prop) return false;
-    if (dept && s.dept !== dept) return false;
-    if (search && !s.name.toLowerCase().includes(search)) return false;
-    return true;
-  });
-
+async function loadStaffPage() {
   const tbody = document.getElementById('staff-tbody');
-  if (!tbody) return;
-  tbody.innerHTML = staff.map(s => `
-    <tr>
-      <td><strong>${s.name}</strong></td>
-      <td><span class="pill ${s.property==='skyz'?'pill-skyz':'pill-phk'}">${s.property.toUpperCase()}</span></td>
-      <td>${s.dept}</td>
-      <td>${s.role}</td>
-      <td><span class="band ${s.assisted?'band-needs':'band-meets'}">${s.assisted?'Assisted':'Self-service'}</span></td>
-      <td class="no-print">
-        <div class="table-actions">
-          <button class="btn btn-secondary btn-sm" onclick="openStaffProfile('${s.id}')">View / Edit</button>
-          <button class="btn btn-primary btn-sm" onclick="startAppraisal('${s.id}')">Appraise</button>
-        </div>
-      </td>
-    </tr>`).join('');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-light);font-size:12px">Loading staff...</td></tr>';
+  try {
+    const sb = initSupabase();
+    let query = sb.from('staff')
+      .select('id,full_name,employee_no,date_of_joining,departments(name),roles(title,is_management),properties(code)')
+      .eq('status','active')
+      .order('full_name');
+    if (currentUser && currentUser.role !== 'hr_admin') {
+      const { data: propRow } = await sb.from('properties').select('id').eq('code', currentUser.property).single();
+      if (propRow) query = query.eq('property_id', propRow.id);
+    }
+    const { data, error } = await query;
+    if (error) throw error;
+    _staffCache = data || [];
+    renderStaffTable();
+  } catch(e) {
+    const tb = document.getElementById('staff-tbody');
+    if (tb) tb.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--red);font-size:12px">Error loading staff: ' + e.message + '</td></tr>';
+  }
 }
 
 // ── STAFF PROFILE MODAL ────────────────────────────────────
@@ -1784,21 +1789,42 @@ function saveStaffProfile(applyBulk) {
 
 function confirmSave(applyTo) {
   closeModal('modal-apply-to');
+  const s = ALL_STAFF.find(x => x.id === window._editingStaffId);
+  if (s) {
+    const nameEl     = document.getElementById('edit-name');
+    const propEl     = document.getElementById('edit-prop');
+    const deptEl     = document.getElementById('edit-dept');
+    const roleEl     = document.getElementById('edit-role');
+    const assistedEl = document.getElementById('edit-assisted');
+    if (nameEl)     s.name     = nameEl.value;
+    if (propEl)     s.property = propEl.value;
+    if (deptEl)     s.dept     = deptEl.value;
+    if (roleEl)     s.role     = roleEl.value;
+    if (assistedEl) s.assisted = assistedEl.value === 'true';
+    _persistStaffEdit(s);
+  }
   closeModal('modal-staff-profile');
-  const s = ALL_STAFF.find(x=>x.id===window._editingStaffId);
-  const msg = applyTo==='current'  ? 'Changes applied to H1 2026 cycle.'
-            : applyTo==='next'     ? 'Changes will apply from H2 2026 onwards.'
-            : 'Changes applied to current and all future cycles.';
+  const msg = applyTo==='current' ? 'Changes applied to H1 2026 cycle.'
+            : applyTo==='next'    ? 'Changes will apply from H2 2026 onwards.'
+            : 'Changes saved and applied immediately.';
   showToast(msg);
+}
+
+async function _persistStaffEdit(s) {
+  try {
+    const sb = initSupabase();
+    await sb.from('staff').update({ full_name: s.name }).eq('id', s.id);
+  } catch(e) { console.warn('Staff update:', e.message); }
 }
 
 // ── APPRAISAL FORM ─────────────────────────────────────────
 let appraisalSubmitted = false;
 
 function openAppraisalForm(name, prop, dept, role) {
-  // Find staff by name - used from appraisals table
-  const s = ALL_STAFF.find(x => x.name === name || x.name.includes(name.split(' ')[0]));
-  if (s) { startAppraisal(s.id); } else { showToast('Staff record not found. Search from Staff & Roles.'); }
+  const s = ALL_STAFF.find(x => x.name === name) ||
+            ALL_STAFF.find(x => x.name.toLowerCase().startsWith(name.split(' ')[0].toLowerCase()));
+  if (s) { startAppraisal(s.id); }
+  else { showToast('Staff record not found. Use Staff & Roles to search.'); }
 }
 
 function startAppraisal(staffId) {
@@ -1960,8 +1986,22 @@ function selectCompRating(btn) {
 }
 
 function saveDraftAppraisal() {
+  const s    = window._appraisalStaff;
+  const kpis = window._appraisalKPIs || [];
+  if (!s) { closeModal('modal-appraisal'); return; }
+  const draft = {
+    staffId:     s.id, staffName: s.name,
+    savedAt:     new Date().toISOString(),
+    kpiSelf:     kpis.map((_,i)=>{ const el=document.querySelector('.kpi-self-'+i); return el?el.value:''; }),
+    kpiHOD:      kpis.map((_,i)=>{ const el=document.querySelector('.kpi-hod-'+i);  return el?el.value:''; }),
+    kpiComments: kpis.map((_,i)=>{ const el=document.querySelector('.kpi-comment-'+i); return el?el.value:''; }),
+    devStrong:   (document.getElementById('dev-strong')   ||{value:''}).value,
+    devTraining: (document.getElementById('dev-training') ||{value:''}).value,
+    devCareer:   (document.getElementById('dev-career')   ||{value:''}).value,
+  };
+  try { localStorage.setItem('appraisal_draft_'+s.id, JSON.stringify(draft)); } catch(e) {}
   closeModal('modal-appraisal');
-  showToast('Appraisal saved as draft. You can return to it later.');
+  showToast('Draft saved for '+s.name+'. Return to their profile to resume.');
 }
 
 function submitAppraisal() {
@@ -2515,7 +2555,6 @@ function selectRating(btn, val) {
 document.getElementById('login-password').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
 document.getElementById('staff-search-input') && document.getElementById('staff-search-input').addEventListener('input', searchStaff);
 
-</script>
 // ══════════════════════════════════════════════════════════
 // EXTRA FUNCTIONS — Staff CRUD, KPI Editor, Reports, Settings
 // ══════════════════════════════════════════════════════════
