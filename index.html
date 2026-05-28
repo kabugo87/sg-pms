@@ -680,24 +680,26 @@ tr:hover td{background:#fafafa}
         <div class="section-header">
           <div class="section-title">Staff &amp; Roles</div>
           <div class="filter-row">
-            <select class="filter-select"><option>Both properties</option><option>Skyz</option><option>PHK</option></select>
-            <select class="filter-select"><option>All departments</option><option>Kitchen</option><option>F&amp;B</option><option>Housekeeping</option><option>Front Office</option><option>Finance</option><option>Sales &amp; Marketing</option><option>Maintenance</option><option>Management</option><option>IT</option><option>HR</option></select>
+            <input type="text" id="filter-staff-search" class="filter-select" placeholder="Search name..." oninput="renderStaffTable()" style="width:160px" />
+            <select class="filter-select" id="filter-staff-prop" onchange="renderStaffTable()">
+              <option value="">Both properties</option><option value="skyz">Skyz</option><option value="phk">PHK</option>
+            </select>
+            <select class="filter-select" id="filter-staff-dept" onchange="renderStaffTable()">
+              <option value="">All departments</option>
+              <option>Management</option><option>Front Office</option><option>Housekeeping</option>
+              <option>Kitchen</option><option>Food &amp; Beverage</option><option>Finance</option>
+              <option>Sales &amp; Marketing</option><option>Maintenance</option><option>IT</option><option>HR</option>
+            </select>
             <button class="btn btn-primary btn-sm" onclick="openAddStaffModal()">+ Add staff</button>
           </div>
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Name</th><th>Property</th><th>Department</th><th>Role</th><th>DOJ</th><th>Status</th><th class="no-print">Actions</th></tr></thead>
-            <tbody>
-              <tr><td><strong>Davis Mugabi</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Management</td><td>General Manager</td><td>6 Apr 2021</td><td><span class="band band-exc">Active</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button><button class="btn btn-danger btn-sm">Remove</button></div></td></tr>
-              <tr><td><strong>Annet Nabude</strong></td><td><span class="pill pill-phk">PHK</span></td><td>HR</td><td>HR Manager</td><td>15 Jun 2020</td><td><span class="band band-exc">Active</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button><button class="btn btn-danger btn-sm">Remove</button></div></td></tr>
-              <tr><td><strong>Mandal Monoranjan</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Kitchen</td><td>Executive Chef</td><td>9 Apr 2018</td><td><span class="band band-exc">Active</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button><button class="btn btn-danger btn-sm">Remove</button></div></td></tr>
-              <tr><td><strong>David Omondi</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Food &amp; Beverage</td><td>F&amp;B Manager</td><td>1 Apr 2018</td><td><span class="band band-exc">Active</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button><button class="btn btn-danger btn-sm">Remove</button></div></td></tr>
-              <tr><td><strong>Venkat Narayana</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Finance</td><td>Finance Manager</td><td>30 Nov 2020</td><td><span class="band band-exc">Active</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button><button class="btn btn-danger btn-sm">Remove</button></div></td></tr>
-              <tr><td><strong>Hope Kugonza</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Housekeeping</td><td>Floor Supervisor</td><td>12 Dec 2017</td><td><span class="band band-exc">Active</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button><button class="btn btn-danger btn-sm">Remove</button></div></td></tr>
-              <tr><td><strong>Abel Asingwiire</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Sales &amp; Marketing</td><td>Sales Manager</td><td>1 Nov 2022</td><td><span class="band band-exc">Active</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button><button class="btn btn-danger btn-sm">Remove</button></div></td></tr>
-              <tr><td><strong>Phillip Wandera</strong></td><td><span class="pill pill-phk">PHK</span></td><td>Maintenance</td><td>Maintenance Supervisor</td><td>21 Dec 2022</td><td><span class="band band-exc">Active</span></td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm">Edit</button><button class="btn btn-danger btn-sm">Remove</button></div></td></tr>
-            </tbody>
+            <thead><tr>
+              <th>Name</th><th>Property</th><th>Department</th><th>Role</th>
+              <th>Appraisal mode</th><th class="no-print">Actions</th>
+            </tr></thead>
+            <tbody id="staff-tbody"></tbody>
           </table>
         </div>
       </div>
@@ -742,11 +744,11 @@ tr:hover td{background:#fafafa}
           <table>
             <thead><tr><th>Job title</th><th>Department</th><th>Property</th><th>Reports to</th><th>KPIs linked</th><th>Last updated</th><th class="no-print">Actions</th></tr></thead>
             <tbody>
-              <tr><td><strong>Executive Chef</strong></td><td>Kitchen</td><td><span class="pill pill-both">Both</span></td><td>General Manager</td><td><span class="band band-exc">3 KPIs</span></td><td>Jan 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD()">View</button><button class="btn btn-ghost btn-sm" onclick="printReport()">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
-              <tr><td><strong>F&amp;B Manager</strong></td><td>Food &amp; Beverage</td><td><span class="pill pill-both">Both</span></td><td>General Manager</td><td><span class="band band-exc">4 KPIs</span></td><td>Jan 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD()">View</button><button class="btn btn-ghost btn-sm" onclick="printReport()">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
-              <tr><td><strong>HR Manager</strong></td><td>HR</td><td><span class="pill pill-both">Both</span></td><td>General Manager / Group HR</td><td><span class="band band-exc">5 KPIs</span></td><td>Jan 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD()">View</button><button class="btn btn-ghost btn-sm" onclick="printReport()">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
-              <tr><td><strong>Floor Supervisor</strong></td><td>Housekeeping</td><td><span class="pill pill-both">Both</span></td><td>Executive Housekeeper</td><td><span class="band band-exc">3 KPIs</span></td><td>Feb 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD()">View</button><button class="btn btn-ghost btn-sm" onclick="printReport()">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
-              <tr><td><strong>Sales Manager</strong></td><td>Sales &amp; Marketing</td><td><span class="pill pill-both">Both</span></td><td>General Manager</td><td><span class="band band-exc">4 KPIs</span></td><td>Feb 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD()">View</button><button class="btn btn-ghost btn-sm" onclick="printReport()">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
+              <tr><td><strong>Executive Chef</strong></td><td>Kitchen</td><td><span class="pill pill-both">Both</span></td><td>General Manager</td><td><span class="band band-exc">3 KPIs</span></td><td>Jan 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD('Executive Chef')">View</button><button class="btn btn-ghost btn-sm" onclick="previewJD('Executive Chef');setTimeout(printJD,400)">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
+              <tr><td><strong>F&amp;B Manager</strong></td><td>Food &amp; Beverage</td><td><span class="pill pill-both">Both</span></td><td>General Manager</td><td><span class="band band-exc">4 KPIs</span></td><td>Jan 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD('F&B Manager')">View</button><button class="btn btn-ghost btn-sm" onclick="previewJD('F&B Manager');setTimeout(printJD,400)">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
+              <tr><td><strong>HR Manager</strong></td><td>HR</td><td><span class="pill pill-both">Both</span></td><td>General Manager / Group HR</td><td><span class="band band-exc">5 KPIs</span></td><td>Jan 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD('HR Manager')">View</button><button class="btn btn-ghost btn-sm" onclick="previewJD('HR Manager');setTimeout(printJD,400)">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
+              <tr><td><strong>Floor Supervisor</strong></td><td>Housekeeping</td><td><span class="pill pill-both">Both</span></td><td>Executive Housekeeper</td><td><span class="band band-exc">3 KPIs</span></td><td>Feb 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD('Floor Supervisor')">View</button><button class="btn btn-ghost btn-sm" onclick="previewJD('Floor Supervisor');setTimeout(printJD,400)">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
+              <tr><td><strong>Sales Manager</strong></td><td>Sales &amp; Marketing</td><td><span class="pill pill-both">Both</span></td><td>General Manager</td><td><span class="band band-exc">4 KPIs</span></td><td>Feb 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD('Sales Manager')">View</button><button class="btn btn-ghost btn-sm" onclick="previewJD('Sales Manager');setTimeout(printJD,400)">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
             </tbody>
           </table>
         </div>
@@ -882,126 +884,16 @@ tr:hover td{background:#fafafa}
       <button class="modal-close" onclick="closeModal('modal-appraisal')">&times;</button>
     </div>
     <div class="modal-body">
-      <div class="appraisal-form-header" style="background:var(--navy);color:#fff;padding:12px 16px;border-radius:6px;margin-bottom:16px">
-        <h3 style="font-family:var(--font-heading);font-size:13px;font-weight:600" id="appraisal-staff-name">Mandal Monoranjan</h3>
-        <p style="font-size:10px;opacity:.7;margin-top:2px">Executive Chef &middot; Kitchen &middot; Protea Hotel Kampala &middot; H1 2026</p>
+      <div id="appraisal-staff-header" style="background:var(--navy);color:#fff;padding:12px 16px;border-radius:6px;margin-bottom:16px">
+        <h3 style="font-family:var(--font-heading);font-size:13px;font-weight:600">Loading...</h3>
       </div>
 
-      <div class="form-section-title">Section 1 &mdash; KPI performance</div>
-      <div style="margin-bottom:16px">
-        <div class="kpi-row" style="background:var(--grey-bg);padding:6px 10px;border-radius:5px;font-size:10px;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">
-          <div>KPI / measure</div><div>Target</div><div>Rating</div><div style="text-align:right">Weight</div>
-        </div>
-        <div class="kpi-row">
-          <div><div class="kpi-name">Food waste reduction</div><div class="kpi-target">30% down year on year</div></div>
-          <div><div class="kpi-target">30% YoY</div></div>
-          <div><select class="kpi-rating-select"><option value="">Select rating</option><option>Exceptional</option><option>Exceeds expectations</option><option selected>Meets expectations</option><option>Needs improvement</option><option>Unsatisfactory</option></select>
-          <div class="kpi-comment"><textarea placeholder="Comments or evidence..."></textarea></div></div>
-          <div class="kpi-weight-badge">25%</div>
-        </div>
-        <div class="kpi-row">
-          <div><div class="kpi-name">Kitchen hygiene audit pass rate</div><div class="kpi-target">Pass every audit</div></div>
-          <div><div class="kpi-target">Pass every audit</div></div>
-          <div><select class="kpi-rating-select"><option value="">Select rating</option><option>Exceptional</option><option selected>Exceeds expectations</option><option>Meets expectations</option><option>Needs improvement</option><option>Unsatisfactory</option></select>
-          <div class="kpi-comment"><textarea placeholder="Comments or evidence..."></textarea></div></div>
-          <div class="kpi-weight-badge">20%</div>
-        </div>
-        <div class="kpi-row">
-          <div><div class="kpi-name">Upselling training completion</div><div class="kpi-target">100% of kitchen team</div></div>
-          <div><div class="kpi-target">100% team</div></div>
-          <div><select class="kpi-rating-select"><option value="">Select rating</option><option>Exceptional</option><option>Exceeds expectations</option><option>Meets expectations</option><option>Needs improvement</option><option>Unsatisfactory</option></select>
-          <div class="kpi-comment"><textarea placeholder="Comments or evidence..."></textarea></div></div>
-          <div class="kpi-weight-badge">15%</div>
-        </div>
-      </div>
+      <div id="appraisal-form-body"></div>
 
-      <div class="form-section-title">Section 2 &mdash; Behavioural competencies</div>
-      <div style="margin-bottom:16px">
-        <div class="competency-row">
-          <div><div class="comp-label">Time management</div><div class="comp-desc">Punctuality and reliability in reporting for duty</div></div>
-          <div class="rating-selector">
-            <button class="rating-btn" onclick="selectRating(this,1)">1</button>
-            <button class="rating-btn" onclick="selectRating(this,2)">2</button>
-            <button class="rating-btn selected-4" onclick="selectRating(this,3)">3</button>
-            <button class="rating-btn" onclick="selectRating(this,4)">4</button>
-            <button class="rating-btn" onclick="selectRating(this,5)">5</button>
-          </div>
-        </div>
-        <div class="competency-row">
-          <div><div class="comp-label">Dependability</div><div class="comp-desc">Attendance and consistency</div></div>
-          <div class="rating-selector">
-            <button class="rating-btn" onclick="selectRating(this,1)">1</button>
-            <button class="rating-btn" onclick="selectRating(this,2)">2</button>
-            <button class="rating-btn" onclick="selectRating(this,3)">3</button>
-            <button class="rating-btn selected-5" onclick="selectRating(this,4)">4</button>
-            <button class="rating-btn" onclick="selectRating(this,5)">5</button>
-          </div>
-        </div>
-        <div class="competency-row">
-          <div><div class="comp-label">Quality of work</div><div class="comp-desc">Standards and accuracy of output</div></div>
-          <div class="rating-selector">
-            <button class="rating-btn" onclick="selectRating(this,1)">1</button>
-            <button class="rating-btn" onclick="selectRating(this,2)">2</button>
-            <button class="rating-btn" onclick="selectRating(this,3)">3</button>
-            <button class="rating-btn" onclick="selectRating(this,4)">4</button>
-            <button class="rating-btn selected-5" onclick="selectRating(this,5)">5</button>
-          </div>
-        </div>
-        <div class="competency-row">
-          <div><div class="comp-label">Initiative</div><div class="comp-desc">Proactiveness and self-direction</div></div>
-          <div class="rating-selector">
-            <button class="rating-btn" onclick="selectRating(this,1)">1</button>
-            <button class="rating-btn" onclick="selectRating(this,2)">2</button>
-            <button class="rating-btn" onclick="selectRating(this,3)">3</button>
-            <button class="rating-btn selected-4" onclick="selectRating(this,4)">4</button>
-            <button class="rating-btn" onclick="selectRating(this,5)">5</button>
-          </div>
-        </div>
-        <div class="competency-row">
-          <div><div class="comp-label">Knowledge &amp; skill</div><div class="comp-desc">Role-specific expertise</div></div>
-          <div class="rating-selector">
-            <button class="rating-btn" onclick="selectRating(this,1)">1</button>
-            <button class="rating-btn" onclick="selectRating(this,2)">2</button>
-            <button class="rating-btn" onclick="selectRating(this,3)">3</button>
-            <button class="rating-btn" onclick="selectRating(this,4)">4</button>
-            <button class="rating-btn selected-5" onclick="selectRating(this,5)">5</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-section-title">Section 3 &mdash; Management factors <span style="font-size:10px;color:var(--green);font-weight:400">(HOD and above only)</span></div>
-      <div style="margin-bottom:16px">
-        <div class="competency-row">
-          <div><div class="comp-label">Planning</div><div class="comp-desc">Ability to plan and organise work in advance</div></div>
-          <div class="rating-selector">
-            <button class="rating-btn" onclick="selectRating(this,1)">1</button>
-            <button class="rating-btn" onclick="selectRating(this,2)">2</button>
-            <button class="rating-btn" onclick="selectRating(this,3)">3</button>
-            <button class="rating-btn selected-4" onclick="selectRating(this,4)">4</button>
-            <button class="rating-btn" onclick="selectRating(this,5)">5</button>
-          </div>
-        </div>
-        <div class="competency-row">
-          <div><div class="comp-label">Leading</div><div class="comp-desc">Ability to motivate and guide team members</div></div>
-          <div class="rating-selector">
-            <button class="rating-btn" onclick="selectRating(this,1)">1</button>
-            <button class="rating-btn" onclick="selectRating(this,2)">2</button>
-            <button class="rating-btn" onclick="selectRating(this,3)">3</button>
-            <button class="rating-btn selected-5" onclick="selectRating(this,4)">4</button>
-            <button class="rating-btn" onclick="selectRating(this,5)">5</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-section-title">Section 4 &mdash; Development plan</div>
-      <div class="form-group"><label>Strong points</label><textarea placeholder="List the employee's key strengths observed during this period..."></textarea></div>
-      <div class="form-group"><label>Training and development needs</label><textarea placeholder="Identify any training gaps or development areas for the next cycle..."></textarea></div>
-      <div class="form-group"><label>Career objectives &mdash; next 6 months</label><textarea placeholder="Agree on career development goals for the next half-year..."></textarea></div>
-    </div>
-    <div class="score-footer">
+        <div class="score-footer">
       <div><div class="score-label">Estimated score (KPI section)</div><div class="score-val">Self 40% + HOD 60% = <span class="text-red">Pending</span></div></div>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-secondary" onclick="closeModal('modal-appraisal')">Save draft</button>
+        <button class="btn btn-secondary" onclick="saveDraftAppraisal()">Save draft</button>
         <button class="btn btn-primary" onclick="submitAppraisal()">Submit appraisal</button>
       </div>
     </div>
@@ -1009,42 +901,127 @@ tr:hover td{background:#fafafa}
 </div>
 
 <!-- MODAL: JD Preview -->
+<!-- MODAL: JD View -->
 <div class="modal-overlay hidden" id="modal-jd">
-  <div class="modal" style="width:620px">
+  <div class="modal" style="width:640px">
     <div class="modal-header">
-      <h3>Job Description &mdash; Executive Chef</h3>
+      <h3 id="jd-modal-title">Job Description</h3>
       <button class="modal-close" onclick="closeModal('modal-jd')">&times;</button>
     </div>
-    <div class="modal-body">
-      <div class="jd-preview-header" style="background:var(--navy);color:#fff;text-align:center;padding:16px;border-radius:6px;margin-bottom:16px">
-        <div style="font-size:11px;letter-spacing:.05em;text-transform:uppercase;opacity:.6;margin-bottom:4px">Protea Hotel Kampala &middot; Kitchen Department</div>
-        <div style="font-family:var(--font-heading);font-size:18px;font-weight:600">Executive Chef</div>
-        <div style="font-size:11px;opacity:.6;margin-top:4px">Reports to: General Manager</div>
-      </div>
-      <div class="jd-section"><div class="jd-section-title">Job purpose</div><div class="jd-section-content">To lead and manage all kitchen operations across the property, ensuring the consistent delivery of high-quality food products that meet Marriott brand standards, guest expectations, and the Group's financial targets. The Executive Chef is accountable for food cost control, hygiene compliance, team development, and kitchen performance against the Balanced Scorecard.</div></div>
-      <div class="jd-section"><div class="jd-section-title">Key responsibilities</div><div class="jd-section-content">
-        1. Oversee daily kitchen operations including preparation, presentation, and service across all food outlets.<br>
-        2. Manage food cost within the approved budget and drive a 30% reduction in food waste year on year.<br>
-        3. Ensure 100% pass rate on all kitchen hygiene and food safety audits.<br>
-        4. Lead, mentor, and develop all kitchen staff; build succession depth in key positions.<br>
-        5. Design, review, and update menus seasonally in line with guest feedback and revenue targets.<br>
-        6. Maintain full compliance with Marriott brand standards for food quality and presentation.<br>
-        7. Collaborate with the F&amp;B Manager on covers growth, event catering, and upselling initiatives.<br>
-        8. Submit weekly kitchen reports covering waste, staffing, training, and cost performance.
-      </div></div>
-      <div class="jd-section"><div class="jd-section-title">Required qualifications</div><div class="jd-section-content">Diploma or degree in Culinary Arts, Hotel Management, or a related field. A professional certification in food safety and hygiene (e.g. HACCP) is required.</div></div>
-      <div class="jd-section"><div class="jd-section-title">Experience</div><div class="jd-section-content">Minimum 7 years of progressive kitchen experience, with at least 3 years in an Executive Chef or Sous Chef role in a 4-star or 5-star hotel environment. Experience in a Marriott or international hotel brand is an added advantage.</div></div>
-      <div class="jd-section"><div class="jd-section-title">Key competencies</div><div class="jd-section-content">Leadership and team development &middot; Food cost management and financial discipline &middot; Creativity and menu innovation &middot; Hygiene and food safety standards &middot; Attention to detail &middot; Communication and guest orientation &middot; Resilience under pressure</div></div>
-      <div class="jd-section"><div class="jd-section-title">Linked KPIs</div><div class="jd-section-content">
-        <span class="band band-meets" style="margin-right:5px">Food waste reduction &mdash; 30% YoY</span>
-        <span class="band band-meets" style="margin-right:5px">Kitchen hygiene audit pass rate &mdash; 100%</span>
-        <span class="band band-meets">Upselling training completion &mdash; 100% of team</span>
-      </div></div>
-    </div>
+    <div class="modal-body" id="jd-modal-body"></div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-jd')">Close</button>
-      <button class="btn btn-ghost" onclick="printReport()">Print / PDF</button>
-      <button class="btn btn-primary">Edit JD</button>
+      <button class="btn btn-ghost" onclick="printJD()">Print / PDF</button>
+      <button class="btn btn-primary" onclick="openEditJD()">Edit JD</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: JD Edit / New -->
+<div class="modal-overlay hidden" id="modal-jd-edit">
+  <div class="modal" style="width:680px">
+    <div class="modal-header">
+      <h3 id="jd-edit-title">New Job Description</h3>
+      <button class="modal-close" onclick="closeModal('modal-jd-edit')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row-3">
+        <div class="form-group"><label>Job title</label><input type="text" id="jd-f-title" placeholder="e.g. Executive Chef" /></div>
+        <div class="form-group"><label>Department</label>
+          <select id="jd-f-dept">
+            <option value="">Select department</option>
+            <option>Management</option><option>Front Office</option><option>Housekeeping</option>
+            <option>Kitchen</option><option>Food &amp; Beverage</option><option>Finance</option>
+            <option>Sales &amp; Marketing</option><option>Maintenance</option><option>IT</option><option>HR</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Property</label>
+          <select id="jd-f-property">
+            <option value="both">Both properties</option>
+            <option value="skyz">Protea Hotel Skyz only</option>
+            <option value="phk">Protea Hotel Kampala only</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Reports to</label><input type="text" id="jd-f-reports" placeholder="e.g. General Manager" /></div>
+        <div class="form-group"><label>Grade / Level (optional)</label><input type="text" id="jd-f-grade" placeholder="e.g. Supervisory, HOD" /></div>
+      </div>
+      <div class="form-group"><label>Job purpose</label><textarea id="jd-f-purpose" placeholder="Summarise why this role exists and what it is accountable for..."></textarea></div>
+      <div class="form-group"><label>Key responsibilities</label><textarea id="jd-f-responsibilities" style="min-height:120px" placeholder="List key duties, one per line or numbered..."></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Required qualifications</label><textarea id="jd-f-qualifications" placeholder="Minimum education and certifications..."></textarea></div>
+        <div class="form-group"><label>Experience</label><textarea id="jd-f-experience" placeholder="Minimum years and type of experience..."></textarea></div>
+      </div>
+      <div class="form-group"><label>Key competencies</label><textarea id="jd-f-competencies" placeholder="e.g. Leadership · Communication · Attention to detail..."></textarea></div>
+      <div class="form-group"><label>Linked KPIs (optional)</label><input type="text" id="jd-f-kpis" placeholder="e.g. Guest satisfaction score, Food waste reduction..." /></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-jd-edit')">Cancel</button>
+      <button class="btn btn-ghost" onclick="previewNewJD()">Preview</button>
+      <button class="btn btn-primary" onclick="saveJD()">Save JD</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL: Staff search (for new appraisal) -->
+<div class="modal-overlay hidden" id="modal-staff-search">
+  <div class="modal" style="width:460px">
+    <div class="modal-header">
+      <h3>Select staff member</h3>
+      <button class="modal-close" onclick="closeModal('modal-staff-search')">&times;</button>
+    </div>
+    <div class="modal-body" style="padding-bottom:8px">
+      <div class="form-group">
+        <label>Search by name, role, or department</label>
+        <input type="text" id="staff-search-input" placeholder="e.g. Racheal, Waitress, Kitchen..." oninput="searchStaff()" autofocus />
+      </div>
+      <div id="staff-search-results" style="border:1px solid var(--grey-border);border-radius:6px;max-height:280px;overflow-y:auto;font-size:12px">
+        <div style="padding:16px;text-align:center;font-size:11px;color:var(--text-light)">Start typing to search...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Staff profile & KPI editor -->
+<div class="modal-overlay hidden" id="modal-staff-profile">
+  <div class="modal" style="width:700px">
+    <div class="modal-header">
+      <h3 id="profile-modal-title">Staff Profile</h3>
+      <button class="modal-close" onclick="closeModal('modal-staff-profile')">&times;</button>
+    </div>
+    <div class="modal-body" id="profile-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-staff-profile')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveStaffProfile()">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Apply to prompt -->
+<div class="modal-overlay hidden" id="modal-apply-to">
+  <div class="modal" style="width:420px">
+    <div class="modal-header">
+      <h3>Apply changes to which cycle?</h3>
+      <button class="modal-close" onclick="closeModal('modal-apply-to')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:12px;color:var(--text-mid);margin-bottom:16px">Choose when these KPI changes take effect. This applies to the individual staff member (or all staff in the role if bulk edit was selected).</p>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn btn-secondary" style="justify-content:flex-start;text-align:left;padding:12px 14px" onclick="confirmSave('current')">
+          <div style="font-weight:600;color:var(--navy)">Current cycle only &mdash; H1 2026</div>
+          <div style="font-size:10px;color:var(--text-light);margin-top:2px">Fixes a mistake or immediate adjustment. Reverts to original template from H2 2026.</div>
+        </button>
+        <button class="btn btn-secondary" style="justify-content:flex-start;text-align:left;padding:12px 14px" onclick="confirmSave('next')">
+          <div style="font-weight:600;color:var(--navy)">From next cycle onwards &mdash; H2 2026+</div>
+          <div style="font-size:10px;color:var(--text-light);margin-top:2px">Planned change. Current cycle H1 2026 is not affected.</div>
+        </button>
+        <button class="btn btn-primary" style="justify-content:flex-start;text-align:left;padding:12px 14px" onclick="confirmSave('both')">
+          <div style="font-weight:600">Apply immediately &mdash; current and all future cycles</div>
+          <div style="font-size:10px;opacity:.75;margin-top:2px">Most common choice. Takes effect right now and persists.</div>
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -1053,6 +1030,8 @@ tr:hover td{background:#fafafa}
 <div id="toast"></div>
 
 <script>
+// This is the replacement JS block only - will be injected into the HTML
+
 const SUPABASE_URL = 'https://iyxgdzukzltlqisdfeoq.supabase.co';
 const SUPABASE_KEY = 'YOUR_ANON_KEY_HERE';
 
@@ -1060,31 +1039,74 @@ let sbClient = null;
 let currentUser = null;
 let currentProp = 'both';
 
-const DEMO_USERS = {
-  'kusain@thesimbagroup.com': { password: 'simba2026', name: 'Kusain Kabugo', role: 'hr', initials: 'KK', property: 'both' },
-  'gm.skyz@thesimbagroup.com': { password: 'simba2026', name: 'GM Skyz', role: 'gm', initials: 'GS', property: 'skyz' },
-  'gm.phk@thesimbagroup.com': { password: 'simba2026', name: 'GM PHK', role: 'gm', initials: 'GP', property: 'phk' },
-  'hr@phkmarriottskyz.com': { password: 'simba2026', name: 'HR Manager', role: 'hod', initials: 'HM', property: 'both' },
+// ── USERS ──────────────────────────────────────────────────
+const USERS = {
+  'kusain@thesimbagroup.com':   { password:'simba2026', name:'Kusain Kabugo', role:'hr_admin', initials:'KK', property:'both' },
+  'hr@phkmarriottskyz.com':     { password:'simba2026', name:'Annet Nabude',  role:'hr',       initials:'AN', property:'skyz' },
+  'hr@proteakla.co.ug':         { password:'simba2026', name:'Laura Namayega',role:'hr',       initials:'LN', property:'phk'  },
+  'gm@phkmarriottskyz.com':     { password:'simba2026', name:'Davis Mugabi',  role:'gm',       initials:'DM', property:'skyz' },
+  'info@proteakla.co.ug':       { password:'simba2026', name:'Phionah',       role:'gm',       initials:'PH', property:'phk'  },
 };
 
+// Roles that can appraise anyone (within their property scope)
+const CAN_APPRAISE = ['hr_admin','hr','gm','hod'];
+
+// ── DEMO STAFF DATA ────────────────────────────────────────
+const DEMO_STAFF = [
+  { id:'s001', name:'Davis Mugabi',       property:'phk',  dept:'Management',      role:'General Manager',          assisted:false },
+  { id:'s002', name:'Annet Nabude',       property:'skyz', dept:'HR',              role:'HR Manager',               assisted:false },
+  { id:'s003', name:'Laura Namayega',     property:'phk',  dept:'HR',              role:'HR Manager',               assisted:false },
+  { id:'s004', name:'Mandal Monoranjan',  property:'phk',  dept:'Kitchen',         role:'Executive Chef',           assisted:false },
+  { id:'s005', name:'David Omondi',       property:'phk',  dept:'Food & Beverage', role:'F&B Manager',              assisted:false },
+  { id:'s006', name:'Hope Kugonza',       property:'phk',  dept:'Housekeeping',    role:'Floor Supervisor',         assisted:false },
+  { id:'s007', name:'Abel Asingwiire',    property:'phk',  dept:'Sales & Marketing',role:'Sales Manager',           assisted:false },
+  { id:'s008', name:'Phillip Wandera',    property:'phk',  dept:'Maintenance',     role:'Maintenance Supervisor',   assisted:false },
+  { id:'s009', name:'Gerald Mugumya',     property:'phk',  dept:'Finance',         role:'Senior Accountant',        assisted:false },
+  { id:'s010', name:'Racheal Logose',     property:'phk',  dept:'Food & Beverage', role:'Waitress',                 assisted:true  },
+  { id:'s011', name:'Martin Opio',        property:'phk',  dept:'Housekeeping',    role:'Room Attendant',           assisted:true  },
+  { id:'s012', name:'Moses Opule',        property:'phk',  dept:'Maintenance',     role:'Plumber',                  assisted:true  },
+  { id:'s013', name:'Faizo Mukama',       property:'phk',  dept:'Kitchen',         role:'Steward',                  assisted:true  },
+  { id:'s014', name:'Geofrey Kati',       property:'phk',  dept:'Housekeeping',    role:'Laundry Supervisor',       assisted:false },
+  { id:'s015', name:'Jackline Nambuya',   property:'phk',  dept:'Finance',         role:'Accounts Assistant',       assisted:true  },
+];
+
+// ── DEMO KPI TEMPLATES PER ROLE ────────────────────────────
+const ROLE_KPIS = {
+  'Waitress':         [ {kpi:'Guest satisfaction score', target:'90%+', weight:35}, {kpi:'Table turnaround time', target:'15 min', weight:25}, {kpi:'Upselling conversion', target:'20% of covers', weight:20}, {kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:20} ],
+  'Room Attendant':   [ {kpi:'Room cleanliness inspection pass rate', target:'95%+', weight:35}, {kpi:'Room turnaround time', target:'30 min or less', weight:30}, {kpi:'Guest satisfaction score', target:'90%+', weight:20}, {kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:15} ],
+  'Steward':          [ {kpi:'Kitchen hygiene compliance', target:'Pass every audit', weight:40}, {kpi:'Equipment maintenance', target:'Zero breakage incidents', weight:30}, {kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:30} ],
+  'Executive Chef':   [ {kpi:'Food waste reduction', target:'30% YoY', weight:25}, {kpi:'Kitchen hygiene audit pass rate', target:'Pass every audit', weight:20}, {kpi:'Food cost % of revenue', target:'Below 32%', weight:25}, {kpi:'Upselling training completion', target:'100% of team', weight:15}, {kpi:'Menu innovation', target:'Seasonal menu update', weight:15} ],
+  'F&B Manager':      [ {kpi:'F&B revenue vs budget', target:'100%+', weight:30}, {kpi:'Guest satisfaction — F&B', target:'90%+', weight:25}, {kpi:'Food & beverage cost control', target:'Within budget', weight:25}, {kpi:'Team training completion', target:'100%', weight:20} ],
+  'Floor Supervisor': [ {kpi:'Room cleanliness inspection pass rate', target:'95%+', weight:30}, {kpi:'Room turnaround time', target:'30 min', weight:25}, {kpi:'Guest satisfaction — Housekeeping', target:'90%+', weight:25}, {kpi:'Team attendance rate', target:'95%+', weight:20} ],
+  'Sales Manager':    [ {kpi:'Revenue vs target', target:'100%+', weight:35}, {kpi:'New accounts acquired', target:'5 per quarter', weight:25}, {kpi:'Conversion rate', target:'30%+', weight:25}, {kpi:'Client retention', target:'80%+', weight:15} ],
+  'default':          [ {kpi:'Quality of work', target:'Meets standards', weight:40}, {kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:30}, {kpi:'Team cooperation', target:'No disciplinary issues', weight:30} ],
+};
+
+function getKPIsForRole(role) {
+  return ROLE_KPIS[role] || ROLE_KPIS['default'];
+}
+
+// ── LOGIN ──────────────────────────────────────────────────
 function doLogin() {
   const email = document.getElementById('login-email').value.trim().toLowerCase();
-  const pwd = document.getElementById('login-password').value;
-  const err = document.getElementById('login-error');
-  const user = DEMO_USERS[email];
-  if (!user || user.password !== pwd) {
-    err.style.display = 'block';
-    return;
-  }
+  const pwd   = document.getElementById('login-password').value;
+  const err   = document.getElementById('login-error');
+  const user  = USERS[email];
+  if (!user || user.password !== pwd) { err.style.display='block'; return; }
   err.style.display = 'none';
   currentUser = { ...user, email };
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
-  document.getElementById('sb-avatar').textContent = user.initials;
+  document.getElementById('sb-avatar').textContent    = user.initials;
   document.getElementById('sb-user-name').textContent = user.name;
-  document.getElementById('sb-user-role').textContent = user.role === 'hr' ? 'HR Admin' : user.role === 'gm' ? 'General Manager' : 'HOD';
+  document.getElementById('sb-user-role').textContent = roleLabel(user.role);
   setWelcome();
   applyRoleAccess();
+  renderStaffTable();
+}
+
+function roleLabel(r) {
+  return r==='hr_admin'?'HR Admin': r==='hr'?'HR Manager': r==='gm'?'General Manager': r==='hod'?'HOD':'Staff';
 }
 
 function doLogout() {
@@ -1097,72 +1119,523 @@ function doLogout() {
 
 function setWelcome() {
   const h = new Date().getHours();
-  const greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
-  document.getElementById('welcome-msg').textContent = greeting + ', ' + currentUser.name.split(' ')[0];
+  const g = h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  document.getElementById('welcome-msg').textContent = g+', '+currentUser.name.split(' ')[0];
 }
 
 function applyRoleAccess() {
   if (!currentUser) return;
-  const propSwitcher = document.getElementById('prop-switcher');
+  const sw = document.getElementById('prop-switcher');
+  // HR Admin sees both; HR and GM locked to their property
   if (currentUser.role === 'gm') {
-    propSwitcher.innerHTML = currentUser.property === 'skyz'
+    sw.innerHTML = currentUser.property === 'skyz'
       ? '<option value="skyz">Protea Hotel Skyz</option>'
       : '<option value="phk">Protea Hotel Kampala</option>';
-    document.querySelectorAll('[data-page="settings"],[data-page="kpis"],[data-page="jds"],[data-page="departments"]').forEach(el => el.style.display = 'none');
+    currentProp = currentUser.property;
+    document.querySelectorAll('[data-page="settings"],[data-page="kpis"],[data-page="jds"],[data-page="departments"]')
+      .forEach(el => el.style.display='none');
+  } else if (currentUser.role === 'hr') {
+    sw.innerHTML = currentUser.property === 'skyz'
+      ? '<option value="skyz">Protea Hotel Skyz</option>'
+      : '<option value="phk">Protea Hotel Kampala</option>';
+    currentProp = currentUser.property;
   }
 }
 
+// ── NAVIGATION ─────────────────────────────────────────────
 function navigate(page) {
-  document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
-  const el = document.getElementById('page-' + page);
-  if (el) el.classList.add('active');
-  const nav = document.querySelector('[data-page="' + page + '"]');
+  document.querySelectorAll('.page-view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  const el  = document.getElementById('page-'+page);
+  const nav = document.querySelector('[data-page="'+page+'"]');
+  if (el)  el.classList.add('active');
   if (nav) nav.classList.add('active');
-  const titles = { home:'Home', appraisals:'Appraisals', analytics:'Analytics', reports:'Reports', staff:'Staff & Roles', kpis:'KPI Setup', jds:'Job Descriptions', departments:'Departments', settings:'Settings' };
-  document.getElementById('tb-title').textContent = titles[page] || page;
-  document.getElementById('tb-sub').textContent = (currentProp === 'both' ? 'Both properties' : currentProp === 'skyz' ? 'Protea Hotel Skyz' : 'Protea Hotel Kampala') + ' \u2014 ' + new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  const titles = { home:'Home', appraisals:'Appraisals', analytics:'Analytics', reports:'Reports',
+    staff:'Staff & Roles', kpis:'KPI Setup', jds:'Job Descriptions', departments:'Departments', settings:'Settings' };
+  document.getElementById('tb-title').textContent = titles[page]||page;
+  document.getElementById('tb-sub').textContent   = propLabel(currentProp)+' \u2014 '+dateStr();
+  if (page==='staff') renderStaffTable();
+}
+
+function propLabel(p) {
+  return p==='both'?'Both properties': p==='skyz'?'Protea Hotel Skyz':'Protea Hotel Kampala';
+}
+function dateStr() {
+  return new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 }
 
 function switchProperty(val) {
   currentProp = val;
-  const label = val === 'both' ? 'Both properties' : val === 'skyz' ? 'Protea Hotel Skyz' : 'Protea Hotel Kampala';
-  document.getElementById('tb-sub').textContent = label + ' \u2014 ' + new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  document.getElementById('tb-sub').textContent = propLabel(val)+' \u2014 '+dateStr();
 }
 
-function openAppraisalForm(name, prop, dept, role) {
-  document.getElementById('appraisal-modal-title').textContent = 'Appraisal \u2014 ' + role + ' \u00B7 ' + prop + ' \u00B7 H1 2026';
-  document.getElementById('appraisal-staff-name').textContent = name;
+// ── STAFF TABLE ────────────────────────────────────────────
+function renderStaffTable(filter) {
+  const dept  = document.getElementById('filter-staff-dept')  ? document.getElementById('filter-staff-dept').value  : '';
+  const prop  = document.getElementById('filter-staff-prop')  ? document.getElementById('filter-staff-prop').value  : '';
+  const search= document.getElementById('filter-staff-search')? document.getElementById('filter-staff-search').value.toLowerCase(): '';
+
+  let staff = DEMO_STAFF.filter(s => {
+    if (currentUser.role !== 'hr_admin' && s.property !== currentUser.property) return false;
+    if (prop && s.property !== prop) return false;
+    if (dept && s.dept !== dept) return false;
+    if (search && !s.name.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  const tbody = document.getElementById('staff-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = staff.map(s => `
+    <tr>
+      <td><strong>${s.name}</strong></td>
+      <td><span class="pill ${s.property==='skyz'?'pill-skyz':'pill-phk'}">${s.property.toUpperCase()}</span></td>
+      <td>${s.dept}</td>
+      <td>${s.role}</td>
+      <td><span class="band ${s.assisted?'band-needs':'band-meets'}">${s.assisted?'Assisted':'Self-service'}</span></td>
+      <td class="no-print">
+        <div class="table-actions">
+          <button class="btn btn-secondary btn-sm" onclick="openStaffProfile('${s.id}')">View / Edit</button>
+          <button class="btn btn-primary btn-sm" onclick="startAppraisal('${s.id}')">Appraise</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+// ── STAFF PROFILE MODAL ────────────────────────────────────
+function openStaffProfile(staffId) {
+  const s = DEMO_STAFF.find(x=>x.id===staffId);
+  if (!s) return;
+  const kpis = getKPIsForRole(s.role);
+  const totalWeight = kpis.reduce((a,k)=>a+k.weight,0);
+
+  document.getElementById('profile-modal-title').textContent = s.name+' \u2014 Profile & KPIs';
+  document.getElementById('profile-modal-body').innerHTML = `
+    <div style="background:var(--grey-bg);border-radius:6px;padding:14px;margin-bottom:16px">
+      <div class="form-row-3">
+        <div class="form-group" style="margin-bottom:0">
+          <label>Full name</label>
+          <input type="text" value="${s.name}" id="edit-name" />
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>Property</label>
+          <select id="edit-prop">
+            <option value="skyz" ${s.property==='skyz'?'selected':''}>Protea Hotel Skyz</option>
+            <option value="phk"  ${s.property==='phk' ?'selected':''}>Protea Hotel Kampala</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>Department</label>
+          <select id="edit-dept">
+            ${['Management','Front Office','Housekeeping','Kitchen','Food & Beverage','Finance','Sales & Marketing','Maintenance','IT','HR']
+              .map(d=>`<option ${s.dept===d?'selected':''}>${d}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="form-row" style="margin-top:12px">
+        <div class="form-group" style="margin-bottom:0">
+          <label>Role / Position</label>
+          <input type="text" value="${s.role}" id="edit-role" />
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>Appraisal mode</label>
+          <select id="edit-assisted">
+            <option value="false" ${!s.assisted?'selected':''}>Self-service (has system access)</option>
+            <option value="true"  ${s.assisted ?'selected':''}>Assisted (HOD appraises on behalf)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section-title" style="margin-bottom:12px">KPI assignments</div>
+    <div style="font-size:11px;color:var(--text-light);margin-bottom:10px">
+      Edit KPIs and weights for this staff member. Weights must total 100%.
+      <span style="color:var(--red);font-weight:600" id="weight-warning"></span>
+    </div>
+    <div id="kpi-editor">
+      ${kpis.map((k,i)=>`
+        <div class="kpi-edit-row" data-index="${i}" style="display:grid;grid-template-columns:2fr 1.5fr .8fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:.5px solid #eee">
+          <input type="text"   class="kpi-edit-name"   value="${k.kpi}"    placeholder="KPI name"   style="padding:6px 8px;border:1px solid var(--grey-border);border-radius:4px;font-size:11px" />
+          <input type="text"   class="kpi-edit-target" value="${k.target}" placeholder="Target"     style="padding:6px 8px;border:1px solid var(--grey-border);border-radius:4px;font-size:11px" />
+          <input type="number" class="kpi-edit-weight" value="${k.weight}" min="0" max="100" oninput="updateWeightTotal()" style="padding:6px 8px;border:1px solid var(--grey-border);border-radius:4px;font-size:11px;text-align:center" />
+          <button onclick="removeKPIRow(this)" style="background:#fcebeb;border:1px solid #f7c1c1;color:#A32D2D;border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer">&times;</button>
+        </div>`).join('')}
+    </div>
+    <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="addKPIRow()">+ Add KPI</button>
+    <div style="margin-top:10px;display:flex;align-items:center;gap:8px">
+      <span style="font-size:11px;color:var(--text-mid)">Total weight:</span>
+      <span id="weight-total" style="font-size:13px;font-weight:600;color:var(--navy)">${totalWeight}%</span>
+    </div>
+
+    <div style="background:#faeeda;border-left:3px solid var(--amber);padding:10px 12px;border-radius:4px;margin-top:16px;font-size:11px;color:var(--amber)">
+      <strong>Bulk edit tip:</strong> To apply the same KPI changes to all staff in the <strong>${s.role}</strong> role, use the <em>Apply to all ${s.role}s</em> option when saving.
+    </div>`;
+
+  document.getElementById('modal-staff-profile').classList.remove('hidden');
+  window._editingStaffId = staffId;
+}
+
+function addKPIRow() {
+  const editor = document.getElementById('kpi-editor');
+  const div = document.createElement('div');
+  div.className = 'kpi-edit-row';
+  div.style.cssText = 'display:grid;grid-template-columns:2fr 1.5fr .8fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:.5px solid #eee';
+  div.innerHTML = `
+    <input type="text"   class="kpi-edit-name"   placeholder="KPI name"   style="padding:6px 8px;border:1px solid var(--grey-border);border-radius:4px;font-size:11px" />
+    <input type="text"   class="kpi-edit-target" placeholder="Target"     style="padding:6px 8px;border:1px solid var(--grey-border);border-radius:4px;font-size:11px" />
+    <input type="number" class="kpi-edit-weight" value="0" min="0" max="100" oninput="updateWeightTotal()" style="padding:6px 8px;border:1px solid var(--grey-border);border-radius:4px;font-size:11px;text-align:center" />
+    <button onclick="removeKPIRow(this)" style="background:#fcebeb;border:1px solid #f7c1c1;color:#A32D2D;border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer">&times;</button>`;
+  editor.appendChild(div);
+  updateWeightTotal();
+}
+
+function removeKPIRow(btn) {
+  btn.closest('.kpi-edit-row').remove();
+  updateWeightTotal();
+}
+
+function updateWeightTotal() {
+  const weights = [...document.querySelectorAll('.kpi-edit-weight')].map(i=>parseFloat(i.value)||0);
+  const total   = weights.reduce((a,b)=>a+b,0);
+  const el      = document.getElementById('weight-total');
+  const warn    = document.getElementById('weight-warning');
+  if (el) el.textContent = total+'%';
+  if (warn) warn.textContent = total!==100 ? ' \u2014 Weights must total 100%' : '';
+  if (el)  el.style.color = total===100?'var(--green)':'var(--red)';
+}
+
+function saveStaffProfile(applyBulk) {
+  const weights = [...document.querySelectorAll('.kpi-edit-weight')].map(i=>parseFloat(i.value)||0);
+  const total   = weights.reduce((a,b)=>a+b,0);
+  if (total !== 100) { showToast('Weights must total 100% before saving.'); return; }
+
+  // Show apply-to prompt
+  document.getElementById('modal-apply-to').classList.remove('hidden');
+}
+
+function confirmSave(applyTo) {
+  closeModal('modal-apply-to');
+  closeModal('modal-staff-profile');
+  const s = DEMO_STAFF.find(x=>x.id===window._editingStaffId);
+  const msg = applyTo==='current'  ? 'Changes applied to H1 2026 cycle.'
+            : applyTo==='next'     ? 'Changes will apply from H2 2026 onwards.'
+            : 'Changes applied to current and all future cycles.';
+  showToast(msg);
+}
+
+// ── APPRAISAL FORM ─────────────────────────────────────────
+let appraisalSubmitted = false;
+
+function startAppraisal(staffId) {
+  const s = DEMO_STAFF.find(x=>x.id===staffId);
+  if (!s) return;
+  appraisalSubmitted = false;
+  buildAppraisalForm(s);
   document.getElementById('modal-appraisal').classList.remove('hidden');
 }
 
-function openNewAppraisalModal() { openAppraisalForm('New staff member', 'PHK', 'Department', 'Role'); }
+function openNewAppraisalModal() {
+  // Show staff search first
+  document.getElementById('modal-staff-search').classList.remove('hidden');
+  document.getElementById('staff-search-input').value = '';
+  document.getElementById('staff-search-results').innerHTML = '';
+}
 
-function openAddStaffModal() { showToast('Add staff form — connect Supabase to enable'); }
-function openAddKPIModal() { showToast('Add KPI form — connect Supabase to enable'); }
-function openAddJDModal() { showToast('New JD form — connect Supabase to enable'); }
+function searchStaff() {
+  const q    = document.getElementById('staff-search-input').value.toLowerCase();
+  const list = DEMO_STAFF.filter(s => {
+    if (currentUser.role!=='hr_admin' && s.property!==currentUser.property) return false;
+    return s.name.toLowerCase().includes(q) || s.role.toLowerCase().includes(q) || s.dept.toLowerCase().includes(q);
+  });
+  document.getElementById('staff-search-results').innerHTML = list.length
+    ? list.map(s=>`
+        <div onclick="selectStaffForAppraisal('${s.id}')"
+             style="padding:9px 12px;border-bottom:.5px solid #eee;cursor:pointer;transition:background .1s"
+             onmouseover="this.style.background='#f0f1f4'" onmouseout="this.style.background=''">
+          <div style="font-size:12px;font-weight:600;color:var(--navy)">${s.name}</div>
+          <div style="font-size:10px;color:var(--text-light)">${s.role} &middot; ${s.dept} &middot; ${s.property.toUpperCase()}</div>
+        </div>`).join('')
+    : '<div style="padding:16px;text-align:center;font-size:11px;color:var(--text-light)">No staff found</div>';
+}
 
+function selectStaffForAppraisal(staffId) {
+  closeModal('modal-staff-search');
+  const s = DEMO_STAFF.find(x=>x.id===staffId);
+  appraisalSubmitted = false;
+  buildAppraisalForm(s);
+  document.getElementById('modal-appraisal').classList.remove('hidden');
+}
+
+function buildAppraisalForm(s) {
+  const kpis = getKPIsForRole(s.role);
+  document.getElementById('appraisal-modal-title').textContent = 'Appraisal \u2014 '+s.role+' \u00B7 '+s.property.toUpperCase()+' \u00B7 H1 2026';
+  document.getElementById('appraisal-staff-header').innerHTML =
+    `<h3 style="font-family:var(--font-heading);font-size:13px;font-weight:600">${s.name}</h3>
+     <p style="font-size:10px;opacity:.7;margin-top:2px">${s.role} &middot; ${s.dept} &middot; ${s.property==='skyz'?'Protea Hotel Skyz':'Protea Hotel Kampala'} &middot; H1 2026</p>`;
+
+  const RATINGS = ['','Exceptional','Exceeds Expectations','Meets Expectations','Needs Improvement','Unsatisfactory'];
+  const ratingSelect = (cls) => `<select class="${cls}" style="width:100%;padding:5px 7px;border:1px solid var(--grey-border);border-radius:4px;font-size:11px;font-family:var(--font-ui)">
+    ${RATINGS.map(r=>`<option value="${r}">${r||'Select rating'}</option>`).join('')}</select>`;
+
+  // Section 1 — KPIs (two columns: staff response + HOD rating)
+  const kpiRows = kpis.map((k,i)=>`
+    <div style="padding:10px 0;border-bottom:.5px solid #eee">
+      <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr .4fr;gap:10px;align-items:center">
+        <div>
+          <div style="font-size:12px;font-weight:500;color:var(--text-dark)">${k.kpi}</div>
+          <div style="font-size:10px;color:var(--text-light);margin-top:2px">Target: ${k.target}</div>
+        </div>
+        <div>${ratingSelect('kpi-self-'+i)}</div>
+        <div>${ratingSelect('kpi-hod-'+i)}</div>
+        <div style="font-size:10px;font-weight:600;color:var(--red);text-align:right">${k.weight}%</div>
+      </div>
+      <div style="margin-top:6px">
+        <textarea class="kpi-comment-${i}" placeholder="Comments / evidence..." style="width:100%;padding:6px 8px;border:1px solid var(--grey-border);border-radius:4px;font-size:11px;font-family:var(--font-ui);resize:vertical;min-height:42px"></textarea>
+      </div>
+    </div>`).join('');
+
+  const COMPETENCIES = [
+    {key:'time_management', label:'Time management',    desc:'Punctuality and reliability'},
+    {key:'dependability',   label:'Dependability',      desc:'Attendance and consistency'},
+    {key:'appearance',      label:'Appearance',         desc:'Grooming and uniform standards'},
+    {key:'cooperation',     label:'Cooperation',        desc:'Working well with colleagues'},
+    {key:'responsibility',  label:'Responsibility',     desc:'Ownership of tasks'},
+    {key:'accuracy',        label:'Accuracy',           desc:'Correctness of work'},
+    {key:'quality',         label:'Quality of work',    desc:'Standards of output'},
+    {key:'quantity',        label:'Quantity of work',   desc:'Volume and productivity'},
+    {key:'initiative',      label:'Initiative',         desc:'Proactiveness and self-direction'},
+    {key:'knowledge',       label:'Knowledge & skill',  desc:'Role-specific expertise'},
+  ];
+
+  const ratingBtns = (key, type) => [1,2,3,4,5].map(v=>
+    `<button type="button" class="rating-btn comp-btn" data-key="${key}" data-type="${type}" data-val="${v}" onclick="selectCompRating(this)">${v}</button>`
+  ).join('');
+
+  const compRows = COMPETENCIES.map(c=>`
+    <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:.5px solid #eee">
+      <div>
+        <div style="font-size:12px;color:var(--text-dark)">${c.label}</div>
+        <div style="font-size:10px;color:var(--text-light);margin-top:1px">${c.desc}</div>
+      </div>
+      <div class="rating-selector">${ratingBtns(c.key,'self')}</div>
+      <div class="rating-selector">${ratingBtns(c.key,'hod')}</div>
+    </div>`).join('');
+
+  // Management section — shown for non-assisted (supervisory) roles
+  const isMgmt = !s.assisted;
+  const MGMT = [{key:'planning',label:'Planning'},{key:'leading',label:'Leading'},{key:'organising',label:'Organising'},{key:'control',label:'Control'}];
+  const mgmtSection = isMgmt ? `
+    <div class="form-section-title" style="margin-top:18px;margin-bottom:10px">Section 3 &mdash; Management factors <span style="font-size:10px;color:var(--green);font-weight:400">(supervisory roles)</span></div>
+    <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr;gap:10px;padding:6px 0;border-bottom:1.5px solid #000;margin-bottom:4px">
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light)">Factor</div>
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light);text-align:center">Staff response</div>
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light);text-align:center">HOD rating</div>
+    </div>
+    ${MGMT.map(m=>`
+      <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:.5px solid #eee">
+        <div style="font-size:12px;color:var(--text-dark)">${m.label}</div>
+        <div class="rating-selector">${ratingBtns(m.key,'self')}</div>
+        <div class="rating-selector">${ratingBtns(m.key,'hod')}</div>
+      </div>`).join('')}` : '';
+
+  document.getElementById('appraisal-form-body').innerHTML = `
+    <div class="form-section-title" style="margin-bottom:10px">Section 1 &mdash; KPI performance</div>
+    <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr .4fr;gap:10px;padding:6px 0;border-bottom:1.5px solid #000;margin-bottom:2px">
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light)">KPI / Measure</div>
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light);text-align:center">Staff response</div>
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light);text-align:center">HOD rating</div>
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light);text-align:right">Weight</div>
+    </div>
+    ${kpiRows}
+
+    <div class="form-section-title" style="margin-top:18px;margin-bottom:10px">Section 2 &mdash; Behavioural competencies</div>
+    <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr;gap:10px;padding:6px 0;border-bottom:1.5px solid #000;margin-bottom:4px">
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light)">Competency</div>
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light);text-align:center">Staff response</div>
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-light);text-align:center">HOD rating</div>
+    </div>
+    ${compRows}
+    ${mgmtSection}
+
+    <div class="form-section-title" style="margin-top:18px;margin-bottom:10px">Section 4 &mdash; Development plan</div>
+    <div class="form-group"><label>Strong points</label><textarea id="dev-strong" placeholder="Key strengths observed during this period..."></textarea></div>
+    <div class="form-group"><label>Training and development needs</label><textarea id="dev-training" placeholder="Training gaps or development areas for next cycle..."></textarea></div>
+    <div class="form-group"><label>Career objectives &mdash; next 6 months</label><textarea id="dev-career" placeholder="Agreed career development goals..."></textarea></div>
+
+    <div style="background:var(--grey-bg);border:1px solid var(--grey-border);border-radius:6px;padding:12px 14px;margin-top:8px">
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+        <input type="checkbox" id="ack-checkbox" style="margin-top:2px;accent-color:var(--navy);width:14px;height:14px;flex-shrink:0" />
+        <span style="font-size:11px;color:var(--text-mid);line-height:1.5">
+          I confirm this appraisal was conducted in the presence of <strong>${s.name}</strong> and that all ratings and the development plan were discussed and agreed upon.
+        </span>
+      </label>
+    </div>`;
+
+  window._appraisalStaff = s;
+  window._appraisalKPIs  = kpis;
+}
+
+function selectCompRating(btn) {
+  const key  = btn.dataset.key;
+  const type = btn.dataset.type;
+  const val  = btn.dataset.val;
+  document.querySelectorAll(`.comp-btn[data-key="${key}"][data-type="${type}"]`)
+    .forEach(b => { b.className='rating-btn comp-btn'; });
+  btn.classList.add('selected-'+val);
+}
+
+function saveDraftAppraisal() {
+  closeModal('modal-appraisal');
+  showToast('Appraisal saved as draft. You can return to it later.');
+}
+
+function submitAppraisal() {
+  if (appraisalSubmitted) return;
+  const ack = document.getElementById('ack-checkbox');
+  if (!ack || !ack.checked) { showToast('Please tick the acknowledgement checkbox before submitting.'); return; }
+  appraisalSubmitted = true;
+  closeModal('modal-appraisal');
+  showToast('Appraisal submitted and locked. Cannot be deleted.');
+}
+
+// ── MODALS ─────────────────────────────────────────────────
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+// ── JD DATA ────────────────────────────────────────────────
+const JD_DATA = {
+  'Executive Chef': {
+    title:'Executive Chef', dept:'Kitchen', property:'both', reportsTo:'General Manager', grade:'HOD',
+    purpose:'To lead and manage all kitchen operations across the property, ensuring consistent delivery of high-quality food that meets Marriott brand standards, guest expectations, and the Group\'s financial targets. The Executive Chef is accountable for food cost control, hygiene compliance, team development, and kitchen performance against the Balanced Scorecard.',
+    responsibilities:'1. Oversee daily kitchen operations including preparation, presentation, and service across all food outlets.\n2. Manage food cost within the approved budget and drive a 30% reduction in food waste year on year.\n3. Ensure 100% pass rate on all kitchen hygiene and food safety audits.\n4. Lead, mentor, and develop all kitchen staff; build succession depth in key positions.\n5. Design, review, and update menus seasonally in line with guest feedback and revenue targets.\n6. Maintain full compliance with Marriott brand standards for food quality and presentation.\n7. Collaborate with the F&B Manager on covers growth, event catering, and upselling initiatives.\n8. Submit weekly kitchen reports covering waste, staffing, training, and cost performance.',
+    qualifications:'Diploma or degree in Culinary Arts, Hotel Management, or a related field. A professional certification in food safety and hygiene (e.g. HACCP) is required.',
+    experience:'Minimum 7 years of progressive kitchen experience, with at least 3 years in an Executive Chef or Sous Chef role in a 4-star or 5-star hotel. Experience in a Marriott or international hotel brand is an added advantage.',
+    competencies:'Leadership and team development · Food cost management · Creativity and menu innovation · Hygiene and food safety standards · Attention to detail · Guest orientation · Resilience under pressure',
+    kpis:'Food waste reduction (30% YoY) · Kitchen hygiene audit pass rate (100%) · Upselling training completion (100% of team)'
+  },
+  'F&B Manager': {
+    title:'F&B Manager', dept:'Food & Beverage', property:'both', reportsTo:'General Manager', grade:'HOD',
+    purpose:'To oversee all food and beverage operations across the property, driving revenue, controlling costs, and delivering a consistently exceptional guest dining experience in line with Marriott brand standards and the Group\'s Balanced Scorecard objectives.',
+    responsibilities:'1. Lead and manage all F&B outlets including restaurants, bar, banqueting, and room service.\n2. Drive F&B revenue to meet and exceed budgeted targets.\n3. Manage food and beverage cost percentages within approved budgets.\n4. Ensure guest satisfaction scores for F&B consistently meet or exceed 90%.\n5. Plan and execute all banqueting and events in line with client requirements.\n6. Develop and implement upselling strategies across all outlets.\n7. Recruit, train, and develop F&B team members in line with the annual training plan.',
+    qualifications:'Degree or diploma in Hospitality Management, Food & Beverage Management, or a related field.',
+    experience:'Minimum 5 years in F&B management, with at least 2 years as an F&B Manager or Assistant F&B Manager in a 4-star or 5-star hotel.',
+    competencies:'Revenue management · Guest experience orientation · Team leadership · Cost control · Menu development · Communication',
+    kpis:'F&B revenue vs budget · Guest satisfaction score · Food and beverage cost control · Team training completion'
+  }
+};
 
-function previewJD() { document.getElementById('modal-jd').classList.remove('hidden'); }
+let _currentJDKey = null;
+let _jdEditMode   = 'new'; // 'new' | 'edit'
 
-function submitAppraisal() { closeModal('modal-appraisal'); showToast('Appraisal submitted successfully.'); }
-
-function selectRating(btn, val) {
-  const siblings = btn.parentElement.querySelectorAll('.rating-btn');
-  siblings.forEach(b => { b.className = 'rating-btn'; });
-  btn.classList.add('selected-' + val);
+function previewJD(key) {
+  key = key || 'Executive Chef';
+  _currentJDKey = key;
+  const jd = JD_DATA[key];
+  if (!jd) { showToast('JD not found.'); return; }
+  document.getElementById('jd-modal-title').textContent = 'Job Description \u2014 ' + jd.title;
+  const propLabel = jd.property==='both'?'Both properties': jd.property==='skyz'?'Protea Hotel Skyz':'Protea Hotel Kampala';
+  document.getElementById('jd-modal-body').innerHTML = `
+    <div style="background:var(--navy);color:#fff;text-align:center;padding:16px;border-radius:6px;margin-bottom:16px">
+      <div style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;opacity:.6;margin-bottom:4px">${propLabel} &middot; ${jd.dept} Department</div>
+      <div style="font-family:var(--font-heading);font-size:18px;font-weight:600">${jd.title}</div>
+      <div style="font-size:11px;opacity:.6;margin-top:4px">Reports to: ${jd.reportsTo}${jd.grade?' &middot; '+jd.grade:''}</div>
+    </div>
+    <div class="jd-section"><div class="jd-section-title">Job purpose</div><div class="jd-section-content">${jd.purpose}</div></div>
+    <div class="jd-section"><div class="jd-section-title">Key responsibilities</div><div class="jd-section-content">${jd.responsibilities.replace(/\n/g,'<br>')}</div></div>
+    <div class="jd-section"><div class="jd-section-title">Required qualifications</div><div class="jd-section-content">${jd.qualifications}</div></div>
+    <div class="jd-section"><div class="jd-section-title">Experience</div><div class="jd-section-content">${jd.experience}</div></div>
+    <div class="jd-section"><div class="jd-section-title">Key competencies</div><div class="jd-section-content">${jd.competencies}</div></div>
+    <div class="jd-section"><div class="jd-section-title">Linked KPIs</div><div class="jd-section-content">${jd.kpis.split('·').map(k=>'<span class="band band-meets" style="margin:2px 4px 2px 0;display:inline-block">'+k.trim()+'</span>').join('')}</div></div>`;
+  document.getElementById('modal-jd').classList.remove('hidden');
 }
 
-function printReport() { window.print(); }
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
+function openEditJD() {
+  if (!_currentJDKey || !JD_DATA[_currentJDKey]) return;
+  _jdEditMode = 'edit';
+  const jd = JD_DATA[_currentJDKey];
+  document.getElementById('jd-edit-title').textContent = 'Edit JD \u2014 ' + jd.title;
+  document.getElementById('jd-f-title').value         = jd.title;
+  document.getElementById('jd-f-dept').value          = jd.dept;
+  document.getElementById('jd-f-property').value      = jd.property;
+  document.getElementById('jd-f-reports').value       = jd.reportsTo;
+  document.getElementById('jd-f-grade').value         = jd.grade||'';
+  document.getElementById('jd-f-purpose').value       = jd.purpose;
+  document.getElementById('jd-f-responsibilities').value = jd.responsibilities;
+  document.getElementById('jd-f-qualifications').value= jd.qualifications;
+  document.getElementById('jd-f-experience').value    = jd.experience;
+  document.getElementById('jd-f-competencies').value  = jd.competencies;
+  document.getElementById('jd-f-kpis').value          = jd.kpis;
+  closeModal('modal-jd');
+  document.getElementById('modal-jd-edit').classList.remove('hidden');
 }
 
+function openAddJDModal() {
+  _jdEditMode = 'new';
+  _currentJDKey = null;
+  document.getElementById('jd-edit-title').textContent = 'New Job Description';
+  ['jd-f-title','jd-f-reports','jd-f-grade','jd-f-purpose','jd-f-responsibilities','jd-f-qualifications','jd-f-experience','jd-f-competencies','jd-f-kpis'].forEach(id=>{
+    document.getElementById(id).value='';
+  });
+  document.getElementById('jd-f-dept').value='';
+  document.getElementById('jd-f-property').value='both';
+  document.getElementById('modal-jd-edit').classList.remove('hidden');
+}
+
+function previewNewJD() {
+  const title = document.getElementById('jd-f-title').value.trim();
+  if (!title) { showToast('Please enter a job title first.'); return; }
+  const draft = {
+    title, dept:document.getElementById('jd-f-dept').value,
+    property:document.getElementById('jd-f-property').value,
+    reportsTo:document.getElementById('jd-f-reports').value,
+    grade:document.getElementById('jd-f-grade').value,
+    purpose:document.getElementById('jd-f-purpose').value,
+    responsibilities:document.getElementById('jd-f-responsibilities').value,
+    qualifications:document.getElementById('jd-f-qualifications').value,
+    experience:document.getElementById('jd-f-experience').value,
+    competencies:document.getElementById('jd-f-competencies').value,
+    kpis:document.getElementById('jd-f-kpis').value,
+  };
+  JD_DATA['__preview__'] = draft;
+  _currentJDKey = '__preview__';
+  closeModal('modal-jd-edit');
+  previewJD('__preview__');
+}
+
+function saveJD() {
+  const title = document.getElementById('jd-f-title').value.trim();
+  if (!title) { showToast('Job title is required.'); return; }
+  const jd = {
+    title, dept:document.getElementById('jd-f-dept').value,
+    property:document.getElementById('jd-f-property').value,
+    reportsTo:document.getElementById('jd-f-reports').value,
+    grade:document.getElementById('jd-f-grade').value,
+    purpose:document.getElementById('jd-f-purpose').value,
+    responsibilities:document.getElementById('jd-f-responsibilities').value,
+    qualifications:document.getElementById('jd-f-qualifications').value,
+    experience:document.getElementById('jd-f-experience').value,
+    competencies:document.getElementById('jd-f-competencies').value,
+    kpis:document.getElementById('jd-f-kpis').value,
+  };
+  JD_DATA[title] = jd;
+  closeModal('modal-jd-edit');
+  showToast((_jdEditMode==='edit'?'JD updated: ':'New JD saved: ')+title);
+}
+
+function printJD() {
+  const body = document.getElementById('jd-modal-body');
+  if (!body) { window.print(); return; }
+  const w = window.open('','_blank');
+  w.document.write('<html><head><title>Job Description</title><style>body{font-family:"Palatino Linotype",Palatino,Georgia,serif;padding:32px;color:#1a1a2e;font-size:13px}h1{color:#1B2A6B;font-size:20px;border-bottom:2px solid #800020;padding-bottom:6px;margin-bottom:16px}.section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#1B2A6B;border-left:3px solid #800020;padding-left:8px;margin:14px 0 6px}.section-content{color:#555;line-height:1.7;padding-left:11px}@media print{body{padding:16px}}</style></head><body>');
+  w.document.write('<h1>'+document.getElementById('jd-modal-title').textContent+'</h1>');
+  w.document.write(body.innerHTML.replace(/class="[^"]*"/g,'').replace(/style="[^"]*background[^"]*navy[^"]*"/g,'style="border:1px solid #1B2A6B;padding:12px;text-align:center;margin-bottom:16px"'));
+  w.document.write('</body></html>');
+  w.document.close();
+  w.print();
+}
+
+function printReport()  { window.print(); }
+function openAddStaffModal()  { showToast('Connect Supabase to enable live staff import.'); }
+function openAddKPIModal()    { showToast('Connect Supabase to enable live KPI management.'); }
+
+// ── REPORTS ────────────────────────────────────────────────
 function showIndividualReport() {
   document.getElementById('report-output').innerHTML = `
     <div class="card print-area" style="margin-bottom:0">
@@ -1192,10 +1665,10 @@ function showDeptReport() {
         <table>
           <thead><tr><th>Department</th><th>Property</th><th>Staff appraised</th><th>Avg. score</th><th>Rating</th></tr></thead>
           <tbody>
-            <tr><td>Management</td><td><span class="pill pill-both">Both</span></td><td>4 / 4</td><td><strong>88%</strong></td><td><span class="band band-exceeds">Exceeds</span></td></tr>
-            <tr><td>Food &amp; Beverage</td><td><span class="pill pill-both">Both</span></td><td>38 / 55</td><td><strong>79%</strong></td><td><span class="band band-exceeds">Exceeds</span></td></tr>
-            <tr><td>Kitchen</td><td><span class="pill pill-both">Both</span></td><td>24 / 30</td><td><strong>74%</strong></td><td><span class="band band-meets">Meets</span></td></tr>
-            <tr><td>Maintenance</td><td><span class="pill pill-both">Both</span></td><td>6 / 7</td><td><strong>58%</strong></td><td><span class="band band-needs">Needs improvement</span></td></tr>
+            <tr><td>Management</td><td><span class="pill pill-both">Both</span></td><td>4/4</td><td><strong>88%</strong></td><td><span class="band band-exceeds">Exceeds</span></td></tr>
+            <tr><td>Food &amp; Beverage</td><td><span class="pill pill-both">Both</span></td><td>38/55</td><td><strong>79%</strong></td><td><span class="band band-exceeds">Exceeds</span></td></tr>
+            <tr><td>Kitchen</td><td><span class="pill pill-both">Both</span></td><td>24/30</td><td><strong>74%</strong></td><td><span class="band band-meets">Meets</span></td></tr>
+            <tr><td>Maintenance</td><td><span class="pill pill-both">Both</span></td><td>6/7</td><td><strong>58%</strong></td><td><span class="band band-needs">Needs improvement</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -1231,7 +1704,23 @@ function showPropertyReport() {
     </div>`;
 }
 
-document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-</script>
+// ── TOAST ──────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// ── RATING BUTTONS (generic) ───────────────────────────────
+function selectRating(btn, val) {
+  btn.parentElement.querySelectorAll('.rating-btn').forEach(b=>{ b.className='rating-btn'; });
+  btn.classList.add('selected-'+val);
+}
+
+document.getElementById('login-password').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+document.getElementById('staff-search-input') && document.getElementById('staff-search-input').addEventListener('input', searchStaff);
+
+</script></script>
 </body>
 </html>
