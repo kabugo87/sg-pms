@@ -2837,6 +2837,7 @@ function renderKPIPage() {
     + '<div class="section-title">KPI Setup</div>'
     + '<div class="filter-row">'
     + '<input type="text" class="filter-select" placeholder="Search role..." oninput="_kpiFilter=this.value;renderKPIPage()" style="width:180px" />'
+    + '<button class="btn btn-primary btn-sm" data-action="new-kpi-role">+ New role</button>'
     + '</div></div>'
     + '<div class="table-wrap"><table>'
     + '<thead><tr><th>Role</th><th>KPIs assigned</th><th style="text-align:center">Total weight</th><th class="no-print">Actions</th></tr></thead>'
@@ -2878,14 +2879,59 @@ document.addEventListener('click', function(e) {
   if (!btn) return;
   var idx = parseInt(btn.dataset.idx);
   window._editingKPIs.splice(idx, 1);
-  openKPIRoleEditor(window._editingKPIRole);
+  // Re-render rows only, not full modal
+  var rowsEl = document.getElementById('kpi-editor-rows');
+  if (rowsEl) {
+    rowsEl.innerHTML = window._editingKPIs.map(function(k, i) {
+      return '<div id="kpi-row-' + i + '" style="display:grid;grid-template-columns:2fr 1fr .6fr .4fr;gap:8px;align-items:center;padding:8px 0;border-bottom:.5px solid #eee">'
+        + '<div><input type="text" class="filter-select" style="width:100%" value="' + k.kpi.replace(/"/g, '&quot;') + '" data-field="kpi" data-idx="' + i + '" /></div>'
+        + '<div><input type="text" class="filter-select" style="width:100%;font-size:10px" value="' + k.target.replace(/"/g, '&quot;') + '" data-field="target" data-idx="' + i + '" /></div>'
+        + '<div><input type="number" class="filter-select" style="width:100%" value="' + k.weight + '" min="0" max="100" data-field="weight" data-idx="' + i + '" /></div>'
+        + '<div style="text-align:center"><button class="btn btn-danger btn-sm" data-action="del-kpi-row" data-idx="' + i + '" style="padding:3px 8px">X</button></div>'
+        + '</div>';
+    }).join('');
+    updateKPIWeightTotal();
+  }
+});
+
+// New role handler
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('button[data-action="new-kpi-role"]');
+  if (!btn) return;
+  var roleName = prompt('Enter the new role name (e.g. Night Auditor):');
+  if (!roleName || !roleName.trim()) return;
+  roleName = roleName.trim();
+  if (ROLE_KPIS[roleName]) { showToast(roleName + ' already exists. Click Edit to modify it.'); return; }
+  ROLE_KPIS[roleName] = [
+    { kpi:'Quality and accuracy of work', target:'Meets department standards', weight:35, p:'Internal Processes', freq:'Monthly' },
+    { kpi:'Guest / customer satisfaction', target:'90% and above', weight:25, p:'Guest Experience', freq:'Monthly' },
+    { kpi:'Attendance and punctuality', target:'Zero unexcused absences', weight:25, p:'People', freq:'Monthly' },
+    { kpi:'Team cooperation and conduct', target:'No disciplinary issues', weight:15, p:'People', freq:'Monthly' },
+  ];
+  renderKPIPage();
+  showToast('Role added: ' + roleName + '. Click Edit to customise the KPIs.');
+  setTimeout(function() { openKPIRoleEditor(roleName); }, 200);
 });
 
 document.addEventListener('click', function(e) {
   if (e.target.id !== 'btn-add-kpi-row') return;
   if (!window._editingKPIs) return;
-  window._editingKPIs.push({ kpi:'New KPI', target:'Target', weight:0, p:'Internal Processes', freq:'Monthly' });
-  openKPIRoleEditor(window._editingKPIRole);
+  var i = window._editingKPIs.length;
+  window._editingKPIs.push({ kpi:'New KPI', target:'Define target', weight:0, p:'Internal Processes', freq:'Monthly' });
+  var rowsEl = document.getElementById('kpi-editor-rows');
+  if (!rowsEl) return;
+  var div = document.createElement('div');
+  div.id = 'kpi-row-' + i;
+  div.style.cssText = 'display:grid;grid-template-columns:2fr 1fr .6fr .4fr;gap:8px;align-items:center;padding:8px 0;border-bottom:.5px solid #eee';
+  div.innerHTML = '<div><input type="text" class="filter-select" style="width:100%" value="New KPI" data-field="kpi" data-idx="' + i + '" /></div>'
+    + '<div><input type="text" class="filter-select" style="width:100%;font-size:10px" value="Define target" data-field="target" data-idx="' + i + '" /></div>'
+    + '<div><input type="number" class="filter-select" style="width:100%" value="0" min="0" max="100" data-field="weight" data-idx="' + i + '" /></div>'
+    + '<div style="text-align:center"><button class="btn btn-danger btn-sm" data-action="del-kpi-row" data-idx="' + i + '" style="padding:3px 8px">X</button></div>';
+  rowsEl.appendChild(div);
+  updateKPIWeightTotal();
+  // Focus the KPI name field
+  var input = div.querySelector('input[data-field="kpi"]');
+  if (input) { input.select(); }
 });
 
 document.addEventListener('input', function(e) {
