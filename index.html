@@ -468,7 +468,7 @@ tr:hover td{background:#fafafa}
             <div style="flex:1"><div class="nav-card-title">Department report</div><div class="nav-card-sub">All staff scores by department</div></div>
             <div class="nav-card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></div>
           </div>
-          <div class="nav-card" onclick="showPropertyReport(currentProp === 'both' ? null : currentProp)">
+          <div class="nav-card" onclick="openPropertyReportPicker()">
             <div class="nav-card-icon nc-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
             <div style="flex:1"><div class="nav-card-title">Property report</div><div class="nav-card-sub">Department averages per property</div></div>
             <div class="nav-card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></div>
@@ -743,6 +743,18 @@ tr:hover td{background:#fafafa}
       <button class="btn btn-secondary" onclick="closeModal('modal-new-cycle')">Cancel</button>
       <button class="btn btn-primary" onclick="createNewCycle()">Create cycle</button>
     </div>
+  </div>
+</div>
+
+
+<!-- MODAL: Property Report Picker -->
+<div class="modal-overlay hidden" id="modal-prop-picker">
+  <div class="modal" style="width:420px">
+    <div class="modal-header" style="background:#f0f1f4;border-bottom:3px solid #800020">
+      <h3 style="color:#1B2A6B">Property report</h3>
+      <button class="modal-close" onclick="closeModal('modal-prop-picker')" style="color:#888">&times;</button>
+    </div>
+    <div id="modal-prop-picker-body" class="modal-body"></div>
   </div>
 </div>
 
@@ -1931,6 +1943,12 @@ function showReportMenu() {
   document.getElementById('report-back').style.display = 'none';
 }
 
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'ptog-both') showPropertyReport(null);
+  if (e.target.id === 'ptog-skyz') showPropertyReport('skyz');
+  if (e.target.id === 'ptog-phk')  showPropertyReport('phk');
+});
+
 function showReportContent(html) {
   document.getElementById('report-menu').style.display = 'none';
   document.getElementById('report-back').style.display = 'flex';
@@ -2222,9 +2240,42 @@ async function showDeptReport() {
 }
 
 // ── 3. PROPERTY REPORT ────────────────────────────────────
+function openPropertyReportPicker() {
+  var modal = document.getElementById('modal-prop-picker');
+  if (!modal) return;
+  var body = document.getElementById('modal-prop-picker-body');
+  body.innerHTML = '';
+  var title = document.createElement('div');
+  title.style.cssText = 'font-size:13px;font-weight:600;color:#1B2A6B;margin-bottom:16px;padding:20px 20px 0';
+  title.textContent = 'Select property to view';
+  body.appendChild(title);
+  var opts = [
+    { label:'Both properties', sub:'Skyz and PHK combined', val:null },
+    { label:'Protea Hotel Skyz Kampala', sub:'Skyz performance only', val:'skyz' },
+    { label:'Protea Hotel Kampala', sub:'PHK performance only', val:'phk' }
+  ];
+  var wrap = document.createElement('div');
+  wrap.style.cssText = 'padding:0 20px 20px;display:flex;flex-direction:column;gap:10px';
+  opts.forEach(function(o) {
+    var card = document.createElement('div');
+    card.className = 'nav-card';
+    card.style.cursor = 'pointer';
+    card.innerHTML = '<div style="flex:1"><div class="nav-card-title">' + o.label + '</div><div class="nav-card-sub">' + o.sub + '</div></div>';
+    card.addEventListener('click', function() {
+      closeModal('modal-prop-picker');
+      showPropertyReport(o.val);
+    });
+    wrap.appendChild(card);
+  });
+  body.appendChild(wrap);
+  modal.classList.remove('hidden');
+}
+
 async function showPropertyReport(propCode) {
   showReportContent('<div style="text-align:center;padding:40px;color:#888;font-size:12px">Loading property report...</div>');
   try {
+    // Ensure staff cache loaded
+    if (_staffCache.length === 0) await loadStaffPage();
     var cl = getClient();
     var cr = await cl.from('appraisal_cycles').select('id,label,start_date,end_date').eq('is_active',true).single();
     if (cr.error) throw cr.error;
@@ -2243,6 +2294,14 @@ async function showPropertyReport(propCode) {
       : all;
 
     var propName = propCode === 'skyz' ? 'Protea Hotel Skyz Kampala' : propCode === 'phk' ? 'Protea Hotel Kampala' : 'Both Properties';
+    var activeBoth = !propCode ? ' btn-primary' : ' btn-secondary';
+    var activeSkyz = propCode==='skyz' ? ' btn-primary' : ' btn-secondary';
+    var activePhk  = propCode==='phk'  ? ' btn-primary' : ' btn-secondary';
+    var propToggle = '<div class="no-print" style="display:flex;gap:6px;margin-bottom:0">'
+      + '<button class="btn btn-sm' + activeBoth + '" id="ptog-both">Both</button>'
+      + '<button class="btn btn-sm' + activeSkyz + '" id="ptog-skyz">Skyz</button>'
+      + '<button class="btn btn-sm' + activePhk  + '" id="ptog-phk">PHK</button>'
+      + '</div>';
     var totalStaff = propCode
       ? _staffCache.filter(function(s){ return s.propCode===propCode; }).length
       : _staffCache.length;
