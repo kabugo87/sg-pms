@@ -523,9 +523,9 @@ tr:hover td{background:#fafafa}
 <!-- MODAL: Appraisal form -->
 <div class="modal-overlay hidden" id="modal-appraisal">
   <div class="modal" style="width:700px">
-    <div class="modal-header">
-      <h3 id="appr-modal-title">Appraisal Form</h3>
-      <button class="modal-close" id="btn-close-appraisal">&times;</button>
+    <div class="modal-header" id="appr-modal-header" style="background:#f0f1f4;color:#1a1a2e;border-bottom:3px solid #800020">
+      <h3 id="appr-modal-title" style="color:#1B2A6B">Appraisal Form</h3>
+      <button class="modal-close" id="btn-close-appraisal" style="color:#888">&times;</button>
     </div>
     <div class="modal-body" id="appr-modal-body"></div>
     <div class="modal-footer">
@@ -1028,13 +1028,19 @@ function renderAppraisalsTable(appraisals) {
     const pill    = s.propCode === 'skyz' ? 'pill-skyz' : 'pill-phk';
     const score   = a.final_score != null ? '<strong>' + Math.round(a.final_score) + '%</strong>' : '\u2014';
     const band    = a.rating_band ? '<span class="band ' + bandClass(a.final_score||0) + '">' + a.rating_band + '</span>' : '<span style="color:var(--text-light);font-size:10px">Pending</span>';
-    const selfDot = a.status === 'complete' || a.status === 'in_progress' ? 'dot-done' : 'dot-open';
-    const selfLbl = a.status === 'complete' || a.status === 'in_progress' ? 'Submitted' : 'Not started';
-    const hodDot  = a.status === 'complete' ? 'dot-done' : a.status === 'in_progress' ? 'dot-prog' : 'dot-open';
-    const hodLbl  = a.status === 'complete' ? 'Complete' : a.status === 'in_progress' ? 'In progress' : 'Awaiting';
-    const actions = a.status === 'complete'
+    const s2Name  = (_staffCache.find(function(x){return x.id===a.staff_id;})||{}).full_name||'';
+    const isDraft    = a.status === 'draft';
+    const isComplete = a.status === 'complete';
+    const selfDot = isComplete ? 'dot-done' : isDraft ? 'dot-prog' : 'dot-open';
+    const selfLbl = isComplete ? 'Submitted' : isDraft ? 'Draft saved' : 'Not started';
+    const hodDot  = isComplete ? 'dot-done' : isDraft ? 'dot-prog' : 'dot-open';
+    const hodLbl  = isComplete ? 'Complete'  : isDraft ? 'Pending'   : 'Awaiting';
+    const actions = isComplete
       ? '<button class="btn btn-secondary btn-sm" data-action="view-appr" data-appr-id="' + a.id + '">View</button>'
-      : '<button class="btn btn-primary btn-sm" data-action="continue-appr" data-staff-id="' + a.staff_id + '">Continue</button>';
+      : isDraft
+        ? '<button class="btn btn-primary btn-sm" data-action="continue-appr" data-appr-id="' + a.id + '" data-staff-id="' + a.staff_id + '">Continue</button>'
+          + ' <button class="btn btn-danger btn-sm" data-action="discard-appr" data-appr-id="' + a.id + '" data-staff-name="' + s2Name + '">Discard</button>'
+        : '<button class="btn btn-primary btn-sm" data-action="start-appr" data-staff-id="' + a.staff_id + '">Start</button>';
     return '<tr data-appr-id="' + a.id + '" data-prop="' + (s.propCode||'') + '" data-dept="' + (s.deptName||'').toLowerCase() + '" data-status="' + a.status + '">'
       + '<td><strong>' + (s.full_name || '\u2014') + '</strong></td>'
       + '<td>' + (s.propCode ? '<span class="pill ' + pill + '">' + s.propCode.toUpperCase() + '</span>' : '\u2014') + '</td>'
@@ -1072,16 +1078,34 @@ function filterAppraisalsTable() {
 
 // Appraisals action delegation
 document.addEventListener('click', function(e) {
-  const btn = e.target.closest('button[data-action]');
+  var btn = e.target.closest('button[data-action]');
   if (!btn) return;
-  if (btn.dataset.action === 'view-appr') {
-    showToast('Full report view coming in R3');
-  }
-  if (btn.dataset.action === 'continue-appr') {
-    const s = _staffCache.find(function(x) { return x.id === btn.dataset.staffId; });
-    if (s) openAppraisalForm(s);
-  }
+  var action = btn.dataset.action;
+  if (action === 'view-appr')     { showToast('Full report view coming in R3.'); }
+  if (action === 'start-appr')    { var s1=_staffCache.find(function(x){return x.id===btn.dataset.staffId;}); if(s1) openAppraisalForm(s1,null); }
+  if (action === 'continue-appr') { var s2=_staffCache.find(function(x){return x.id===btn.dataset.staffId;}); if(s2) continueDraft(s2,btn.dataset.apprId); }
+  if (action === 'discard-appr')  { var nm=btn.dataset.staffName||'this staff member'; if(confirm('Discard the draft for '+nm+'? This cannot be undone.')) discardDraft(btn.dataset.apprId); }
 });
+
+async function continueDraft(s, apprId) {
+  try {
+    var cl = getClient();
+    var res = await cl.from('appraisals').select('kpi_responses').eq('id',apprId).single();
+    if (res.error) throw res.error;
+    openAppraisalForm(s, res.data ? res.data.kpi_responses : null);
+  } catch(e) { showToast('Could not load draft: '+e.message); openAppraisalForm(s,null); }
+}
+
+async function discardDraft(apprId) {
+  try {
+    var cl = getClient();
+    var res = await cl.from('appraisals').delete().eq('id',apprId);
+    if (res.error) throw res.error;
+    showToast('Draft discarded.');
+    loadAppraisalsPage();
+    loadHomeData();
+  } catch(e) { showToast('Error discarding: '+e.message); console.error('discardDraft:',e); }
+}
 
 // New appraisal button
 document.addEventListener('click', function(e) {
@@ -1173,10 +1197,11 @@ let _appraisalStaff = null;
 let _appraisalKPIs  = [];
 let _submitted      = false;
 
-function openAppraisalForm(staff) {
+function openAppraisalForm(staff, savedData) {
   _appraisalStaff = staff;
   _submitted = false;
   _appraisalKPIs = getKPIsForRole(staff.roleTitle || '');
+  window._savedDraftData = savedData || null;
 
   const propName = staff.propCode === 'skyz' ? 'Protea Hotel Skyz' : 'Protea Hotel Kampala';
   document.getElementById('appr-modal-title').textContent = 'Appraisal \u2014 ' + staff.full_name + ' \u00B7 H1 2026';
@@ -1292,6 +1317,34 @@ function openAppraisalForm(staff) {
     + '</label></div>';
 
   document.getElementById('modal-appraisal').classList.remove('hidden');
+  if (window._savedDraftData) { setTimeout(function(){ restoreDraft(window._savedDraftData); updateAppraisalScore(); }, 50); }
+  else { updateAppraisalScore(); }
+}
+
+function restoreDraft(d) {
+  if (!d) return;
+  (d.kpiSelf||[]).forEach(function(v,i){ var el=document.querySelector('.kpi-self[data-idx="'+i+'"]'); if(el&&v) el.value=v; });
+  (d.kpiHod||[]).forEach(function(v,i){ var el=document.querySelector('.kpi-hod[data-idx="'+i+'"]'); if(el&&v) el.value=v; });
+  (d.kpiComments||[]).forEach(function(v,i){ var el=document.querySelector('.kpi-comment[data-idx="'+i+'"]'); if(el&&v) el.value=v; });
+  function restoreRatings(vals, keys, type) {
+    if (!vals) return;
+    vals.forEach(function(val,i) {
+      if (!val||!keys[i]) return;
+      var grp = document.querySelectorAll('.r-btn[data-key="'+keys[i]+'"][data-type="'+type+'"]');
+      grp.forEach(function(b){ b.className='r-btn'; });
+      var target = document.querySelector('.r-btn[data-key="'+keys[i]+'"][data-type="'+type+'"][data-val="'+val+'"]');
+      if (target) target.classList.add('sel-'+val);
+    });
+  }
+  var ck = ['time_mgmt','dependability','appearance','cooperation','responsibility','accuracy','quality','quantity','initiative','knowledge'];
+  var mk = ['planning','leading','organising','control'];
+  restoreRatings(d.compSelf, ck, 'self');
+  restoreRatings(d.compHod,  ck, 'hod');
+  restoreRatings(d.mgmtSelf, mk, 'self');
+  restoreRatings(d.mgmtHod,  mk, 'hod');
+  if (d.devStrong   && document.getElementById('dev-strong'))   document.getElementById('dev-strong').value   = d.devStrong;
+  if (d.devTraining && document.getElementById('dev-training')) document.getElementById('dev-training').value = d.devTraining;
+  if (d.devCareer   && document.getElementById('dev-career'))   document.getElementById('dev-career').value   = d.devCareer;
   updateAppraisalScore();
 }
 
@@ -1349,30 +1402,43 @@ function updateAppraisalScore() {
 document.addEventListener('click', function(e) {
   if (e.target.id !== 'btn-save-draft') return;
   if (!_appraisalStaff) return;
-  const draft = {
-    staffId: _appraisalStaff.id,
-    staffName: _appraisalStaff.full_name,
-    savedAt: new Date().toISOString(),
-    kpiSelf: _appraisalKPIs.map(function(k, i) {
-      const el = document.querySelector('.kpi-self[data-idx="' + i + '"]');
-      return el ? el.value : '';
-    }),
-    kpiHod: _appraisalKPIs.map(function(k, i) {
-      const el = document.querySelector('.kpi-hod[data-idx="' + i + '"]');
-      return el ? el.value : '';
-    }),
-    kpiComments: _appraisalKPIs.map(function(k, i) {
-      const el = document.querySelector('.kpi-comment[data-idx="' + i + '"]');
-      return el ? el.value : '';
-    }),
-    devStrong:   (document.getElementById('dev-strong')   || { value:'' }).value,
-    devTraining: (document.getElementById('dev-training') || { value:'' }).value,
-    devCareer:   (document.getElementById('dev-career')   || { value:'' }).value,
-  };
-  try { localStorage.setItem('draft_' + _appraisalStaff.id, JSON.stringify(draft)); } catch(ignore) {}
-  closeModal('modal-appraisal');
-  showToast('Draft saved for ' + _appraisalStaff.full_name);
+  saveDraft();
 });
+
+async function saveDraft() {
+  var s = _appraisalStaff;
+  var kpis = _appraisalKPIs;
+  if (!s) return;
+  function getRVal(key, type) {
+    var sel = document.querySelector('.r-btn[data-key="'+key+'"][data-type="'+type+'"][class*="sel-"]');
+    return sel ? parseInt(sel.dataset.val) : null;
+  }
+  var compKeys = ['time_mgmt','dependability','appearance','cooperation','responsibility','accuracy','quality','quantity','initiative','knowledge'];
+  var mgmtKeys = ['planning','leading','organising','control'];
+  var dd = {
+    kpiSelf:     kpis.map(function(k,i){ var el=document.querySelector('.kpi-self[data-idx="'+i+'"]');    return el?el.value:''; }),
+    kpiHod:      kpis.map(function(k,i){ var el=document.querySelector('.kpi-hod[data-idx="'+i+'"]');     return el?el.value:''; }),
+    kpiComments: kpis.map(function(k,i){ var el=document.querySelector('.kpi-comment[data-idx="'+i+'"]'); return el?el.value:''; }),
+    compSelf:    compKeys.map(function(k){ return getRVal(k,'self'); }),
+    compHod:     compKeys.map(function(k){ return getRVal(k,'hod'); }),
+    mgmtSelf:    mgmtKeys.map(function(k){ return getRVal(k,'self'); }),
+    mgmtHod:     mgmtKeys.map(function(k){ return getRVal(k,'hod'); }),
+    devStrong:   (document.getElementById('dev-strong')  ||{value:''}).value,
+    devTraining: (document.getElementById('dev-training')||{value:''}).value,
+    devCareer:   (document.getElementById('dev-career')  ||{value:''}).value,
+  };
+  try {
+    var cl = getClient();
+    var cr = await cl.from('appraisal_cycles').select('id').eq('is_active',true).single();
+    if (cr.error) throw cr.error;
+    var ur = await cl.from('appraisals').upsert({ cycle_id:cr.data.id, staff_id:s.id, appraised_by:currentUser.id, status:'draft', kpi_responses:dd }, { onConflict:'cycle_id,staff_id' });
+    if (ur.error) throw ur.error;
+    try { localStorage.setItem('draft_'+s.id, JSON.stringify(dd)); } catch(ig){}
+    closeModal('modal-appraisal');
+    showToast('Draft saved for '+s.full_name+'. Continue anytime from the Appraisals page.');
+    loadAppraisalsPage();
+  } catch(err) { showToast('Error saving draft: '+err.message); console.error('saveDraft:',err); }
+}
 
 // Submit appraisal
 document.addEventListener('click', function(e) {
