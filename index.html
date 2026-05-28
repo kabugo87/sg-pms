@@ -231,7 +231,7 @@ tr:hover td{background:#fafafa}
       <input type="password" id="login-password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
     </div>
     <button class="btn btn-primary" id="login-btn" onclick="doLogin()">Sign in &rarr;</button>
-    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <strong>R4</strong></p>
+    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <strong>R5</strong></p>
   </div>
 </div>
 
@@ -502,18 +502,8 @@ tr:hover td{background:#fafafa}
           </table>
         </div>
       </div>
-      <div class="page-view" id="page-kpis">
-        <div style="text-align:center;padding:60px 20px;color:var(--text-light)">
-          <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:8px">KPI Setup</div>
-          <div style="font-size:12px">Coming soon</div>
-        </div>
-      </div>
-      <div class="page-view" id="page-jds">
-        <div style="text-align:center;padding:60px 20px;color:var(--text-light)">
-          <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:8px">Job Descriptions</div>
-          <div style="font-size:12px">Coming soon</div>
-        </div>
-      </div>
+      <div class="page-view" id="page-kpis"></div>
+      <div class="page-view" id="page-jds"></div>
       <div class="page-view" id="page-departments">
         <div style="text-align:center;padding:60px 20px;color:var(--text-light)">
           <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:8px">Departments</div>
@@ -563,6 +553,103 @@ tr:hover td{background:#fafafa}
       <div id="appr-score-display" style="margin-right:auto;font-size:12px;color:var(--text-mid)">Score: pending</div>
       <button class="btn btn-secondary" id="btn-save-draft">Save draft</button>
       <button class="btn btn-primary" id="btn-submit-appraisal">Submit appraisal</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL: KPI Role Editor -->
+<div class="modal-overlay hidden" id="modal-kpi-editor">
+  <div class="modal" style="width:740px">
+    <div class="modal-header" style="background:#f0f1f4;border-bottom:3px solid #800020">
+      <h3 id="kpi-editor-title" style="color:#1B2A6B">Edit KPIs</h3>
+      <button class="modal-close" id="btn-close-kpi-editor" style="color:#888">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:2fr 1fr .6fr .4fr;gap:8px;padding:6px 0;border-bottom:1.5px solid #000;margin-bottom:4px">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:#888">KPI / Measure</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:#888">Target</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:#888">Weight %</div>
+        <div></div>
+      </div>
+      <div id="kpi-editor-rows"></div>
+      <button class="btn btn-secondary btn-sm" id="btn-add-kpi-row" style="margin-top:10px">+ Add KPI</button>
+    </div>
+    <div class="modal-footer">
+      <div id="kpi-weight-total" style="font-size:12px;font-weight:600;margin-right:auto"></div>
+      <button class="btn btn-secondary" id="btn-close-kpi-editor-cancel">Cancel</button>
+      <button class="btn btn-primary" id="btn-save-kpi-role">Save KPIs</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: JD Editor -->
+<div class="modal-overlay hidden" id="modal-jd-editor">
+  <div class="modal" style="width:680px">
+    <div class="modal-header" style="background:#f0f1f4;border-bottom:3px solid #800020">
+      <h3 id="jd-modal-title" style="color:#1B2A6B">New Job Description</h3>
+      <button class="modal-close" id="btn-close-jd-editor" style="color:#888">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Position title *</label><input type="text" id="jd-f-title" placeholder="e.g. Floor Supervisor" /></div>
+        <div class="form-group"><label>Department *</label><input type="text" id="jd-f-dept" placeholder="e.g. Housekeeping" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Reports to</label><input type="text" id="jd-f-reports" placeholder="e.g. Executive Housekeeper" /></div>
+        <div class="form-group"><label>Property</label>
+          <select id="jd-f-prop"><option value="both">Both properties</option><option value="skyz">Protea Hotel Skyz</option><option value="phk">Protea Hotel Kampala</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Employment type</label><input type="text" id="jd-f-emptype" value="Full-Time" /></div>
+        <div class="form-group"><label>Effective date</label><input type="text" id="jd-f-date" placeholder="e.g. June 2026" /></div>
+      </div>
+      <div class="form-group"><label>Purpose of the role *</label><textarea id="jd-f-purpose" style="min-height:80px" placeholder="Describe the overall purpose and accountability of this role..."></textarea></div>
+      <div class="form-group"><label>Key responsibilities</label><textarea id="jd-f-resp" style="min-height:120px" placeholder="List responsibilities, grouped A. B. C. etc..."></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Qualifications</label><textarea id="jd-f-qual" style="min-height:60px"></textarea></div>
+        <div class="form-group"><label>Experience required</label><textarea id="jd-f-exp" style="min-height:60px"></textarea></div>
+      </div>
+      <div class="form-group"><label>Technical skills &amp; competencies</label><textarea id="jd-f-skills" style="min-height:60px"></textarea></div>
+      <div class="form-group"><label>Key working relationships</label><textarea id="jd-f-relations" style="min-height:50px" placeholder="e.g. General Manager, HODs, HR Manager..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="btn-close-jd-editor">Cancel</button>
+      <button class="btn btn-primary" id="btn-save-jd">Save JD</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: JD Preview -->
+<div class="modal-overlay hidden" id="modal-jd-preview">
+  <div class="modal" style="width:700px">
+    <div class="modal-header" style="background:#f0f1f4;border-bottom:3px solid #800020">
+      <h3 id="jd-preview-title" style="color:#1B2A6B">Job Description</h3>
+      <button class="modal-close" id="btn-close-jd-preview" style="color:#888">&times;</button>
+    </div>
+    <div class="modal-body" id="jd-preview-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="btn-close-jd-preview">Close</button>
+      <button class="btn btn-primary" id="btn-print-jd">Print / PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Reject Appraisal -->
+<div class="modal-overlay hidden" id="modal-reject">
+  <div class="modal" style="width:480px">
+    <div class="modal-header" style="background:#fcebeb;border-bottom:3px solid #A32D2D">
+      <h3 style="color:#A32D2D">Return appraisal for revision</h3>
+      <button class="modal-close" id="btn-close-reject" style="color:#888">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:#555;margin-bottom:14px">You are returning the appraisal for <strong id="reject-staff-name"></strong> to the HOD for revision. Please provide a clear reason.</div>
+      <div class="form-group"><label>Reason for rejection *</label><textarea id="reject-comments" style="min-height:80px" placeholder="e.g. HOD ratings appear inconsistent with guest satisfaction scores. Please review Section 1 KPI ratings and resubmit."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="btn-close-reject">Cancel</button>
+      <button class="btn btn-danger" id="btn-confirm-reject">Return to HOD</button>
     </div>
   </div>
 </div>
@@ -897,6 +984,8 @@ function navigate(page) {
   if (page === 'home')        loadHomeData();
   if (page === 'reports')     loadReportsPage();
   if (page === 'analytics')   loadAnalyticsPage();
+  if (page === 'kpis')         loadKPIPage();
+  if (page === 'jds')          loadJDPage();
 }
 
 function switchProperty(val) {
@@ -1065,12 +1154,24 @@ function renderAppraisalsTable(appraisals) {
     const s2Name  = (_staffCache.find(function(x){return x.id===a.staff_id;})||{}).full_name||'';
     const isDraft    = a.status === 'draft';
     const isComplete = a.status === 'complete';
-    const selfDot = isComplete ? 'dot-done' : isDraft ? 'dot-prog' : 'dot-open';
-    const selfLbl = isComplete ? 'Submitted' : isDraft ? 'Draft saved' : 'Not started';
-    const hodDot  = isComplete ? 'dot-done' : isDraft ? 'dot-prog' : 'dot-open';
-    const hodLbl  = isComplete ? 'Complete'  : isDraft ? 'Pending'   : 'Awaiting';
-    const actions = isComplete
+    const isSubmitted2 = a.status === 'submitted';
+    const isApproved2  = a.status === 'approved';
+    const selfDot = isApproved2 ? 'dot-done' : isComplete || isSubmitted2 ? 'dot-done' : isDraft ? 'dot-prog' : 'dot-open';
+    const selfLbl = isApproved2 ? 'Approved' : isComplete ? 'Submitted' : isSubmitted2 ? 'Submitted' : isDraft ? 'Draft saved' : 'Not started';
+    const hodDot  = isApproved2 ? 'dot-done' : isComplete ? 'dot-done' : isSubmitted2 ? 'dot-prog' : isDraft ? 'dot-prog' : 'dot-open';
+    const hodLbl  = isApproved2 ? 'Approved' : isComplete ? 'Complete'  : isSubmitted2 ? 'Pending approval' : isDraft ? 'Pending' : 'Awaiting';
+    const isSubmitted = a.status === 'submitted';
+    const isApproved  = a.status === 'approved';
+    const actions = isApproved
       ? '<button class="btn btn-secondary btn-sm" data-action="view-appr" data-appr-id="' + a.id + '">View</button>'
+      : isComplete
+      ? '<button class="btn btn-secondary btn-sm" data-action="view-appr" data-appr-id="' + a.id + '">View</button>'
+      : isSubmitted && canApprove()
+      ? '<button class="btn btn-primary btn-sm" data-action="view-appr" data-appr-id="' + a.id + '">View</button>'
+        + ' <button class="btn btn-secondary btn-sm" data-action="approve-appr" data-appr-id="' + a.id + '" data-staff-name="' + s2Name + '">Approve</button>'
+        + ' <button class="btn btn-danger btn-sm" data-action="reject-appr" data-appr-id="' + a.id + '" data-staff-name="' + s2Name + '">Return</button>'
+      : isSubmitted
+      ? '<button class="btn btn-secondary btn-sm" data-action="view-appr" data-appr-id="' + a.id + '">View</button><span style="font-size:10px;color:#854F0B;margin-left:6px">Awaiting approval</span>'
       : isDraft
         ? '<button class="btn btn-primary btn-sm" data-action="continue-appr" data-appr-id="' + a.id + '" data-staff-id="' + a.staff_id + '">Continue</button>'
           + ' <button class="btn btn-danger btn-sm" data-action="discard-appr" data-appr-id="' + a.id + '" data-staff-name="' + s2Name + '">Discard</button>'
@@ -1553,7 +1654,7 @@ async function submitAppraisal() {
       cycle_id:        cycle.id,
       staff_id:        s.id,
       appraised_by:    currentUser.id,
-      status:          'complete',
+      status:          'submitted',
       self_kpi_score:  selfKPI,
       hod_kpi_score:   hodKPI,
       self_competency_score: selfComp,
@@ -1922,7 +2023,7 @@ async function showDeptReport() {
     var ar = await cl.from('appraisals')
       .select('id,status,final_score,self_kpi_score,hod_kpi_score,rating_band,staff_id')
       .eq('cycle_id', cycle.id)
-      .eq('status','complete');
+      .in('status',['complete','submitted','approved']);
     if (ar.error) throw ar.error;
     var appraisals = ar.data || [];
 
@@ -2015,7 +2116,7 @@ async function showPropertyReport(propCode) {
     var ar = await cl.from('appraisals')
       .select('id,status,final_score,self_kpi_score,hod_kpi_score,rating_band,staff_id')
       .eq('cycle_id', cycle.id)
-      .eq('status','complete');
+      .in('status',['complete','submitted','approved']);
     if (ar.error) throw ar.error;
     var all = ar.data || [];
 
@@ -2104,7 +2205,7 @@ async function showConsolidatedReport() {
     var ar = await cl.from('appraisals')
       .select('id,status,final_score,staff_id,rating_band')
       .eq('cycle_id', cycle.id)
-      .eq('status','complete');
+      .in('status',['complete','submitted','approved']);
     if (ar.error) throw ar.error;
     var appraisals = ar.data || [];
 
@@ -2676,6 +2777,406 @@ async function loadAINarrative(completed, deptAvgs, skyzAvg, phkAvg, compRate, a
     if (el) el.textContent = avgScore + '% overall average across ' + completed.length + ' completed appraisals for ' + cycleLabel + '. Completion rate stands at ' + compRate + '%.';
     console.warn('AI narrative:', e.message);
   }
+}
+
+
+// ══════════════════════════════════════════════════════════
+// R5: KPI SETUP, JOB DESCRIPTIONS, APPROVAL WORKFLOW
+// ══════════════════════════════════════════════════════════
+
+// ── KPI SETUP ────────────────────────────────────────────
+let _kpiFilter = '';
+
+function loadKPIPage() {
+  renderKPIPage();
+}
+
+function renderKPIPage() {
+  var page = document.getElementById('page-kpis');
+  if (!page) return;
+  var filter = _kpiFilter.toLowerCase();
+
+  // Get unique roles from cache
+  var roles = {};
+  Object.keys(ROLE_KPIS).forEach(function(role) {
+    if (role === 'default') return;
+    if (filter && !role.toLowerCase().includes(filter)) return;
+    roles[role] = ROLE_KPIS[role];
+  });
+  // Also add any alias roles
+  Object.keys(ROLE_ALIASES).forEach(function(alias) {
+    if (filter && !alias.toLowerCase().includes(filter)) return;
+    if (!roles[alias]) roles[alias] = null; // mapped role
+  });
+
+  var roleKeys = Object.keys(ROLE_KPIS).filter(function(r){ return r !== 'default'; }).sort();
+
+  var roleOptions = roleKeys.map(function(r) {
+    return '<option value="' + r + '">' + r + '</option>';
+  }).join('');
+
+  var rows = roleKeys.filter(function(r){ return !filter || r.toLowerCase().includes(filter); }).map(function(role) {
+    var kpis = ROLE_KPIS[role] || [];
+    var totalW = kpis.reduce(function(t,k){ return t+k.weight; },0);
+    var badge = totalW === 100
+      ? '<span style="color:#3B6D11;font-size:10px;font-weight:600">100%</span>'
+      : '<span style="color:#A32D2D;font-size:10px;font-weight:600">' + totalW + '%</span>';
+    return '<tr>'
+      + '<td style="padding:9px 12px;border-bottom:.5px solid #eee;font-weight:600">' + role + '</td>'
+      + '<td style="padding:9px 12px;border-bottom:.5px solid #eee">'
+      + kpis.map(function(k){ return '<div style="font-size:11px;color:#333;margin-bottom:2px">' + k.kpi + ' <span style="color:#800020;font-size:10px">(' + k.weight + '%)</span></div>'; }).join('')
+      + '</td>'
+      + '<td style="padding:9px 12px;border-bottom:.5px solid #eee;text-align:center">' + badge + '</td>'
+      + '<td style="padding:9px 12px;border-bottom:.5px solid #eee"><div class="table-actions">'
+      + '<button class="btn btn-secondary btn-sm" data-action="edit-kpi-role" data-role="' + role + '">Edit</button>'
+      + '</div></td>'
+      + '</tr>';
+  }).join('');
+
+  page.innerHTML = '<div class="section-header">'
+    + '<div class="section-title">KPI Setup</div>'
+    + '<div class="filter-row">'
+    + '<input type="text" class="filter-select" placeholder="Search role..." oninput="_kpiFilter=this.value;renderKPIPage()" style="width:180px" />'
+    + '</div></div>'
+    + '<div class="table-wrap"><table>'
+    + '<thead><tr><th>Role</th><th>KPIs assigned</th><th style="text-align:center">Total weight</th><th class="no-print">Actions</th></tr></thead>'
+    + '<tbody>' + rows + '</tbody></table></div>'
+    + '<div style="font-size:11px;color:#888;margin-top:8px">KPIs are drawn from the Simba Group Balanced Scorecard 2026. Weights must total 100% per role. Red weight = misconfigured.</div>';
+}
+
+// KPI role editor
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('button[data-action="edit-kpi-role"]');
+  if (!btn) return;
+  openKPIRoleEditor(btn.dataset.role);
+});
+
+function openKPIRoleEditor(role) {
+  var kpis = ROLE_KPIS[role] ? JSON.parse(JSON.stringify(ROLE_KPIS[role])) : [];
+  window._editingKPIRole = role;
+  window._editingKPIs    = kpis;
+
+  function kpiRow(k, i) {
+    return '<div id="kpi-row-' + i + '" style="display:grid;grid-template-columns:2fr 1fr .6fr .4fr;gap:8px;align-items:center;padding:8px 0;border-bottom:.5px solid #eee">'
+      + '<div><input type="text" class="filter-select" style="width:100%" value="' + k.kpi.replace(/"/g,'&quot;') + '" data-field="kpi" data-idx="' + i + '" /></div>'
+      + '<div><input type="text" class="filter-select" style="width:100%;font-size:10px" value="' + k.target.replace(/"/g,'&quot;') + '" data-field="target" data-idx="' + i + '" /></div>'
+      + '<div><input type="number" class="filter-select" style="width:100%" value="' + k.weight + '" min="0" max="100" data-field="weight" data-idx="' + i + '" /></div>'
+      + '<div style="text-align:center"><button class="btn btn-danger btn-sm" data-action="del-kpi-row" data-idx="' + i + '" style="padding:3px 8px">X</button></div>'
+      + '</div>';
+  }
+
+  var modal = document.getElementById('modal-kpi-editor');
+  if (!modal) return;
+  document.getElementById('kpi-editor-title').textContent = 'KPIs for ' + role;
+  document.getElementById('kpi-editor-rows').innerHTML = kpis.map(kpiRow).join('');
+  updateKPIWeightTotal();
+  modal.classList.remove('hidden');
+}
+
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('button[data-action="del-kpi-row"]');
+  if (!btn) return;
+  var idx = parseInt(btn.dataset.idx);
+  window._editingKPIs.splice(idx, 1);
+  openKPIRoleEditor(window._editingKPIRole);
+});
+
+document.addEventListener('click', function(e) {
+  if (e.target.id !== 'btn-add-kpi-row') return;
+  if (!window._editingKPIs) return;
+  window._editingKPIs.push({ kpi:'New KPI', target:'Target', weight:0, p:'Internal Processes', freq:'Monthly' });
+  openKPIRoleEditor(window._editingKPIRole);
+});
+
+document.addEventListener('input', function(e) {
+  var el = e.target;
+  if (!el.dataset.field || !el.dataset.idx) return;
+  var modal = document.getElementById('modal-kpi-editor');
+  if (!modal || modal.classList.contains('hidden')) return;
+  var idx = parseInt(el.dataset.idx);
+  var kpis = window._editingKPIs;
+  if (!kpis || !kpis[idx]) return;
+  if (el.dataset.field === 'weight') kpis[idx].weight = parseInt(el.value)||0;
+  else kpis[idx][el.dataset.field] = el.value;
+  if (el.dataset.field === 'weight') updateKPIWeightTotal();
+});
+
+function updateKPIWeightTotal() {
+  var kpis = window._editingKPIs || [];
+  var total = kpis.reduce(function(t,k){ return t+(parseInt(k.weight)||0); },0);
+  var el = document.getElementById('kpi-weight-total');
+  if (el) {
+    el.textContent = 'Total weight: ' + total + '%';
+    el.style.color = total === 100 ? '#3B6D11' : '#A32D2D';
+  }
+}
+
+document.addEventListener('click', function(e) {
+  if (e.target.id !== 'btn-save-kpi-role') return;
+  var role = window._editingKPIRole;
+  var kpis = window._editingKPIs;
+  if (!role || !kpis) return;
+  ROLE_KPIS[role] = kpis;
+  document.getElementById('modal-kpi-editor').classList.add('hidden');
+  showToast('KPIs saved for ' + role + '.');
+  renderKPIPage();
+});
+
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'btn-close-kpi-editor') closeModal('modal-kpi-editor');
+});
+
+// ── JOB DESCRIPTIONS ─────────────────────────────────────
+// JD store — in memory, matches your Finance Manager JD structure
+var JD_STORE = {
+  'Finance Manager': {
+    title: 'Finance Manager', dept: 'Finance', property: 'both',
+    reportsTo: 'General Manager', employmentType: 'Full-Time',
+    purpose: 'The Finance Manager is the financial custodian of the property. The role carries full accountability for the hotel\'s financial health from daily cash management and payroll integrity to statutory compliance, audit readiness, and the accuracy of management reports submitted to the General Manager and Group Finance.',
+    responsibilities: 'A. Financial Governance & Reporting\nOversee all financial operations of the hotel, ensuring accuracy, completeness, and timeliness of all accounting records.\nPrepare and present monthly management accounts, P&L statements, balance sheets, and cash flow reports to the General Manager.\n\nB. Revenue Management & Cost Control\nMonitor hotel revenue streams and flag variances promptly.\nDrive cost-consciousness across all departments.\n\nC. Statutory Compliance & Audit\nEnsure full and timely compliance with Ugandan statutory obligations: PAYE, NSSF, VAT, and withholding tax.\nServe as primary liaison with URA and external auditors.\n\nD. Leadership & Team Development\nLead, coach, and develop the Finance team. Set clear performance expectations and conduct regular appraisals.',
+    qualifications: 'Bachelor\'s degree in Finance, Accounting, Commerce, or a related field. Full professional qualification (CPA, ACCA, CA, or equivalent) is required.',
+    experience: 'Minimum 5 years of post-qualification experience in finance or accounting. At least 3 years in a 4-star or 5-star hotel environment.',
+    skills: 'Proficiency in OPERA, Tally, Sun Systems, Sage, or SAP. Advanced MS Excel skills. Strong knowledge of Ugandan tax law and IFRS/GAAP.',
+    relationships: 'General Manager, Heads of Department, Group Finance Director, HR Manager, External Auditors, URA.',
+    effectiveDate: 'May 2026'
+  }
+};
+var _currentJD = null;
+
+function loadJDPage() { renderJDTable(); }
+
+function renderJDTable() {
+  var page = document.getElementById('page-jds');
+  if (!page) return;
+  var jds = Object.values(JD_STORE);
+  var rows = jds.map(function(jd) {
+    var pill = jd.property === 'skyz' ? 'pill-skyz' : jd.property === 'phk' ? 'pill-phk' : '<span class="band band-meets" style="font-size:9px">Both</span>';
+    return '<tr>'
+      + '<td style="padding:9px 12px;border-bottom:.5px solid #eee"><strong>' + jd.title + '</strong></td>'
+      + '<td style="padding:9px 12px;border-bottom:.5px solid #eee">' + jd.dept + '</td>'
+      + '<td style="padding:9px 12px;border-bottom:.5px solid #eee">' + pill + '</td>'
+      + '<td style="padding:9px 12px;border-bottom:.5px solid #eee">' + jd.reportsTo + '</td>'
+      + '<td style="padding:9px 12px;border-bottom:.5px solid #eee">' + (jd.effectiveDate||'') + '</td>'
+      + '<td style="padding:9px 12px;border-bottom:.5px solid #eee"><div class="table-actions">'
+      + '<button class="btn btn-secondary btn-sm" data-action="view-jd" data-jd-key="' + jd.title + '">View</button>'
+      + '<button class="btn btn-ghost btn-sm"      data-action="edit-jd" data-jd-key="' + jd.title + '">Edit</button>'
+      + '<button class="btn btn-danger btn-sm"     data-action="del-jd"  data-jd-key="' + jd.title + '">Delete</button>'
+      + '</div></td></tr>';
+  }).join('');
+
+  page.innerHTML = '<div class="section-header">'
+    + '<div class="section-title">Job Descriptions</div>'
+    + '<div class="filter-row"><button class="btn btn-primary btn-sm" data-action="new-jd">+ New JD</button></div>'
+    + '</div>'
+    + (jds.length === 0
+      ? '<div style="text-align:center;padding:40px;font-size:12px;color:#888">No job descriptions yet. Click “+ New JD” to create one.</div>'
+      : '<div class="table-wrap"><table>'
+        + '<thead><tr><th>Position title</th><th>Department</th><th>Property</th><th>Reports to</th><th>Effective date</th><th class="no-print">Actions</th></tr></thead>'
+        + '<tbody>' + rows + '</tbody></table></div>'
+    );
+}
+
+// JD actions
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('button[data-action]');
+  if (!btn) return;
+  var action = btn.dataset.action;
+  var key    = btn.dataset.jdKey;
+
+  if (action === 'new-jd')  openJDModal(null);
+  if (action === 'edit-jd') openJDModal(key);
+  if (action === 'view-jd') previewJD(key);
+  if (action === 'del-jd')  {
+    if (confirm('Delete JD for "' + key + '"? This cannot be undone.')) {
+      delete JD_STORE[key];
+      renderJDTable();
+      showToast('JD deleted: ' + key);
+    }
+  }
+});
+
+function openJDModal(key) {
+  var jd = key ? JD_STORE[key] : null;
+  var modal = document.getElementById('modal-jd-editor');
+  if (!modal) return;
+  _currentJD = key;
+  document.getElementById('jd-f-title').value        = jd ? jd.title        : '';
+  document.getElementById('jd-f-dept').value         = jd ? jd.dept         : '';
+  document.getElementById('jd-f-prop').value         = jd ? jd.property     : 'both';
+  document.getElementById('jd-f-reports').value      = jd ? jd.reportsTo    : '';
+  document.getElementById('jd-f-emptype').value      = jd ? jd.employmentType:'Full-Time';
+  document.getElementById('jd-f-date').value         = jd ? jd.effectiveDate : '';
+  document.getElementById('jd-f-purpose').value      = jd ? jd.purpose       : '';
+  document.getElementById('jd-f-resp').value         = jd ? jd.responsibilities:'';
+  document.getElementById('jd-f-qual').value         = jd ? jd.qualifications : '';
+  document.getElementById('jd-f-exp').value          = jd ? jd.experience     : '';
+  document.getElementById('jd-f-skills').value       = jd ? jd.skills         : '';
+  document.getElementById('jd-f-relations').value    = jd ? jd.relationships   : '';
+  document.getElementById('jd-modal-title').textContent = key ? 'Edit JD: ' + key : 'New Job Description';
+  modal.classList.remove('hidden');
+}
+
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'btn-close-jd-editor') closeModal('modal-jd-editor');
+  if (e.target.id === 'btn-save-jd') saveJD();
+});
+
+function saveJD() {
+  var title = document.getElementById('jd-f-title').value.trim();
+  if (!title) { showToast('Position title is required.'); return; }
+  var jd = {
+    title:          title,
+    dept:           document.getElementById('jd-f-dept').value.trim(),
+    property:       document.getElementById('jd-f-prop').value,
+    reportsTo:      document.getElementById('jd-f-reports').value.trim(),
+    employmentType: document.getElementById('jd-f-emptype').value.trim(),
+    effectiveDate:  document.getElementById('jd-f-date').value.trim(),
+    purpose:        document.getElementById('jd-f-purpose').value.trim(),
+    responsibilities: document.getElementById('jd-f-resp').value.trim(),
+    qualifications: document.getElementById('jd-f-qual').value.trim(),
+    experience:     document.getElementById('jd-f-exp').value.trim(),
+    skills:         document.getElementById('jd-f-skills').value.trim(),
+    relationships:  document.getElementById('jd-f-relations').value.trim(),
+  };
+  // If renaming, remove old key
+  if (_currentJD && _currentJD !== title) delete JD_STORE[_currentJD];
+  JD_STORE[title] = jd;
+  closeModal('modal-jd-editor');
+  renderJDTable();
+  showToast((_currentJD ? 'JD updated: ' : 'JD created: ') + title);
+}
+
+function previewJD(key) {
+  var jd = JD_STORE[key];
+  if (!jd) { showToast('JD not found.'); return; }
+  var propName = jd.property === 'skyz' ? 'Protea Hotel Skyz Kampala' : jd.property === 'phk' ? 'Protea Hotel Kampala' : 'Protea Hotel Skyz Kampala & Protea Hotel Kampala';
+  var modal = document.getElementById('modal-jd-preview');
+  if (!modal) return;
+  document.getElementById('jd-preview-title').textContent = jd.title + ' \u2014 Job Description';
+  document.getElementById('jd-preview-body').innerHTML = buildJDHTML(jd, propName);
+  modal.classList.remove('hidden');
+}
+
+function buildJDHTML(jd, propName) {
+  function section(title, content) {
+    if (!content) return '';
+    return '<div style="margin-bottom:16px">'
+      + '<div style="font-family:\'Palatino Linotype\',Palatino,Georgia,serif;font-size:12px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:3px;display:inline-block;margin-bottom:8px">' + title + '</div>'
+      + '<div style="font-size:12px;color:#333;line-height:1.7;white-space:pre-line">' + content + '</div>'
+      + '</div>';
+  }
+  return '<div id="jd-printable" style="font-family:\'Palatino Linotype\',Palatino,Georgia,serif;padding:4px">'
+    + '<div style="text-align:center;padding-bottom:14px;border-bottom:2px solid #000;margin-bottom:18px">'
+    + '<div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#888;margin-bottom:4px">' + propName + '</div>'
+    + '<div style="font-size:20px;font-weight:700;color:#1B2A6B">JOB DESCRIPTION</div>'
+    + '</div>'
+    + section('POSITION DETAILS',
+        'Position title: ' + jd.title + '\n'
+        + 'Department: ' + jd.dept + '\n'
+        + 'Reports to: ' + jd.reportsTo + '\n'
+        + 'Property: ' + propName + '\n'
+        + 'Employment type: ' + (jd.employmentType||'Full-Time') + '\n'
+        + 'Effective date: ' + (jd.effectiveDate||'')
+      )
+    + section('PURPOSE OF THE ROLE', jd.purpose)
+    + section('KEY RESPONSIBILITIES', jd.responsibilities)
+    + section('QUALIFICATIONS', jd.qualifications)
+    + section('EXPERIENCE', jd.experience)
+    + section('TECHNICAL SKILLS & COMPETENCIES', jd.skills)
+    + section('KEY WORKING RELATIONSHIPS', jd.relationships)
+    + '<div style="margin-top:20px;padding-top:14px;border-top:1.5px solid #000">'
+    + '<div style="font-family:\'Palatino Linotype\',Palatino,Georgia,serif;font-size:12px;font-weight:700;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:3px;display:inline-block;margin-bottom:10px">ACKNOWLEDGEMENT</div>'
+    + '<div style="font-size:11px;color:#555;margin-bottom:14px;line-height:1.6">I confirm that I have received, read, and understood this Job Description, and accept it as the basis for my performance expectations in this role.</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:8px">'
+    + '<div><div style="border-top:1.5px solid #000;padding-top:6px;margin-bottom:4px"></div><div style="font-size:11px;color:#888">Staff signature & date</div></div>'
+    + '<div><div style="border-top:1.5px solid #000;padding-top:6px;margin-bottom:4px"></div><div style="font-size:11px;color:#888">HR signature & date</div></div>'
+    + '</div></div></div>';
+}
+
+function printJD() {
+  var body = document.getElementById('jd-printable');
+  if (!body) return;
+  var w = window.open('', '_blank', 'width=900,height:700');
+  var css = '<style>body{font-family:"Palatino Linotype",Palatino,Georgia,serif;padding:28px;color:#1a1a2e;font-size:12px;line-height:1.6}@media print{@page{margin:10mm}}</style>';
+  w.document.write('<!DOCTYPE html><html><head><title>Job Description</title>' + css + '</head><body>');
+  w.document.write(body.innerHTML);
+  w.document.write('</body></html>');
+  w.document.close();
+  setTimeout(function(){ w.print(); }, 400);
+}
+
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'btn-close-jd-preview') closeModal('modal-jd-preview');
+  if (e.target.id === 'btn-print-jd') printJD();
+});
+
+// ── APPROVAL WORKFLOW ─────────────────────────────────────
+// Change submitAppraisal status from 'complete' to 'submitted'
+// Add approve/reject actions on appraisals table
+
+function canApprove() {
+  return currentUser && (currentUser.role === 'hr_admin' || currentUser.role === 'gm' || currentUser.role === 'hr');
+}
+
+// Approval action delegation
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('button[data-action]');
+  if (!btn) return;
+  var action = btn.dataset.action;
+  if (action === 'approve-appr') approveAppraisal(btn.dataset.apprId, btn.dataset.staffName);
+  if (action === 'reject-appr')  openRejectModal(btn.dataset.apprId, btn.dataset.staffName);
+});
+
+async function approveAppraisal(apprId, staffName) {
+  if (!canApprove()) { showToast('You do not have approval rights.'); return; }
+  if (!confirm('Approve appraisal for ' + (staffName||'this staff member') + '? This will lock the record permanently.')) return;
+  try {
+    var cl = getClient();
+    var res = await cl.from('appraisals').update({
+      status:          'approved',
+      reviewed_by:     currentUser.id,
+      reviewed_at:     new Date().toISOString(),
+      review_comments: null
+    }).eq('id', apprId);
+    if (res.error) throw res.error;
+    showToast('Appraisal approved for ' + (staffName||'staff member') + '.');
+    loadAppraisalsPage();
+    loadHomeData();
+  } catch(e) { showToast('Error: ' + e.message); console.error('approveAppraisal:', e); }
+}
+
+function openRejectModal(apprId, staffName) {
+  if (!canApprove()) { showToast('You do not have approval rights.'); return; }
+  var modal = document.getElementById('modal-reject');
+  if (!modal) return;
+  document.getElementById('reject-staff-name').textContent = staffName || 'this staff member';
+  document.getElementById('reject-comments').value = '';
+  window._rejectApprId = apprId;
+  window._rejectStaffName = staffName;
+  modal.classList.remove('hidden');
+}
+
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'btn-close-reject')  closeModal('modal-reject');
+  if (e.target.id === 'btn-confirm-reject') confirmReject();
+});
+
+async function confirmReject() {
+  var comments = (document.getElementById('reject-comments')||{value:''}).value.trim();
+  if (!comments) { showToast('Please provide a reason for rejection.'); return; }
+  try {
+    var cl = getClient();
+    var res = await cl.from('appraisals').update({
+      status:          'draft',
+      reviewed_by:     currentUser.id,
+      reviewed_at:     new Date().toISOString(),
+      review_comments: comments
+    }).eq('id', window._rejectApprId);
+    if (res.error) throw res.error;
+    closeModal('modal-reject');
+    showToast('Appraisal returned to HOD with comments.');
+    loadAppraisalsPage();
+  } catch(e) { showToast('Error: ' + e.message); console.error('confirmReject:', e); }
 }
 
 
