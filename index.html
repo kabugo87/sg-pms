@@ -303,7 +303,7 @@ tr:hover td{background:#fafafa}
       <input type="password" id="login-password" placeholder="••••••••" />
     </div>
     <button class="btn btn-primary" onclick="doLogin()">Sign in &rarr;</button>
-    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <span style="font-weight:600">v11-m3</span></p>
+    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <span style="font-weight:600">v11-m4</span></p>
   </div>
 </div>
 
@@ -1656,7 +1656,7 @@ async function loadStaffPage() {
   try {
     const sb = initSupabase();
     let query = sb.from('staff')
-      .select('id,full_name,employee_no,date_of_joining,departments(name),roles(title,is_management),properties(code)')
+      .select('id,full_name,employee_no,date_of_joining,departments!staff_department_id_fkey(name),roles!staff_role_id_fkey(title,is_management),properties!staff_property_id_fkey(code)')
       .eq('status','active')
       .order('full_name');
     if (currentUser && currentUser.role !== 'hr_admin') {
@@ -2950,7 +2950,7 @@ async function showDeptReport() {
 
     // Get all complete appraisals with full staff details
     const { data: appraisals } = await sb.from('appraisals')
-      .select('id,final_score,self_kpi_score,hod_kpi_score,rating_band,status,staff(full_name,employee_no,departments(name),roles(title),properties(code,name))')
+      .select('id,final_score,self_kpi_score,hod_kpi_score,rating_band,status,staff(full_name,employee_no,departments!staff_department_id_fkey(name),roles!staff_role_id_fkey(title),properties!staff_property_id_fkey(code,name))')
       .eq('cycle_id', cycle.id)
       .eq('status','complete')
       .order('final_score', { ascending: false });
@@ -3155,7 +3155,7 @@ async function loadAppraisalsPage() {
     if (!cycle) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;font-size:12px">No active cycle found.</td></tr>'; return; }
 
     let query = sb.from('appraisals')
-      .select('id,status,self_kpi_score,hod_kpi_score,final_score,rating_band,staff(id,full_name,departments(name),roles(title),properties(code))')
+      .select('id,status,self_kpi_score,hod_kpi_score,final_score,rating_band,staff(id,full_name,departments!staff_department_id_fkey(name),roles!staff_role_id_fkey(title),properties!staff_property_id_fkey(code))')
       .eq('cycle_id', cycle.id)
       .order('final_score', { ascending: false, nullsFirst: false });
 
@@ -3216,7 +3216,7 @@ async function viewAppraisal(appraisalId) {
   try {
     const sb = initSupabase();
     const { data: a, error } = await sb.from('appraisals')
-      .select('*,staff(id,full_name,employee_no,date_of_joining,departments(name),roles(title),properties(code,name))')
+      .select('*,staff(id,full_name,employee_no,date_of_joining,departments!staff_department_id_fkey(name),roles!staff_role_id_fkey(title),properties!staff_property_id_fkey(code,name))')
       .eq('id', appraisalId).single();
     if (error) throw error;
     // Map to the shape showIndividualReport expects and render
@@ -3348,7 +3348,7 @@ async function loadAnalyticsPage() {
     const { data: cycle } = await sb.from('appraisal_cycles').select('id').eq('is_active',true).single();
     if (!cycle) return;
     const { data: appraisals } = await sb.from('appraisals')
-      .select('final_score,rating_band,staff(departments(name),properties(code))')
+      .select('final_score,rating_band,staff(departments!staff_department_id_fkey(name),properties!staff_property_id_fkey(code))')
       .eq('cycle_id', cycle.id).eq('status','complete');
     if (!appraisals || appraisals.length === 0) return;
 
