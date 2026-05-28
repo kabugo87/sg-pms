@@ -231,7 +231,7 @@ tr:hover td{background:#fafafa}
       <input type="password" id="login-password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
     </div>
     <button class="btn btn-primary" id="login-btn" onclick="doLogin()">Sign in &rarr;</button>
-    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <strong>R5</strong></p>
+    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <strong>R6</strong></p>
   </div>
 </div>
 
@@ -504,18 +504,8 @@ tr:hover td{background:#fafafa}
       </div>
       <div class="page-view" id="page-kpis"></div>
       <div class="page-view" id="page-jds"></div>
-      <div class="page-view" id="page-departments">
-        <div style="text-align:center;padding:60px 20px;color:var(--text-light)">
-          <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:8px">Departments</div>
-          <div style="font-size:12px">Coming soon</div>
-        </div>
-      </div>
-      <div class="page-view" id="page-settings">
-        <div style="text-align:center;padding:60px 20px;color:var(--text-light)">
-          <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:8px">Settings</div>
-          <div style="font-size:12px">Coming soon</div>
-        </div>
-      </div>
+      <div class="page-view" id="page-departments"></div>
+      <div class="page-view" id="page-settings"></div>
 
     </div><!-- /content -->
   </div><!-- /main -->
@@ -650,6 +640,70 @@ tr:hover td{background:#fafafa}
     <div class="modal-footer">
       <button class="btn btn-secondary" id="btn-close-reject">Cancel</button>
       <button class="btn btn-danger" id="btn-confirm-reject">Return to HOD</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL: Staff Profile -->
+<div class="modal-overlay hidden" id="modal-staff-profile">
+  <div class="modal" style="width:560px">
+    <div class="modal-header" style="background:#f0f1f4;border-bottom:3px solid #800020">
+      <div>
+        <h3 id="sp-name" style="color:#1B2A6B;font-family:'Palatino Linotype',Palatino,Georgia,serif">Staff Profile</h3>
+        <div style="font-size:10px;color:#666;margin-top:2px"><span id="sp-role"></span> &middot; <span id="sp-dept"></span> &middot; <span id="sp-prop"></span></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-staff-profile')" style="color:#888">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+        <div class="metric-card"><div class="metric-label">Employee No.</div><div style="font-size:13px;font-weight:600;margin-top:4px" id="sp-emp-no"></div></div>
+        <div class="metric-card"><div class="metric-label">Date of joining</div><div style="font-size:12px;font-weight:500;margin-top:4px" id="sp-doj"></div></div>
+        <div class="metric-card"><div class="metric-label">Appraisal mode</div><div style="font-size:12px;font-weight:500;margin-top:4px" id="sp-mode"></div></div>
+      </div>
+      <div style="font-family:'Palatino Linotype',Palatino,Georgia,serif;font-size:12px;font-weight:600;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:3px;display:inline-block;margin-bottom:10px">Appraisal history</div>
+      <div id="sp-appr-history"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" id="sp-deact-btn">Deactivate staff</button>
+      <button class="btn btn-secondary" id="sp-edit-btn">Edit details</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-staff-profile')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add / Edit Staff -->
+<div class="modal-overlay hidden" id="modal-add-staff">
+  <div class="modal" style="width:560px">
+    <div class="modal-header" style="background:#f0f1f4;border-bottom:3px solid #800020">
+      <h3 id="add-staff-modal-title" style="color:#1B2A6B">Add new staff member</h3>
+      <button class="modal-close" id="btn-close-add-staff" style="color:#888">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="add-staff-form" onsubmit="return false">
+        <div class="form-row">
+          <div class="form-group"><label>Full name *</label><input type="text" id="asf-name" placeholder="As per NSSF card" /></div>
+          <div class="form-group"><label>Employee number</label><input type="text" id="asf-empno" placeholder="e.g. PHNS1234" /></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Property *</label>
+            <select id="asf-prop">
+              <option value="">Select property</option>
+              <option value="skyz">Protea Hotel Skyz Kampala</option>
+              <option value="phk">Protea Hotel Kampala</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Date of joining</label><input type="date" id="asf-doj" /></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Department *</label><select id="asf-dept"><option value="">Select department</option></select></div>
+          <div class="form-group"><label>Role</label><select id="asf-role"><option value="">Select role</option></select></div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="btn-close-add-staff">Cancel</button>
+      <button class="btn btn-primary" id="btn-save-staff">Save staff member</button>
     </div>
   </div>
 </div>
@@ -986,6 +1040,8 @@ function navigate(page) {
   if (page === 'analytics')   loadAnalyticsPage();
   if (page === 'kpis')         loadKPIPage();
   if (page === 'jds')          loadJDPage();
+  if (page === 'departments')  loadDepartmentsPage();
+  if (page === 'settings')     loadSettingsPage();
 }
 
 function switchProperty(val) {
@@ -1086,7 +1142,7 @@ document.addEventListener('click', function(e) {
   const s      = _staffCache.find(function(x) { return x.id === sid; });
   if (!s) return;
   if (action === 'appraise') openAppraisalForm(s);
-  if (action === 'view')     showToast('Staff profile coming in R3');
+  if (action === 'view')     openStaffProfile(sid);
 });
 
 // Staff filters
@@ -3223,6 +3279,343 @@ async function confirmReject() {
     showToast('Appraisal returned to HOD with comments.');
     loadAppraisalsPage();
   } catch(e) { showToast('Error: ' + e.message); console.error('confirmReject:', e); }
+}
+
+
+// ══════════════════════════════════════════════════════════
+// R6: STAFF MANAGEMENT, DEPARTMENTS, SETTINGS, FIXES
+// ══════════════════════════════════════════════════════════
+
+// ── FIX: KPI editor Cancel button ────────────────────────
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'btn-close-kpi-editor-cancel') closeModal('modal-kpi-editor');
+});
+
+// ── STAFF PROFILE & MANAGEMENT ───────────────────────────
+async function openStaffProfile(sid) {
+  var s = _staffCache.find(function(x){ return x.id === sid; });
+  if (!s) { showToast('Staff record not found.'); return; }
+
+  var modal = document.getElementById('modal-staff-profile');
+  if (!modal) return;
+
+  // Set header
+  var pill = s.propCode === 'skyz' ? 'pill-skyz' : 'pill-phk';
+  var mode = s.isMgmt ? 'Self-service' : 'Assisted';
+  var doj  = s.date_of_joining
+    ? new Date(s.date_of_joining).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})
+    : 'Not recorded';
+
+  document.getElementById('sp-name').textContent    = s.full_name;
+  document.getElementById('sp-role').textContent    = s.roleTitle || '';
+  document.getElementById('sp-dept').textContent    = s.deptName  || '';
+  document.getElementById('sp-prop').innerHTML      = '<span class="pill ' + pill + '">' + s.propCode.toUpperCase() + '</span>';
+  document.getElementById('sp-emp-no').textContent  = s.employee_no || 'Not assigned';
+  document.getElementById('sp-doj').textContent     = doj;
+  document.getElementById('sp-mode').textContent    = mode;
+  document.getElementById('sp-appr-history').innerHTML = '<div style="font-size:11px;color:#888;padding:8px 0">Loading appraisal history...</div>';
+
+  // Show/hide edit controls based on role
+  var canEdit = currentUser && (currentUser.role === 'hr_admin' || currentUser.role === 'hr');
+  document.getElementById('sp-edit-btn').style.display   = canEdit ? '' : 'none';
+  document.getElementById('sp-deact-btn').style.display  = canEdit ? '' : 'none';
+
+  window._viewingStaffId = sid;
+  modal.classList.remove('hidden');
+
+  // Load appraisal history
+  try {
+    var cl = getClient();
+    var ar = await cl.from('appraisals')
+      .select('id,status,final_score,rating_band,hod_submitted_at,cycle_id,appraisal_cycles(label)')
+      .eq('staff_id', sid)
+      .order('hod_submitted_at', { ascending: false });
+    var appraisals = (ar.data || []);
+    var histEl = document.getElementById('sp-appr-history');
+    if (!appraisals.length) {
+      histEl.innerHTML = '<div style="font-size:11px;color:#888;padding:8px 0">No appraisals on record.</div>';
+    } else {
+      histEl.innerHTML = appraisals.map(function(a) {
+        var sc    = a.final_score ? Math.round(a.final_score) + '%' : 'Pending';
+        var cycle = a.appraisal_cycles ? a.appraisal_cycles.label : '';
+        var dot   = a.status === 'approved' ? 'dot-done' : a.status === 'submitted' ? 'dot-prog' : a.status === 'draft' ? 'dot-prog' : 'dot-open';
+        var lbl   = a.status === 'approved' ? 'Approved' : a.status === 'submitted' ? 'Submitted' : a.status === 'draft' ? 'Draft' : 'Not started';
+        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:.5px solid #eee">'
+          + '<div><div style="font-size:12px;font-weight:500">' + cycle + '</div>'
+          + '<div style="font-size:10px;color:#888;margin-top:1px"><span class="status-badge"><span class="status-dot ' + dot + '"></span>' + lbl + '</span></div></div>'
+          + '<div style="font-size:13px;font-weight:700;color:#1B2A6B">' + sc + (a.rating_band ? ' <span style="font-size:9px;font-weight:400;color:#555">(' + a.rating_band + ')</span>' : '') + '</div>'
+          + '</div>';
+      }).join('');
+    }
+  } catch(e) {
+    var histEl2 = document.getElementById('sp-appr-history');
+    if (histEl2) histEl2.innerHTML = '<div style="font-size:11px;color:#888">Could not load history.</div>';
+  }
+}
+
+// Open edit form from profile modal
+document.addEventListener('click', function(e) {
+  if (e.target.id !== 'sp-edit-btn') return;
+  var sid = window._viewingStaffId;
+  var s   = _staffCache.find(function(x){ return x.id === sid; });
+  if (!s) return;
+  closeModal('modal-staff-profile');
+  openEditStaff(s);
+});
+
+// Deactivate staff
+document.addEventListener('click', function(e) {
+  if (e.target.id !== 'sp-deact-btn') return;
+  var sid = window._viewingStaffId;
+  var s   = _staffCache.find(function(x){ return x.id === sid; });
+  if (!s) return;
+  if (!confirm('Deactivate ' + s.full_name + '? They will be removed from the active staff list. Their appraisal history is preserved.')) return;
+  deactivateStaff(sid, s.full_name);
+});
+
+async function deactivateStaff(sid, name) {
+  try {
+    var cl = getClient();
+    var res = await cl.from('staff').update({ status: 'inactive' }).eq('id', sid);
+    if (res.error) throw res.error;
+    closeModal('modal-staff-profile');
+    showToast(name + ' has been deactivated.');
+    loadStaffPage();
+    loadHomeData();
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
+// ── ADD STAFF ─────────────────────────────────────────────
+function openAddStaff() {
+  var modal = document.getElementById('modal-add-staff');
+  if (!modal) return;
+  document.getElementById('add-staff-form').reset();
+  document.getElementById('add-staff-modal-title').textContent = 'Add new staff member';
+  window._editingStaffId = null;
+  // Populate dept and role dropdowns from cache
+  populateStaffFormDropdowns();
+  modal.classList.remove('hidden');
+}
+
+function openEditStaff(s) {
+  var modal = document.getElementById('modal-add-staff');
+  if (!modal) return;
+  window._editingStaffId = s.id;
+  document.getElementById('add-staff-modal-title').textContent = 'Edit staff: ' + s.full_name;
+  populateStaffFormDropdowns();
+  document.getElementById('asf-name').value    = s.full_name || '';
+  document.getElementById('asf-empno').value   = s.employee_no || '';
+  document.getElementById('asf-prop').value    = s.propCode || '';
+  document.getElementById('asf-dept').value    = s.deptName || '';
+  document.getElementById('asf-role').value    = s.roleTitle || '';
+  document.getElementById('asf-doj').value     = s.date_of_joining ? s.date_of_joining.substring(0,10) : '';
+  modal.classList.remove('hidden');
+}
+
+function populateStaffFormDropdowns() {
+  var depts = ['Management', 'Front Office', 'Housekeeping', 'Kitchen', 'Food & Beverage',
+               'Finance', 'Sales & Marketing', 'Maintenance', 'ICT & Telecom', 'HR', 'Admin', 'Laundry'];
+  var deptSel = document.getElementById('asf-dept');
+  if (deptSel) {
+    var cur = deptSel.value;
+    deptSel.innerHTML = '<option value="">Select department</option>'
+      + depts.map(function(d){ return '<option value="' + d + '"' + (cur===d?' selected':'') + '>' + d + '</option>'; }).join('');
+  }
+  // Role dropdown - populated from ROLE_KPIS keys
+  var roleSel = document.getElementById('asf-role');
+  if (roleSel) {
+    var curR = roleSel.value;
+    var roles = Object.keys(ROLE_KPIS).filter(function(r){ return r !== 'default'; }).sort();
+    roleSel.innerHTML = '<option value="">Select role</option>'
+      + roles.map(function(r){ return '<option value="' + r + '"' + (curR===r?' selected':'') + '>' + r + '</option>'; }).join('');
+  }
+}
+
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'btn-close-add-staff') closeModal('modal-add-staff');
+  if (e.target.id === 'btn-save-staff') saveStaff();
+});
+
+async function saveStaff() {
+  var name  = (document.getElementById('asf-name') ||{value:''}).value.trim();
+  var empno = (document.getElementById('asf-empno')||{value:''}).value.trim();
+  var prop  = (document.getElementById('asf-prop') ||{value:''}).value;
+  var dept  = (document.getElementById('asf-dept') ||{value:''}).value;
+  var role  = (document.getElementById('asf-role') ||{value:''}).value;
+  var doj   = (document.getElementById('asf-doj')  ||{value:''}).value;
+
+  if (!name) { showToast('Full name is required.'); return; }
+  if (!prop) { showToast('Please select a property.'); return; }
+  if (!dept) { showToast('Please select a department.'); return; }
+
+  try {
+    var cl = getClient();
+    // Resolve IDs from lookup maps
+    var propRow = Object.values(_propMap).find(function(p){ return p.code === prop; });
+    var deptRow = Object.values(_deptMap).find(function(d){ return d.name === dept; });
+    var roleRow = Object.values(_roleMap).find(function(r){ return r.title === role; });
+
+    if (!propRow) { showToast('Property not found. Check Supabase properties table.'); return; }
+    if (!deptRow) { showToast('Department "' + dept + '" not found in database.'); return; }
+
+    var payload = {
+      full_name:       name,
+      employee_no:     empno || null,
+      property_id:     propRow.id,
+      department_id:   deptRow ? deptRow.id : null,
+      role_id:         roleRow ? roleRow.id : null,
+      date_of_joining: doj || null,
+      status:          'active',
+    };
+
+    var res;
+    if (window._editingStaffId) {
+      res = await cl.from('staff').update(payload).eq('id', window._editingStaffId);
+    } else {
+      res = await cl.from('staff').insert(payload);
+    }
+    if (res.error) throw res.error;
+
+    closeModal('modal-add-staff');
+    showToast(window._editingStaffId ? name + ' updated successfully.' : name + ' added to staff list.');
+    loadStaffPage();
+    loadHomeData();
+  } catch(e) {
+    showToast('Error saving staff: ' + e.message);
+    console.error('saveStaff:', e);
+  }
+}
+
+// Wire + Add staff button on staff page header
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'btn-add-staff') openAddStaff();
+});
+
+// ── DEPARTMENTS PAGE ──────────────────────────────────────
+function loadDepartmentsPage() {
+  var page = document.getElementById('page-departments');
+  if (!page) return;
+
+  var depts = ['Management & Admin','Front Office','Housekeeping','Kitchen',
+               'Food & Beverage','Finance','Sales & Marketing','Maintenance',
+               'ICT & Telecom','HR','Laundry'];
+
+  var deptColors = {
+    'Management & Admin':'#1B2A6B','Front Office':'#185FA5','Housekeeping':'#3B6D11',
+    'Kitchen':'#800020','Food & Beverage':'#854F0B','Finance':'#534AB7',
+    'Sales & Marketing':'#0F6E56','Maintenance':'#888','ICT & Telecom':'#185FA5',
+    'HR':'#800020','Laundry':'#3B6D11'
+  };
+
+  // Count staff per dept from cache
+  var deptCounts = {};
+  _staffCache.forEach(function(s) {
+    var dn = s.deptName||'Unknown';
+    deptCounts[dn] = (deptCounts[dn]||0) + 1;
+  });
+
+  page.innerHTML = '<div class="section-header"><div class="section-title">Departments</div></div>'
+    + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">'
+    + depts.map(function(d) {
+        var count  = deptCounts[d] || 0;
+        var color  = deptColors[d] || '#1B2A6B';
+        var kpiRoles = Object.keys(ROLE_KPIS).filter(function(r) {
+          return r !== 'default' && _staffCache.some(function(s){ return s.deptName === d && s.roleTitle === r; });
+        });
+        return '<div class="card" style="border-top:3px solid ' + color + ';cursor:pointer" onclick="navigate(\'staff\');setTimeout(function(){document.getElementById(\'filter-staff-dept\').value=\'' + d + '\';renderStaffTable();},200)">'
+          + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+          + '<div style="font-family:\'Palatino Linotype\',Palatino,Georgia,serif;font-size:13px;font-weight:600;color:' + color + '">' + d + '</div>'
+          + '<div style="font-size:20px;font-weight:700;color:#1B2A6B;font-family:\'Palatino Linotype\',Palatino,Georgia,serif">' + count + '</div>'
+          + '</div>'
+          + '<div style="font-size:10px;color:#888">' + count + ' active staff</div>'
+          + '<div style="font-size:10px;color:#888;margin-top:2px">' + (kpiRoles.length > 0 ? kpiRoles.length + ' role' + (kpiRoles.length!==1?'s':'') + ' with KPIs' : 'No KPI roles assigned') + '</div>'
+          + '<div style="font-size:10px;color:#185FA5;margin-top:6px">Click to view staff \u2192</div>'
+          + '</div>';
+      }).join('')
+    + '</div>';
+}
+
+// ── SETTINGS PAGE ─────────────────────────────────────────
+async function loadSettingsPage() {
+  var page = document.getElementById('page-settings');
+  if (!page) return;
+
+  page.innerHTML = '<div class="section-header"><div class="section-title">Settings</div></div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'
+    // Cycle settings
+    + '<div class="card">'
+    + '<div class="card-title">Active appraisal cycle</div>'
+    + '<div id="settings-cycle-content"><div style="font-size:11px;color:#888">Loading...</div></div>'
+    + '</div>'
+    // User access
+    + '<div class="card">'
+    + '<div class="card-title">User access</div>'
+    + '<div id="settings-users-content"><div style="font-size:11px;color:#888">Loading...</div></div>'
+    + '</div>'
+    // Rating bands
+    + '<div class="card">'
+    + '<div class="card-title">Rating bands</div>'
+    + '<table style="width:100%;border-collapse:collapse;font-size:12px">'
+    + '<thead><tr style="background:#f0f1f4"><th style="padding:7px 10px;text-align:left;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Band</th><th style="padding:7px 10px;text-align:center;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Score range</th></tr></thead>'
+    + '<tbody>'
+    + '<tr><td style="padding:7px 10px;border-bottom:.5px solid #eee"><span class="band band-exc">Exceptional</span></td><td style="padding:7px 10px;border-bottom:.5px solid #eee;text-align:center">90% and above</td></tr>'
+    + '<tr><td style="padding:7px 10px;border-bottom:.5px solid #eee"><span class="band band-exceeds">Exceeds expectations</span></td><td style="padding:7px 10px;border-bottom:.5px solid #eee;text-align:center">75% to 89%</td></tr>'
+    + '<tr><td style="padding:7px 10px;border-bottom:.5px solid #eee"><span class="band band-meets">Meets expectations</span></td><td style="padding:7px 10px;border-bottom:.5px solid #eee;text-align:center">60% to 74%</td></tr>'
+    + '<tr><td style="padding:7px 10px;border-bottom:.5px solid #eee"><span class="band band-needs">Needs improvement</span></td><td style="padding:7px 10px;border-bottom:.5px solid #eee;text-align:center">40% to 59%</td></tr>'
+    + '<tr><td style="padding:7px 10px"><span class="band band-unsat">Unsatisfactory</span></td><td style="padding:7px 10px;text-align:center">Below 40%</td></tr>'
+    + '</tbody></table>'
+    + '</div>'
+    // Scoring weights
+    + '<div class="card">'
+    + '<div class="card-title">Scoring weights</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">'
+    + '<div class="metric-card" style="text-align:center"><div class="metric-label">Staff self-appraisal</div><div class="metric-value text-navy" style="font-size:28px">40%</div></div>'
+    + '<div class="metric-card" style="text-align:center"><div class="metric-label">HOD appraisal</div><div class="metric-value text-navy" style="font-size:28px">60%</div></div>'
+    + '</div>'
+    + '<div style="font-size:11px;color:#888;line-height:1.5">Weighting is fixed per your system design. HOD carries 60% of the final score. Staff self-appraisal carries 40%.</div>'
+    + '</div>'
+    + '</div>';
+
+  // Load cycle from Supabase
+  try {
+    var cl = getClient();
+    var cr = await cl.from('appraisal_cycles').select('*').eq('is_active',true).single();
+    var cycle = cr.data;
+    var cycleEl = document.getElementById('settings-cycle-content');
+    if (cycleEl && cycle) {
+      var sd = new Date(cycle.start_date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+      var ed = new Date(cycle.end_date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+      cycleEl.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:12px">'
+        + '<tr><td style="padding:6px 0;border-bottom:.5px solid #eee;color:#888;font-size:10px;text-transform:uppercase">Cycle name</td><td style="padding:6px 0;border-bottom:.5px solid #eee;font-weight:600">' + cycle.label + '</td></tr>'
+        + '<tr><td style="padding:6px 0;border-bottom:.5px solid #eee;color:#888;font-size:10px;text-transform:uppercase">Start date</td><td style="padding:6px 0;border-bottom:.5px solid #eee">' + sd + '</td></tr>'
+        + '<tr><td style="padding:6px 0;border-bottom:.5px solid #eee;color:#888;font-size:10px;text-transform:uppercase">End date</td><td style="padding:6px 0;border-bottom:.5px solid #eee">' + ed + '</td></tr>'
+        + '<tr><td style="padding:6px 0;color:#888;font-size:10px;text-transform:uppercase">Status</td><td style="padding:6px 0"><span class="band band-exc">Active</span></td></tr>'
+        + '</table>';
+    }
+
+    // Load user profiles
+    var ur = await cl.from('user_profiles').select('name,role,property,initials');
+    var usersEl = document.getElementById('settings-users-content');
+    if (usersEl && ur.data) {
+      var roleLabels = { hr_admin:'HR Admin', hr:'HR Manager', gm:'General Manager', hod:'HOD' };
+      var propLabels = { both:'Both properties', skyz:'Skyz', phk:'PHK' };
+      usersEl.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:12px">'
+        + '<thead><tr style="background:#f0f1f4">'
+        + '<th style="padding:7px 10px;text-align:left;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Name</th>'
+        + '<th style="padding:7px 10px;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Role</th>'
+        + '<th style="padding:7px 10px;border-bottom:1.5px solid #000;font-size:10px;text-transform:uppercase">Access</th>'
+        + '</tr></thead><tbody>'
+        + ur.data.map(function(u) {
+            var pill = u.property === 'skyz' ? 'pill-skyz' : u.property === 'phk' ? 'pill-phk' : '<span class="band band-meets" style="font-size:9px">Both</span>';
+            return '<tr><td style="padding:7px 10px;border-bottom:.5px solid #eee;font-weight:500">' + u.name + '</td>'
+              + '<td style="padding:7px 10px;border-bottom:.5px solid #eee">' + (roleLabels[u.role]||u.role) + '</td>'
+              + '<td style="padding:7px 10px;border-bottom:.5px solid #eee">' + (u.property==='both'?'<span class="band band-meets" style="font-size:9px">Both</span>':u.property==='skyz'?'<span class="pill pill-skyz">Skyz</span>':'<span class="pill pill-phk">PHK</span>') + '</td></tr>';
+          }).join('')
+        + '</tbody></table>';
+    }
+  } catch(e) {
+    console.warn('loadSettingsPage:', e.message);
+  }
 }
 
 
