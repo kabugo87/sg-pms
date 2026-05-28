@@ -303,7 +303,7 @@ tr:hover td{background:#fafafa}
       <input type="password" id="login-password" placeholder="••••••••" />
     </div>
     <button class="btn btn-primary" onclick="doLogin()">Sign in &rarr;</button>
-    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <span style="font-weight:600">v11-m6</span></p>
+    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <span style="font-weight:600">v11-m7</span></p>
   </div>
 </div>
 
@@ -1662,26 +1662,48 @@ let _staffCache = [];
 
 async function loadStaffPage() {
   const tbody = document.getElementById('staff-tbody');
+  const counter = document.getElementById('staff-count');
   if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-light);font-size:12px">Loading staff...</td></tr>';
   try {
     const sb = initSupabase();
+    const [{ data: depts }, { data: rolesData }, { data: props }] = await Promise.all([
+      sb.from('departments').select('id,name'),
+      sb.from('roles').select('id,title,is_management'),
+      sb.from('properties').select('id,code,name'),
+    ]);
+    const deptMap = Object.fromEntries((depts||[]).map(d => [d.id, d]));
+    const roleMap = Object.fromEntries((rolesData||[]).map(r => [r.id, r]));
+    const propMap = Object.fromEntries((props||[]).map(p => [p.id, p]));
+
+    const propFilter = currentProp !== 'both'
+      ? currentProp
+      : (currentUser.role !== 'hr_admin' ? currentUser.property : null);
+
     let query = sb.from('staff')
-      .select('id,full_name,employee_no,date_of_joining,departments!staff_department_id_fkey(name),roles!staff_role_id_fkey(title,is_management),properties!staff_property_id_fkey(code)')
+      .select('id,full_name,employee_no,date_of_joining,property_id,department_id,role_id,status')
       .eq('status','active')
       .order('full_name');
-    // Filter by selected property (prop switcher) or user's own property
-    const propFilter = currentProp !== 'both' ? currentProp : (currentUser.role !== 'hr_admin' ? currentUser.property : null);
+
     if (propFilter) {
-      const { data: propRow } = await sb.from('properties').select('id').eq('code', propFilter).single();
+      const propRow = (props||[]).find(p => p.code === propFilter);
       if (propRow) query = query.eq('property_id', propRow.id);
     }
+
     const { data, error } = await query;
     if (error) throw error;
-    _staffCache = data || [];
+
+    _staffCache = (data||[]).map(s => ({
+      ...s,
+      departments: deptMap[s.department_id] || { name: '' },
+      roles:       roleMap[s.role_id]       || { title: '', is_management: false },
+      properties:  propMap[s.property_id]   || { code: '', name: '' },
+    }));
+
     renderStaffTable();
   } catch(e) {
     const tb = document.getElementById('staff-tbody');
-    if (tb) tb.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--red);font-size:12px">Error loading staff: ' + e.message + '</td></tr>';
+    if (tb) tb.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--red);font-size:12px">Error: ' + e.message + '</td></tr>';
+    console.error('loadStaffPage:', e);
   }
 }
 
@@ -2965,7 +2987,7 @@ async function showDeptReport() {
 
     // Get all complete appraisals with full staff details
     const { data: appraisals } = await sb.from('appraisals')
-      .select('id,final_score,self_kpi_score,hod_kpi_score,rating_band,status,staff(full_name,employee_no,departments!staff_department_id_fkey(name),roles!staff_role_id_fkey(title),properties!staff_property_id_fkey(code,name))')
+      .select('id,final_score,self_kpi_score,hod_kpi_score,rating_band,status,staff(full_name,employee_no,departments(name),roles(title),properties(code,name))')
       .eq('cycle_id', cycle.id)
       .eq('status','complete')
       .order('final_score', { ascending: false });
@@ -3163,22 +3185,22 @@ async function loadAppraisalsPage() {
   const tbody  = document.getElementById('appraisals-tbody');
   const counter= document.getElementById('appr-count');
   if (!tbody) return;
-  tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-light);font-size:12px">Loading appraisals\u2026</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-light);font-size:12px">Loading appraisals...</td></tr>';
   try {
     const sb = initSupabase();
+    if (_staffCache.length === 0) await loadStaffPage();
+
     const { data: cycle } = await sb.from('appraisal_cycles').select('id,label').eq('is_active',true).single();
     if (!cycle) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;font-size:12px">No active cycle found.</td></tr>'; return; }
 
-    let query = sb.from('appraisals')
-      .select('id,status,self_kpi_score,hod_kpi_score,final_score,rating_band,staff(id,full_name,departments!staff_department_id_fkey(name),roles!staff_role_id_fkey(title),properties!staff_property_id_fkey(code))')
+    const { data: appraisals, error } = await sb.from('appraisals')
+      .select('id,status,self_kpi_score,hod_kpi_score,final_score,rating_band,staff_id')
       .eq('cycle_id', cycle.id)
       .order('final_score', { ascending: false, nullsFirst: false });
-
-    const { data: appraisals, error } = await query;
     if (error) throw error;
 
     if (!appraisals || appraisals.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-light);font-size:12px">No appraisals yet for this cycle. Use \u201C+ New\u201D to start one.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-light);font-size:12px">No appraisals yet for this cycle. Use &ldquo;+ New&rdquo; to start one.</td></tr>';
       if (counter) counter.textContent = '0 records';
       return;
     }
@@ -3186,37 +3208,36 @@ async function loadAppraisalsPage() {
     if (counter) counter.textContent = appraisals.length + ' records';
 
     const BAND_CLASS = { 'Exceptional':'band-exc','Exceeds Expectations':'band-exceeds','Meets Expectations':'band-meets','Needs Improvement':'band-needs','Unsatisfactory':'band-unsat' };
-    const statusDot  = s => s==='complete'?'dot-done': s==='in_progress'?'dot-prog':'dot-open';
-    const statusLabel= s => s==='complete'?'Complete': s==='in_progress'?'In progress':'Not started';
+    const statusDot   = s => s==='complete'?'dot-done':s==='in_progress'?'dot-prog':'dot-open';
+    const statusLabel = s => s==='complete'?'Complete':s==='in_progress'?'In progress':'Not started';
 
     tbody.innerHTML = appraisals.map(a => {
-      const s = a.staff || {};
-      const propCode = s.properties?.code || '';
+      const st       = _staffCache.find(x => x.id === a.staff_id) || {};
+      const propCode = st.properties?.code || '';
       const propPill = propCode==='skyz'?'pill-skyz':'pill-phk';
-      const score    = a.final_score != null ? '<strong>'+Math.round(a.final_score)+'%</strong>' : '\u2014';
+      const score    = a.final_score != null ? '<strong>'+Math.round(a.final_score)+'%</strong>' : '&mdash;';
       const band     = a.rating_band ? '<span class="band '+(BAND_CLASS[a.rating_band]||'band-meets')+'">'+a.rating_band+'</span>' : '<span style="color:var(--text-light);font-size:10px">Pending</span>';
       const isComplete = a.status === 'complete';
-      const actions  = isComplete
-        ? `<button class="btn btn-secondary btn-sm" onclick="viewAppraisal('${a.id}')">View</button>
-           <button class="btn btn-ghost btn-sm" onclick="viewAppraisal('${a.id}');setTimeout(printIndividualReport,500)">Print</button>`
-        : `<button class="btn btn-primary btn-sm" onclick="openAppraisalById('${a.staff?.id}')">Continue</button>`;
-      return `<tr>
-        <td><strong>${s.full_name||'\u2014'}</strong></td>
-        <td><span class="pill ${propPill}">${propCode.toUpperCase()}</span></td>
-        <td>${s.departments?.name||'\u2014'}</td>
-        <td>${s.roles?.title||'\u2014'}</td>
-        <td><span class="status-badge"><span class="status-dot ${statusDot(a.status)}"></span>${statusLabel(a.status)}</span></td>
-        <td><span class="status-badge"><span class="status-dot ${isComplete?'dot-done':'dot-open'}"></span>${isComplete?'Complete':'Pending'}</span></td>
-        <td>${score}</td>
-        <td>${band}</td>
-        <td class="no-print"><div class="table-actions">${actions}</div></td>
-      </tr>`;
+      const actions = isComplete
+        ? '<button class="btn btn-secondary btn-sm" onclick="viewAppraisal(\'' + a.id + '\')">View</button> <button class="btn btn-ghost btn-sm" onclick="viewAppraisal(\'' + a.id + '\');setTimeout(printIndividualReport,500)">Print</button>'
+        : '<button class="btn btn-primary btn-sm" onclick="openAppraisalById(\'' + a.staff_id + '\')">Continue</button>';
+      return '<tr>'
+        +'<td><strong>'+(st.full_name||'&mdash;')+'</strong></td>'
+        +'<td><span class="pill '+propPill+'">'+propCode.toUpperCase()+'</span></td>'
+        +'<td>'+(st.departments?.name||'&mdash;')+'</td>'
+        +'<td>'+(st.roles?.title||'&mdash;')+'</td>'
+        +'<td><span class="status-badge"><span class="status-dot '+statusDot(a.status)+'"></span>'+statusLabel(a.status)+'</span></td>'
+        +'<td><span class="status-badge"><span class="status-dot '+(isComplete?'dot-done':'dot-open')+'"></span>'+(isComplete?'Complete':'Pending')+'</span></td>'
+        +'<td>'+score+'</td>'
+        +'<td>'+band+'</td>'
+        +'<td class="no-print"><div class="table-actions">'+actions+'</div></td>'
+        +'</tr>';
     }).join('');
 
-    // Re-apply current filter/tab
     filterAppraisals();
   } catch(e) {
     tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--red);font-size:12px">Error: '+e.message+'</td></tr>';
+    console.error('loadAppraisalsPage:', e);
   }
 }
 
@@ -3230,19 +3251,15 @@ function openAppraisalById(staffId) {
 async function viewAppraisal(appraisalId) {
   try {
     const sb = initSupabase();
-    const { data: a, error } = await sb.from('appraisals')
-      .select('*,staff(id,full_name,employee_no,date_of_joining,departments!staff_department_id_fkey(name),roles!staff_role_id_fkey(title),properties!staff_property_id_fkey(code,name))')
-      .eq('id', appraisalId).single();
+    const { data: a, error } = await sb.from('appraisals').select('*').eq('id', appraisalId).single();
     if (error) throw error;
-    // Map to the shape showIndividualReport expects and render
-    const s = {
-      id: a.staff.id, name: a.staff.full_name, emp: a.staff.employee_no||'',
-      role: a.staff.roles?.title||'', dept: a.staff.departments?.name||'',
-      property: a.staff.properties?.code||'', doj: a.staff.date_of_joining||''
-    };
-    showIndividualReportFromData(s, a);
+    const sc = _staffCache.find(x => x.id === a.staff_id) || {};
+    const mapped = { id: sc.id||a.staff_id, name: sc.full_name||'Staff Member', emp: sc.employee_no||'',
+      role: sc.roles?.title||'', dept: sc.departments?.name||'',
+      property: sc.properties?.code||'', doj: sc.date_of_joining||'' };
+    showIndividualReportFromData(mapped, a);
     navigate('reports');
-  } catch(e) { showToast('Error loading appraisal: '+e.message); }
+  } catch(e) { showToast('Error: '+e.message); }
 }
 
 function showIndividualReportFromData(s, a) {
@@ -3363,7 +3380,7 @@ async function loadAnalyticsPage() {
     const { data: cycle } = await sb.from('appraisal_cycles').select('id').eq('is_active',true).single();
     if (!cycle) return;
     const { data: appraisals } = await sb.from('appraisals')
-      .select('final_score,rating_band,staff(departments!staff_department_id_fkey(name),properties!staff_property_id_fkey(code))')
+      .select('final_score,rating_band,staff(departments(name),properties(code))')
       .eq('cycle_id', cycle.id).eq('status','complete');
     if (!appraisals || appraisals.length === 0) return;
 
@@ -3416,28 +3433,19 @@ function selectStaffForReport(staffId) {
 async function viewAppraisalByStaff(staffId) {
   try {
     const sb = initSupabase();
+    if (_staffCache.length === 0) await loadStaffPage();
     const { data: cycle } = await sb.from('appraisal_cycles').select('id').eq('is_active',true).single();
     if (!cycle) { showToast('No active cycle found.'); return; }
-    const { data: appraisal } = await sb.from('appraisals')
-      .select('*,staff(id,full_name,employee_no,date_of_joining,departments!staff_department_id_fkey(name),roles!staff_role_id_fkey(title),properties!staff_property_id_fkey(code,name))')
-      .eq('cycle_id', cycle.id)
-      .eq('staff_id', staffId)
-      .single();
-    if (!appraisal) {
-      showToast('No completed appraisal found for this staff member this cycle.');
-      return;
-    }
-    const s = appraisal.staff;
-    const mapped = {
-      id: s.id, name: s.full_name, emp: s.employee_no||'',
-      role: s.roles?.title||'', dept: s.departments?.name||'',
-      property: s.properties?.code||'', doj: s.date_of_joining||''
-    };
-    showIndividualReportFromData(mapped, appraisal);
+    const { data: a, error } = await sb.from('appraisals').select('*')
+      .eq('cycle_id', cycle.id).eq('staff_id', staffId).single();
+    if (error || !a) { showToast('No appraisal found for this staff member this cycle.'); return; }
+    const sc = _staffCache.find(x => x.id === staffId) || {};
+    const mapped = { id: sc.id||staffId, name: sc.full_name||'Staff Member', emp: sc.employee_no||'',
+      role: sc.roles?.title||'', dept: sc.departments?.name||'',
+      property: sc.properties?.code||'', doj: sc.date_of_joining||'' };
+    showIndividualReportFromData(mapped, a);
     navigate('reports');
-  } catch(e) {
-    showToast('No appraisal found for this staff member yet.');
-  }
+  } catch(e) { showToast('Error: '+e.message); console.error(e); }
 }
 
 // ── DEPT REPORT INIT ──────────────────────────────────────
