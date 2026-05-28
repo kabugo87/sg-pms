@@ -552,15 +552,15 @@ tr:hover td{background:#fafafa}
       <!-- APPRAISALS PAGE -->
       <div class="page-view" id="page-appraisals">
         <div class="section-header">
-          <div class="section-title">Appraisals &mdash; H1 2026</div>
+          <div style="display:flex;align-items:center;gap:12px"><div class="section-title">Appraisals &mdash; H1 2026</div><span id="appr-count" style="font-size:11px;color:var(--text-light)">8 records</span></div>
           <div class="filter-row">
             <div style="display:flex;gap:4px;background:#f0f1f4;padding:3px;border-radius:5px;border:1px solid var(--grey-border)">
               <button class="btn btn-sm appr-tab active" id="tab-all"     onclick="setApprTab('all')"       style="background:#fff;color:var(--navy);border:none;padding:4px 10px;border-radius:3px;font-size:11px;font-weight:500">All</button>
               <button class="btn btn-sm appr-tab"        id="tab-pending" onclick="setApprTab('pending')"   style="background:transparent;color:var(--text-mid);border:none;padding:4px 10px;border-radius:3px;font-size:11px">Pending</button>
               <button class="btn btn-sm appr-tab"        id="tab-done"    onclick="setApprTab('done')"      style="background:transparent;color:var(--text-mid);border:none;padding:4px 10px;border-radius:3px;font-size:11px">Submitted</button>
             </div>
-            <select class="filter-select" id="filter-prop"><option value="">Both properties</option><option value="skyz">Skyz</option><option value="phk">PHK</option></select>
-            <select class="filter-select" id="filter-dept"><option value="">All departments</option><option>Kitchen</option><option>Food &amp; Beverage</option><option>Front Office</option><option>Housekeeping</option><option>Finance</option><option>Sales &amp; Marketing</option><option>Maintenance</option><option>Management</option><option>IT</option><option>HR</option></select>
+            <select class="filter-select" id="filter-prop" onchange="filterAppraisals()"><option value="">Both properties</option><option value="skyz">Skyz</option><option value="phk">PHK</option></select>
+            <select class="filter-select" id="filter-dept" onchange="filterAppraisals()"><option value="">All departments</option><option>Kitchen</option><option>Food &amp; Beverage</option><option>Front Office</option><option>Housekeeping</option><option>Finance</option><option>Sales &amp; Marketing</option><option>Maintenance</option><option>Management</option><option>IT</option><option>HR</option></select>
             <button class="btn btn-primary btn-sm" onclick="openNewAppraisalModal()">+ New</button>
           </div>
         </div>
@@ -1534,6 +1534,7 @@ function applyRoleAccess() {
   if (!currentUser) return;
   const sw = document.getElementById('prop-switcher');
   // HR Admin sees both; HR and GM locked to their property
+  const isHRAdmin = currentUser.email === 'kusain@thesimbagroup.com';
   if (currentUser.role === 'gm') {
     sw.innerHTML = currentUser.property === 'skyz'
       ? '<option value="skyz">Protea Hotel Skyz</option>'
@@ -1541,7 +1542,7 @@ function applyRoleAccess() {
     currentProp = currentUser.property;
     document.querySelectorAll('[data-page="settings"],[data-page="kpis"],[data-page="jds"],[data-page="departments"]')
       .forEach(el => el.style.display='none');
-  } else if (currentUser.role === 'hr') {
+  } else if (currentUser.role === 'hr' && !isHRAdmin) {
     sw.innerHTML = currentUser.property === 'skyz'
       ? '<option value="skyz">Protea Hotel Skyz</option>'
       : '<option value="phk">Protea Hotel Kampala</option>';
@@ -2092,23 +2093,51 @@ function showDeptReport() {
     </div>`;
 }
 
+let _apprTab = 'all';
+
 function setApprTab(tab) {
+  _apprTab = tab;
   document.querySelectorAll('.appr-tab').forEach(b => {
-    b.style.background = 'transparent'; b.style.color = 'var(--text-mid)'; b.style.fontWeight = '400';
+    b.style.background = 'transparent';
+    b.style.color = 'var(--text-mid)';
+    b.style.fontWeight = '400';
   });
-  const active = document.getElementById('tab-'+tab);
-  if (active) { active.style.background = '#fff'; active.style.color = 'var(--navy)'; active.style.fontWeight = '500'; }
-  // Filter appraisals table rows
+  const active = document.getElementById('tab-' + tab);
+  if (active) {
+    active.style.background = '#fff';
+    active.style.color = 'var(--navy)';
+    active.style.fontWeight = '500';
+  }
+  filterAppraisals();
+}
+
+function filterAppraisals() {
+  const propFilter  = (document.getElementById('filter-prop')  || {value:''}).value.toLowerCase();
+  const deptFilter  = (document.getElementById('filter-dept')  || {value:''}).value.toLowerCase();
   const rows = document.querySelectorAll('#appraisals-tbody tr');
+
   rows.forEach(row => {
-    const selfCell = row.cells[4] ? row.cells[4].textContent.trim() : '';
-    const hodCell  = row.cells[5] ? row.cells[5].textContent.trim() : '';
-    const isComplete = hodCell.includes('Complete');
+    if (!row.cells || row.cells.length < 6) { row.style.display = ''; return; }
+
+    const prop     = row.cells[1] ? row.cells[1].textContent.trim().toLowerCase() : '';
+    const dept     = row.cells[2] ? row.cells[2].textContent.trim().toLowerCase() : '';
+    const hodText  = row.cells[5] ? row.cells[5].textContent.trim() : '';
+    const isComplete = hodText.includes('Complete');
     const isPending  = !isComplete;
-    if (tab==='all') row.style.display='';
-    else if (tab==='done') row.style.display = isComplete?'':'none';
-    else if (tab==='pending') row.style.display = isPending?'':'none';
+
+    let show = true;
+    if (propFilter && !prop.includes(propFilter))  show = false;
+    if (deptFilter && !dept.includes(deptFilter))  show = false;
+    if (_apprTab === 'done'    && isPending)        show = false;
+    if (_apprTab === 'pending' && isComplete)       show = false;
+
+    row.style.display = show ? '' : 'none';
   });
+
+  // Update count
+  const visible = [...document.querySelectorAll('#appraisals-tbody tr')].filter(r => r.style.display !== 'none').length;
+  const counter = document.getElementById('appr-count');
+  if (counter) counter.textContent = visible + ' record' + (visible !== 1 ? 's' : '');
 }
 
 function showPropertyReport() {
