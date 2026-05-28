@@ -488,9 +488,10 @@ tr:hover td{background:#fafafa}
             <span id="staff-count" style="font-size:11px;color:var(--text-light)"></span>
           </div>
           <div class="filter-row">
-            <input type="text" id="filter-staff-search" class="filter-select" placeholder="Search name..." style="width:160px" />
-            <select class="filter-select" id="filter-staff-prop"><option value="">Both properties</option><option value="skyz">Skyz</option><option value="phk">PHK</option></select>
-            <select class="filter-select" id="filter-staff-dept"><option value="">All departments</option><option>Food &amp; Beverage</option><option>Front Office</option><option>House Keeping</option><option>Finance</option><option>Sales &amp; Marketing</option><option>Maintenance</option><option>OPM/AGM</option><option>ICT &amp; Telecom</option><option>HR</option><option>Laundry</option><option>Admin</option></select>
+            <input type="text" id="filter-staff-search" class="filter-select" placeholder="Search name..." style="width:160px" oninput="renderStaffTable()" />
+            <select class="filter-select" id="filter-staff-prop" onchange="renderStaffTable()"><option value="">Both properties</option><option value="skyz">Skyz</option><option value="phk">PHK</option></select>
+            <select class="filter-select" id="filter-staff-dept" onchange="renderStaffTable()"><option value="">All departments</option><option>Food &amp; Beverage</option><option>Front Office</option><option>House Keeping</option><option>Finance</option><option>Sales &amp; Marketing</option><option>Maintenance</option><option>OPM/AGM</option><option>ICT &amp; Telecom</option><option>HR</option><option>Laundry</option><option>Admin</option></select>
+            <button class="btn btn-primary btn-sm" id="btn-add-staff">+ Add staff</button>
           </div>
         </div>
         <div class="table-wrap">
