@@ -1039,6 +1039,14 @@ tr:hover td{background:#fafafa}
 const SUPABASE_URL = 'https://iyxgdzukzltlqisdfeoq.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_E3iYX07fL0dLqSoYz_-MuQ_da3IoNQP';
 
+let sbClient = null;
+function initSupabase() {
+  if (!sbClient && window.supabase) {
+    sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+  return sbClient;
+}
+
 // ── USERS (fallback only - real auth via Supabase) ────────
 const FALLBACK_USER = {
   email: 'kusain@thesimbagroup.com',
