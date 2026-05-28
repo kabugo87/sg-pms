@@ -303,7 +303,7 @@ tr:hover td{background:#fafafa}
       <input type="password" id="login-password" placeholder="••••••••" />
     </div>
     <button class="btn btn-primary" onclick="doLogin()">Sign in &rarr;</button>
-    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <span style="font-weight:600">v11-m1</span></p>
+    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <span style="font-weight:600">v11-m3</span></p>
   </div>
 </div>
 
@@ -736,11 +736,11 @@ tr:hover td{background:#fafafa}
           <table>
             <thead><tr><th>Job title</th><th>Department</th><th>Property</th><th>Reports to</th><th>KPIs linked</th><th>Last updated</th><th class="no-print">Actions</th></tr></thead>
             <tbody>
-              <tr><td><strong>Executive Chef</strong></td><td>Kitchen</td><td><span class="pill pill-both">Both</span></td><td>General Manager</td><td><span class="band band-exc">3 KPIs</span></td><td>Jan 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD('Executive Chef')">View</button><button class="btn btn-ghost btn-sm" onclick="previewJD('Executive Chef');setTimeout(printJD,400)">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
-              <tr><td><strong>F&amp;B Manager</strong></td><td>Food &amp; Beverage</td><td><span class="pill pill-both">Both</span></td><td>General Manager</td><td><span class="band band-exc">4 KPIs</span></td><td>Jan 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD('F&B Manager')">View</button><button class="btn btn-ghost btn-sm" onclick="previewJD('F&B Manager');setTimeout(printJD,400)">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
-              <tr><td><strong>HR Manager</strong></td><td>HR</td><td><span class="pill pill-both">Both</span></td><td>General Manager / Group HR</td><td><span class="band band-exc">5 KPIs</span></td><td>Jan 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD('HR Manager')">View</button><button class="btn btn-ghost btn-sm" onclick="previewJD('HR Manager');setTimeout(printJD,400)">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
-              <tr><td><strong>Floor Supervisor</strong></td><td>Housekeeping</td><td><span class="pill pill-both">Both</span></td><td>Executive Housekeeper</td><td><span class="band band-exc">3 KPIs</span></td><td>Feb 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD('Floor Supervisor')">View</button><button class="btn btn-ghost btn-sm" onclick="previewJD('Floor Supervisor');setTimeout(printJD,400)">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
-              <tr><td><strong>Sales Manager</strong></td><td>Sales &amp; Marketing</td><td><span class="pill pill-both">Both</span></td><td>General Manager</td><td><span class="band band-exc">4 KPIs</span></td><td>Feb 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD('Sales Manager')">View</button><button class="btn btn-ghost btn-sm" onclick="previewJD('Sales Manager');setTimeout(printJD,400)">Print</button><button class="btn btn-danger btn-sm">Delete</button></div></td></tr>
+              <tr><td><strong>Executive Chef</strong></td><td>Kitchen</td><td><span class="pill pill-both">Both</span></td><td>General Manager</td><td><span class="band band-exc">3 KPIs</span></td><td>Jan 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD('Executive Chef')">View</button><button class="btn btn-ghost btn-sm" onclick="previewJD('Executive Chef');setTimeout(printJD,400)">Print</button><button class="btn btn-danger btn-sm" onclick="deleteJD('Executive Chef')">Delete</button></div></td></tr>
+              <tr><td><strong>F&amp;B Manager</strong></td><td>Food &amp; Beverage</td><td><span class="pill pill-both">Both</span></td><td>General Manager</td><td><span class="band band-exc">4 KPIs</span></td><td>Jan 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD('F&B Manager')">View</button><button class="btn btn-ghost btn-sm" onclick="previewJD('F&B Manager');setTimeout(printJD,400)">Print</button><button class="btn btn-danger btn-sm" onclick="deleteJD('F&B Manager')">Delete</button></div></td></tr>
+              <tr><td><strong>HR Manager</strong></td><td>HR</td><td><span class="pill pill-both">Both</span></td><td>General Manager / Group HR</td><td><span class="band band-exc">5 KPIs</span></td><td>Jan 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD('HR Manager')">View</button><button class="btn btn-ghost btn-sm" onclick="previewJD('HR Manager');setTimeout(printJD,400)">Print</button><button class="btn btn-danger btn-sm" onclick="deleteJD('HR Manager')">Delete</button></div></td></tr>
+              <tr><td><strong>Floor Supervisor</strong></td><td>Housekeeping</td><td><span class="pill pill-both">Both</span></td><td>Executive Housekeeper</td><td><span class="band band-exc">3 KPIs</span></td><td>Feb 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD('Floor Supervisor')">View</button><button class="btn btn-ghost btn-sm" onclick="previewJD('Floor Supervisor');setTimeout(printJD,400)">Print</button><button class="btn btn-danger btn-sm" onclick="deleteJD('Floor Supervisor')">Delete</button></div></td></tr>
+              <tr><td><strong>Sales Manager</strong></td><td>Sales &amp; Marketing</td><td><span class="pill pill-both">Both</span></td><td>General Manager</td><td><span class="band band-exc">4 KPIs</span></td><td>Feb 2026</td><td class="no-print"><div class="table-actions"><button class="btn btn-secondary btn-sm" onclick="previewJD('Sales Manager')">View</button><button class="btn btn-ghost btn-sm" onclick="previewJD('Sales Manager');setTimeout(printJD,400)">Print</button><button class="btn btn-danger btn-sm" onclick="deleteJD('Sales Manager')">Delete</button></div></td></tr>
             </tbody>
           </table>
         </div>
@@ -1631,6 +1631,7 @@ function navigate(page) {
   if (page==='analytics')   loadAnalyticsPage();
   if (page==='reports')     { /* loaded on demand */ }
   if (page==='kpis')        renderKPITable();
+  if (page==='jds')         renderJDTable();
   if (page==='settings')    loadSettingsPage();
 }
 
@@ -1824,7 +1825,16 @@ function openAppraisalForm(name, prop, dept, role) {
 }
 
 function startAppraisal(staffId) {
-  const s = ALL_STAFF.find(x=>x.id===staffId);
+  let s = _staffCache.find(x => x.id === staffId);
+  if (s) {
+    s = { id:s.id, name:s.full_name, emp:s.employee_no||'',
+          role:s.roles?.title||'',
+          dept:s.departments?.name||'',
+          property:s.properties?.code||'',
+          assisted: !(s.roles?.is_management ?? true) };
+  } else {
+    s = ALL_STAFF.find(x => x.id === staffId);
+  }
   if (!s) return;
   appraisalSubmitted = false;
   buildAppraisalForm(s);
@@ -1840,7 +1850,14 @@ function openNewAppraisalModal() {
 
 function searchStaff() {
   const q    = document.getElementById('staff-search-input').value.toLowerCase();
-  const list = ALL_STAFF.filter(s => {
+  // Use live _staffCache if populated, fall back to ALL_STAFF
+  const source = _staffCache.length > 0 ? _staffCache.map(s => ({
+    id: s.id, name: s.full_name,
+    role: s.role?.title||s.roles?.title||'',
+    dept: s.department?.name||s.departments?.name||'',
+    property: s.property?.code||s.properties?.code||''
+  })) : ALL_STAFF;
+  const list = source.filter(s => {
     if (currentUser.role!=='hr_admin' && s.property!==currentUser.property) return false;
     return s.name.toLowerCase().includes(q) || s.role.toLowerCase().includes(q) || s.dept.toLowerCase().includes(q);
   });
@@ -1857,7 +1874,18 @@ function searchStaff() {
 
 function selectStaffForAppraisal(staffId) {
   closeModal('modal-staff-search');
-  const s = ALL_STAFF.find(x=>x.id===staffId);
+  // Try _staffCache first (live data), then ALL_STAFF
+  let s = _staffCache.find(x => x.id === staffId);
+  if (s) {
+    // Normalise live cache shape to match buildAppraisalForm expectations
+    s = { id:s.id, name:s.full_name, emp:s.employee_no||'',
+          role:s.roles?.title||'',
+          dept:s.departments?.name||'',
+          property:s.properties?.code||'',
+          assisted: !(s.roles?.is_management ?? true) };
+  } else {
+    s = ALL_STAFF.find(x => x.id === staffId);
+  }
   appraisalSubmitted = false;
   buildAppraisalForm(s);
   document.getElementById('modal-appraisal').classList.remove('hidden');
@@ -2099,6 +2127,33 @@ const JD_DATA = {
     experience:'Minimum 5 years in F&B management, with at least 2 years as an F&B Manager or Assistant F&B Manager in a 4-star or 5-star hotel.',
     competencies:'Revenue management · Guest experience orientation · Team leadership · Cost control · Menu development · Communication',
     kpis:'F&B revenue vs budget · Guest satisfaction score · Food and beverage cost control · Team training completion'
+  },
+  'HR Manager': {
+    title:'HR Manager', dept:'HR', property:'both', reportsTo:'General Manager / Group HR', grade:'HOD',
+    purpose:'To lead and manage all human resources functions across the property, ensuring the attraction, development, and retention of talent in line with Simba Group values and Marriott brand standards. The HR Manager is accountable for employee relations, compliance, learning and development, and performance management.',
+    responsibilities:'1. Manage the full employee lifecycle from recruitment and onboarding to offboarding.\n2. Lead the performance management process including the half-yearly appraisal cycle.\n3. Maintain compliance with Ugandan labour laws and Marriott brand HR standards.\n4. Drive employee engagement initiatives and maintain a positive workplace culture.\n5. Manage training and development plans aligned to identified gaps and business needs.\n6. Handle employee relations matters, grievances, and disciplinary processes fairly and consistently.\n7. Maintain accurate HR records, contracts, and NSSF/PAYE submissions.\n8. Partner with department heads to address people challenges and succession planning.',
+    qualifications:'Degree in Human Resource Management, Business Administration, or a related field. A postgraduate qualification or HRMA membership is an added advantage.',
+    experience:'Minimum 5 years of progressive HR experience, with at least 2 years in a senior HR role preferably in hospitality or a service industry.',
+    competencies:'Employment law and compliance · Talent management · Employee relations · Training and development · Confidentiality and ethics · Communication and influencing',
+    kpis:'Regrettable attrition rate · Appraisal completion rate · Training hours per employee · Grievance resolution time'
+  },
+  'Floor Supervisor': {
+    title:'Floor Supervisor', dept:'Housekeeping', property:'both', reportsTo:'Executive Housekeeper', grade:'Supervisory',
+    purpose:'To supervise daily housekeeping operations on assigned floors, ensuring all guest rooms and public areas are cleaned and maintained to Marriott brand standards within agreed turnaround times, and that the housekeeping team delivers consistent service excellence.',
+    responsibilities:'1. Supervise room attendants and public area staff on assigned floors during each shift.\n2. Inspect all cleaned rooms and public areas to ensure compliance with Marriott cleanliness standards.\n3. Assign rooms and tasks to room attendants at the start of each shift.\n4. Report and follow up on maintenance defects and room status discrepancies.\n5. Manage linen, amenities, and cleaning supplies for the floor, minimising waste.\n6. Handle guest requests and complaints on the floor promptly and professionally.\n7. Complete shift reports and room status updates accurately in the PMS system.',
+    qualifications:'Certificate or diploma in Housekeeping, Hotel Operations, or a related field.',
+    experience:'Minimum 2 years of housekeeping experience with at least 1 year in a supervisory role in a 4-star or 5-star hotel.',
+    competencies:'Attention to detail · Team supervision · Time management · Guest orientation · Communication · Physical stamina',
+    kpis:'Room cleanliness inspection pass rate · Room turnaround time · Guest satisfaction score (Housekeeping) · Team attendance rate'
+  },
+  'Sales Manager': {
+    title:'Sales Manager', dept:'Sales & Marketing', property:'both', reportsTo:'General Manager', grade:'HOD',
+    purpose:'To drive revenue growth for the property by acquiring new accounts, managing existing client relationships, and developing and executing sales strategies aligned to the property budget and Marriott brand positioning.',
+    responsibilities:'1. Develop and execute the annual sales plan to achieve room revenue, MICE, and F&B targets.\n2. Prospect, qualify, and close new corporate, government, and group accounts.\n3. Manage and grow existing key accounts through regular client engagement and reviews.\n4. Represent the property at trade shows, networking events, and client familiarisation visits.\n5. Prepare and submit weekly sales call reports and monthly performance summaries.\n6. Collaborate with the F&B and Front Office teams on upselling and cross-selling opportunities.\n7. Monitor competitor activity and market trends and report findings to the General Manager.',
+    qualifications:'Degree in Sales, Marketing, Business Administration, Hospitality Management, or a related field.',
+    experience:'Minimum 4 years of sales experience, with at least 2 years in a hotel or hospitality environment. Proven track record of meeting or exceeding revenue targets.',
+    competencies:'Negotiation and closing · Relationship management · Market awareness · Presentation skills · CRM discipline · Goal orientation',
+    kpis:'Revenue vs target · New accounts acquired · Conversion rate · Client retention rate'
   }
 };
 
@@ -2197,7 +2252,37 @@ function saveJD() {
   };
   JD_DATA[title] = jd;
   closeModal('modal-jd-edit');
+  renderJDTable();
   showToast((_jdEditMode==='edit'?'JD updated: ':'New JD saved: ')+title);
+}
+
+function deleteJD(key) {
+  if (!confirm('Delete JD for "' + key + '"? This cannot be undone.')) return;
+  delete JD_DATA[key];
+  renderJDTable();
+  showToast('JD deleted: ' + key);
+}
+
+function renderJDTable() {
+  const tbody = document.querySelector('#page-jds .table-wrap table tbody');
+  if (!tbody) return;
+  const PROP_PILL = p => p==='both'?'<span class="pill pill-both">Both</span>':p==='skyz'?'<span class="pill pill-skyz">Skyz</span>':'<span class="pill pill-phk">PHK</span>';
+  tbody.innerHTML = Object.values(JD_DATA).filter(jd=>jd.title!=='__preview__').map(jd => {
+    const kpiCount = jd.kpis ? jd.kpis.split('·').filter(k=>k.trim()).length : 0;
+    return `<tr>
+      <td><strong>${jd.title}</strong></td>
+      <td>${jd.dept||'—'}</td>
+      <td>${PROP_PILL(jd.property||'both')}</td>
+      <td>${jd.reportsTo||'—'}</td>
+      <td><span class="band band-exc">${kpiCount} KPI${kpiCount!==1?'s':''}</span></td>
+      <td>${new Date().toLocaleDateString('en-GB',{month:'short',year:'numeric'})}</td>
+      <td class="no-print"><div class="table-actions">
+        <button class="btn btn-secondary btn-sm" onclick="previewJD('${jd.title.replace(/'/g,"\\'")}')">View</button>
+        <button class="btn btn-ghost btn-sm" onclick="previewJD('${jd.title.replace(/'/g,"\\'")}');setTimeout(printJD,400)">Print</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteJD('${jd.title.replace(/'/g,"\\'")}')">Delete</button>
+      </div></td>
+    </tr>`;
+  }).join('');
 }
 
 function printJD() {
@@ -2878,7 +2963,7 @@ async function showDeptReport() {
     // Group by department
     const depts = {};
     appraisals.forEach(a => {
-      const d = a.staff?.departments?.name || 'Unknown';
+      const d = a.staff?.department?.name || a.staff?.departments?.name || 'Unknown';
       if (!depts[d]) depts[d] = [];
       depts[d].push(a);
     });
@@ -3025,7 +3110,7 @@ function renderStaffTable() {
     const propCode = s.properties?.code || '';
     const propPill = propCode==='skyz' ? 'pill-skyz' : 'pill-phk';
     const isMgmt   = s.roles?.is_management;
-    const doj      = s.date_of_joining ? new Date(s.date_of_joining).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
+    const doj = s.date_of_joining ? new Date(s.date_of_joining).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
     return `<tr>
       <td><strong>${s.full_name}</strong></td>
       <td><span class="pill ${propPill}">${propCode.toUpperCase()}</span></td>
@@ -3090,7 +3175,7 @@ async function loadAppraisalsPage() {
     const statusLabel= s => s==='complete'?'Complete': s==='in_progress'?'In progress':'Not started';
 
     tbody.innerHTML = appraisals.map(a => {
-      const s        = a.staff || {};
+      const s = a.staff || {};
       const propCode = s.properties?.code || '';
       const propPill = propCode==='skyz'?'pill-skyz':'pill-phk';
       const score    = a.final_score != null ? '<strong>'+Math.round(a.final_score)+'%</strong>' : '\u2014';
