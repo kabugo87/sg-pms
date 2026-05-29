@@ -225,7 +225,7 @@ body.role-hod .sb-prop { display:none!important; }
 body.role-hod [data-page="home"]        { display:none!important; }
 body.role-hod [data-page="analytics"]   { display:none!important; }
 body.role-hod [data-page="reports"]     { display:none!important; }
-body.role-hod [data-page="staff"]       { display:none!important; }
+/* staff visible for HOD */
 body.role-hod [data-page="kpis"]        { display:none!important; }
 body.role-hod [data-page="jds"]         { display:none!important; }
 body.role-hod [data-page="departments"] { display:none!important; }
@@ -1216,7 +1216,7 @@ async function doLogin() {
     setWelcome();
     await loadLookups();
     if (profile.role === 'hod') {
-      navigate('appraisals');
+      navigate('staff');
     } else {
       loadHomeData();
     }
@@ -1426,17 +1426,18 @@ async function loadAppraisalsPage() {
     if (ce) throw ce;
     // Filter by property — only show appraisals for staff in current user's property
     const staffIds = _staffCache.map(function(s){ return s.id; });
-    // HODs only see their dept staff — no cross-dept assigned staff
+    // HODs: strictly their dept staff only, no assigned staff bleed
     var assignedIds = currentUser.role === 'hod' ? [] : await getAssignedStaffIds();
     const allRelevantIds = staffIds.concat(assignedIds.filter(function(id){
       return staffIds.indexOf(id) === -1;
     }));
+    var filterIds = currentUser.role === 'hod' ? staffIds : allRelevantIds;
     var apprQuery = client.from('appraisals')
       .select('id,status,self_kpi_score,hod_kpi_score,final_score,rating_band,staff_id,hod_submitted_at,review_comments,pro_rated,months_in_cycle')
       .eq('cycle_id', cycle.id)
       .order('hod_submitted_at', { ascending: false, nullsFirst: false });
     if (currentUser.role !== 'hr_admin' || currentProp !== 'both') {
-      apprQuery = apprQuery.in('staff_id', allRelevantIds.length > 0 ? allRelevantIds : ['00000000-0000-0000-0000-000000000000']);
+      apprQuery = apprQuery.in('staff_id', filterIds.length > 0 ? filterIds : ['00000000-0000-0000-0000-000000000000']);
     }
     const { data: appraisals, error: ae } = await apprQuery;
     if (ae) throw ae;
@@ -4227,7 +4228,7 @@ async function restoreSession() {
     setWelcome();
     await loadLookups();
     if (profile.role === 'hod') {
-      navigate('appraisals');
+      navigate('staff');
     } else {
       loadHomeData();
     }
