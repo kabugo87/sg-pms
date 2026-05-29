@@ -473,7 +473,7 @@ tr:hover td{background:#fafafa}
             <div style="flex:1"><div class="nav-card-title">Property report</div><div class="nav-card-sub">Department averages per property</div></div>
             <div class="nav-card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></div>
           </div>
-          <div class="nav-card" onclick="showConsolidatedReport()">
+          <div class="nav-card" onclick="showConsolidatedReport()" id="nav-consolidated">
             <div class="nav-card-icon nc-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
             <div style="flex:1"><div class="nav-card-title">Consolidated report</div><div class="nav-card-sub">Both properties side by side</div></div>
             <div class="nav-card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></div>
@@ -1354,8 +1354,8 @@ function renderStaffTable() {
       + '<td style="font-size:11px;color:var(--text-mid)">' + doj + '</td>'
       + '<td>' + mode + '</td>'
       + '<td class="no-print"><div class="table-actions">'
-      + '<button class="btn btn-secondary btn-sm" data-action="view" data-staff-id="' + s.id + '">View</button>'
-      + '<button class="btn btn-primary btn-sm"   data-action="appraise" data-staff-id="' + s.id + '">Appraise</button>'
+      + (currentUser && (currentUser.role === 'hr_admin' || currentUser.role === 'hr' || currentUser.role === 'gm') ? '<button class="btn btn-secondary btn-sm" data-action="view" data-staff-id="' + s.id + '">View</button> ' : '')
+      + '<button class="btn btn-primary btn-sm" data-action="appraise" data-staff-id="' + s.id + '">Appraise</button>'
       + '</div></td></tr>';
   }).join('');
 }
@@ -1407,10 +1407,9 @@ async function loadAppraisalsPage() {
     const { data: cycle, error: ce } = await client.from('appraisal_cycles').select('id,label').eq('is_active', true).single();
     if (ce) throw ce;
     // Filter by property — only show appraisals for staff in current user's property
-    // For HODs: staff cache is already dept-filtered, so staffIds is correct
     const staffIds = _staffCache.map(function(s){ return s.id; });
-    // Also include any staff specifically assigned to current user
-    const assignedIds = await getAssignedStaffIds();
+    // HODs only see their dept staff — no cross-dept assigned staff
+    var assignedIds = currentUser.role === 'hod' ? [] : await getAssignedStaffIds();
     const allRelevantIds = staffIds.concat(assignedIds.filter(function(id){
       return staffIds.indexOf(id) === -1;
     }));
@@ -1999,8 +1998,13 @@ async function loadHomeData() {
       if (p) propId = p.id;
     }
 
-    let staffQ = client.from('staff').select('id,property_id', { count:'exact', head:false }).eq('status','active');
+    let staffQ = client.from('staff').select('id,property_id,department_id', { count:'exact', head:false }).eq('status','active');
     if (propId) staffQ = staffQ.eq('property_id', propId);
+    // HOD: filter to their department
+    if (currentUser.role === 'hod' && currentUser.department) {
+      const hodDeptRow = Object.values(_deptMap).find(function(d){ return d.name === currentUser.department; });
+      if (hodDeptRow) staffQ = staffQ.eq('department_id', hodDeptRow.id);
+    }
     const { data: staffData, count: staffCount } = await staffQ;
     const total = staffCount || (staffData || []).length;
 
@@ -2943,11 +2947,12 @@ function buildAnalyticsPage(cycle, allAppraisals, viewData, totalStaff) {
     + '<div class="section-header no-print" style="margin-bottom:16px">'
     + '<div class="section-title">Performance Intelligence Report</div>'
     + '<div class="filter-row">'
-    + '<select class="filter-select" onchange="switchProperty(this.value)" id="analytics-prop-filter">'
-    + '<option value="both"' + (currentProp==='both'?' selected':'') + '>Both properties</option>'
-    + '<option value="skyz"' + (currentProp==='skyz'?' selected':'') + '>Protea Hotel Skyz</option>'
-    + '<option value="phk"'  + (currentProp==='phk' ?' selected':'') + '>Protea Hotel Kampala</option>'
-    + '</select>'
+    + (currentUser && currentUser.role !== 'hod' ?
+      '<select class="filter-select" onchange="switchProperty(this.value)" id="analytics-prop-filter">'
+      + '<option value="both"' + (currentProp==='both'?' selected':'') + '>Both properties</option>'
+      + '<option value="skyz"' + (currentProp==='skyz'?' selected':'') + '>Protea Hotel Skyz</option>'
+      + '<option value="phk"'  + (currentProp==='phk' ?' selected':'') + '>Protea Hotel Kampala</option>'
+      + '</select>' : '')  
     + '<button class="btn btn-primary btn-sm" onclick="printAnalytics()">Print / PDF</button>'
     + '</div></div>'
 
