@@ -673,6 +673,7 @@ tr:hover td{background:#fafafa}
         <div class="metric-card"><div class="metric-label">Date of joining</div><div style="font-size:12px;font-weight:500;margin-top:4px" id="sp-doj"></div></div>
         <div class="metric-card"><div class="metric-label">Appraisal mode</div><div style="font-size:12px;font-weight:500;margin-top:4px" id="sp-mode"></div></div>
       </div>
+      <div id="sp-appraiser-section" style="margin-bottom:14px;display:none"><div style="font-family:'Palatino Linotype',Palatino,Georgia,serif;font-size:12px;font-weight:600;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:3px;display:inline-block;margin-bottom:10px">Assigned appraiser</div><div style="display:flex;gap:8px;align-items:center;margin-top:8px"><select id="sp-appraiser-select" class="filter-select" style="flex:1"><option value="">Default (HOD / department)</option></select><button class="btn btn-primary btn-sm" id="sp-save-appraiser">Save</button><button class="btn btn-secondary btn-sm" id="sp-clear-appraiser">Clear</button></div><div style="font-size:10px;color:#888;margin-top:4px">Assign a specific appraiser for this staff member. Overrides the default department HOD.</div></div>
       <div style="font-family:'Palatino Linotype',Palatino,Georgia,serif;font-size:12px;font-weight:600;color:#1B2A6B;border-bottom:2px solid #800020;padding-bottom:3px;display:inline-block;margin-bottom:10px">Appraisal history</div>
       <div id="sp-appr-history"></div>
     </div>
@@ -1287,7 +1288,7 @@ async function loadStaffPage() {
   try {
     if (Object.keys(_deptMap).length === 0) await loadLookups();
     const client = getClient();
-    let query = client.from('staff').select('id,full_name,employee_no,date_of_joining,property_id,department_id,role_id,status,appraisal_mode').eq('status','active').order('full_name');
+    let query = client.from('staff').select('id,full_name,employee_no,date_of_joining,property_id,department_id,role_id,status,appraisal_mode,assigned_appraiser').eq('status','active').order('full_name');
     const propFilter = currentProp !== 'both' ? currentProp : (currentUser.role !== 'hr_admin' ? currentUser.property : null);
     if (propFilter) {
       const pRow = Object.values(_propMap).find(function(p) { return p.code === propFilter; });
@@ -1341,7 +1342,9 @@ function renderStaffTable() {
       : s.appraisal_mode === 'assisted' ? 'Assisted'
       : s.isMgmt ? 'Self-service' : 'Assisted';
     var modeOverride = s.appraisal_mode && s.appraisal_mode !== 'auto' ? ' <span style="font-size:9px;color:#854F0B">(override)</span>' : '';
-    const mode = '<span class="band ' + (s.isMgmt ? 'band-meets' : 'band-needs') + '">' + modeLabel + '</span>' + modeOverride;
+    var appraiserTag = s.assigned_appraiser
+      ? ' <span style="font-size:9px;color:#185FA5;font-weight:600">(assigned)</span>' : '';
+    const mode = '<span class="band ' + (s.isMgmt ? 'band-meets' : 'band-needs') + '">' + modeLabel + '</span>' + modeOverride + appraiserTag;
     const doj  = s.date_of_joining ? new Date(s.date_of_joining).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '\u2014';
     return '<tr data-staff-id="' + s.id + '">'
       + '<td><strong>' + s.full_name + '</strong></td>'
@@ -1403,10 +1406,21 @@ async function loadAppraisalsPage() {
     const client = getClient();
     const { data: cycle, error: ce } = await client.from('appraisal_cycles').select('id,label').eq('is_active', true).single();
     if (ce) throw ce;
-    const { data: appraisals, error: ae } = await client.from('appraisals')
+    // Filter by property — only show appraisals for staff in current user's property
+    const staffIds = _staffCache.map(function(s){ return s.id; });
+    // Also include any staff specifically assigned to current user
+    const assignedIds = await getAssignedStaffIds();
+    const allRelevantIds = staffIds.concat(assignedIds.filter(function(id){
+      return staffIds.indexOf(id) === -1;
+    }));
+    var apprQuery = client.from('appraisals')
       .select('id,status,self_kpi_score,hod_kpi_score,final_score,rating_band,staff_id,hod_submitted_at,review_comments,pro_rated,months_in_cycle')
       .eq('cycle_id', cycle.id)
       .order('hod_submitted_at', { ascending: false, nullsFirst: false });
+    if (currentUser.role !== 'hr_admin' || currentProp !== 'both') {
+      apprQuery = apprQuery.in('staff_id', allRelevantIds.length > 0 ? allRelevantIds : ['00000000-0000-0000-0000-000000000000']);
+    }
+    const { data: appraisals, error: ae } = await apprQuery;
     if (ae) throw ae;
 
     window._appraisalsCache = appraisals || [];
@@ -3690,8 +3704,15 @@ async function openStaffProfile(sid) {
   document.getElementById('sp-edit-btn').style.display   = canEdit ? '' : 'none';
   document.getElementById('sp-deact-btn').style.display  = canEdit ? '' : 'none';
 
+  // Show appraiser assignment for HR
+  var appraiserSection = document.getElementById('sp-appraiser-section');
+  if (appraiserSection) appraiserSection.style.display = canEdit ? '' : 'none';
+
   window._viewingStaffId = sid;
   modal.classList.remove('hidden');
+
+  // Load appraiser options
+  if (canEdit) loadAppraiserOptions(s.assigned_appraiser);
 
   // Load appraisal history
   try {
@@ -4030,6 +4051,75 @@ async function createNewCycle() {
     loadHomeData();
     loadSettingsPage();
   } catch(e) { showToast('Error: ' + e.message); console.error('createNewCycle:', e); }
+}
+
+
+// ── APPRAISER ASSIGNMENT ──────────────────────────────────
+var _appraiserOptions = []; // cache of user_profiles
+
+async function loadAppraiserOptions(currentAssigned) {
+  try {
+    var cl = getClient();
+    var res = await cl.from('user_profiles').select('id,name,role,property');
+    _appraiserOptions = res.data || [];
+    var sel = document.getElementById('sp-appraiser-select');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Default (HOD / department)</option>'
+      + _appraiserOptions.map(function(u) {
+          var roleL = u.role === 'hr_admin' ? 'HR Admin' : u.role === 'hr' ? 'HR' : u.role === 'gm' ? 'GM' : u.role === 'hod' ? 'HOD' : u.role;
+          var propL = u.property === 'both' ? 'Both' : u.property ? u.property.toUpperCase() : '';
+          var selected = currentAssigned && u.id === currentAssigned ? ' selected' : '';
+          return '<option value="' + u.id + '"' + selected + '>' + u.name + ' (' + roleL + (propL ? ', ' + propL : '') + ')</option>';
+        }).join('');
+  } catch(e) { console.warn('loadAppraiserOptions:', e.message); }
+}
+
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'sp-save-appraiser') saveAssignedAppraiser();
+  if (e.target.id === 'sp-clear-appraiser') clearAssignedAppraiser();
+});
+
+async function saveAssignedAppraiser() {
+  var sid = window._viewingStaffId;
+  var sel = document.getElementById('sp-appraiser-select');
+  if (!sid || !sel) return;
+  var appraiserId = sel.value || null;
+  var appraiserName = appraiserId
+    ? (_appraiserOptions.find(function(u){ return u.id === appraiserId; }) || {}).name || 'Selected user'
+    : null;
+  try {
+    var cl = getClient();
+    var res = await cl.from('staff').update({ assigned_appraiser: appraiserId }).eq('id', sid);
+    if (res.error) throw res.error;
+    // Update cache
+    var cached = _staffCache.find(function(x){ return x.id === sid; });
+    if (cached) cached.assigned_appraiser = appraiserId;
+    showToast(appraiserId
+      ? 'Appraiser assigned: ' + appraiserName
+      : 'Appraiser assignment cleared. Reverted to department default.');
+    loadStaffPage();
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
+async function clearAssignedAppraiser() {
+  var sel = document.getElementById('sp-appraiser-select');
+  if (sel) sel.value = '';
+  await saveAssignedAppraiser();
+}
+
+// ── APPRAISALS PAGE — include assigned staff ──────────────
+// When loading appraisals, also include staff assigned to current user
+// even if they are from a different department
+async function getAssignedStaffIds() {
+  if (!currentUser) return [];
+  try {
+    var cl = getClient();
+    var res = await cl.from('staff')
+      .select('id')
+      .eq('assigned_appraiser', currentUser.id)
+      .eq('status', 'active');
+    return (res.data || []).map(function(s){ return s.id; });
+  } catch(e) { return []; }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
