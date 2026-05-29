@@ -1490,20 +1490,26 @@ function renderAppraisalsTable(appraisals) {
     const hodLbl  = isApproved2 ? 'Approved' : isComplete ? 'Complete'  : isSubmitted2 ? 'Pending approval' : isDraft ? 'Pending' : 'Awaiting';
     const isSubmitted = a.status === 'submitted';
     const isApproved  = a.status === 'approved';
+    var canReset  = canApprove(); // HR Admin, HR, GM
+    var canDelete = currentUser && currentUser.role === 'hr_admin';
+    var resetBtn  = canReset  ? ' <button class="btn btn-secondary btn-sm" data-action="reset-appr" data-appr-id="' + a.id + '" data-staff-name="' + s2Name + '">Reset</button>' : '';
+    var deleteBtn = canDelete ? ' <button class="btn btn-danger btn-sm" data-action="delete-appr" data-appr-id="' + a.id + '" data-staff-name="' + s2Name + '">Delete</button>' : '';
     const actions = isApproved
-      ? '<button class="btn btn-secondary btn-sm" data-action="view-appr" data-appr-id="' + a.id + '">View</button>'
+      ? '<button class="btn btn-secondary btn-sm" data-action="view-appr" data-appr-id="' + a.id + '">View</button>' + resetBtn + deleteBtn
       : isComplete
-      ? '<button class="btn btn-secondary btn-sm" data-action="view-appr" data-appr-id="' + a.id + '">View</button>'
+      ? '<button class="btn btn-secondary btn-sm" data-action="view-appr" data-appr-id="' + a.id + '">View</button>' + resetBtn + deleteBtn
       : isSubmitted && canApprove()
       ? '<button class="btn btn-primary btn-sm" data-action="view-appr" data-appr-id="' + a.id + '">View</button>'
         + ' <button class="btn btn-secondary btn-sm" data-action="approve-appr" data-appr-id="' + a.id + '" data-staff-name="' + s2Name + '">Approve</button>'
         + ' <button class="btn btn-danger btn-sm" data-action="reject-appr" data-appr-id="' + a.id + '" data-staff-name="' + s2Name + '">Return</button>'
+        + resetBtn + deleteBtn
       : isSubmitted
       ? '<button class="btn btn-secondary btn-sm" data-action="view-appr" data-appr-id="' + a.id + '">View</button><span style="font-size:10px;color:#854F0B;margin-left:6px">Awaiting approval</span>'
       : isDraft
         ? (a.review_comments ? '<div style="font-size:10px;color:#A32D2D;margin-bottom:4px;padding:4px 8px;background:#fcebeb;border-radius:3px;border-left:3px solid #A32D2D">Returned: ' + a.review_comments + '</div>' : '')
           + '<button class="btn btn-primary btn-sm" data-action="continue-appr" data-appr-id="' + a.id + '" data-staff-id="' + a.staff_id + '">Continue</button>'
           + ' <button class="btn btn-danger btn-sm" data-action="discard-appr" data-appr-id="' + a.id + '" data-staff-name="' + s2Name + '">Discard</button>'
+          + deleteBtn
         : '<button class="btn btn-primary btn-sm" data-action="start-appr" data-staff-id="' + a.staff_id + '">Start</button>';
     return '<tr data-appr-id="' + a.id + '" data-prop="' + (s.propCode||'') + '" data-dept="' + (s.deptName||'').toLowerCase() + '" data-status="' + a.status + '">'
       + '<td><strong>' + (s.full_name || '\u2014') + '</strong></td>'
@@ -3648,6 +3654,8 @@ document.addEventListener('click', function(e) {
   var action = btn.dataset.action;
   if (action === 'approve-appr') approveAppraisal(btn.dataset.apprId, btn.dataset.staffName);
   if (action === 'reject-appr')  openRejectModal(btn.dataset.apprId, btn.dataset.staffName);
+  if (action === 'reset-appr')   resetAppraisalToDraft(btn.dataset.apprId, btn.dataset.staffName);
+  if (action === 'delete-appr')  deleteAppraisal(btn.dataset.apprId, btn.dataset.staffName);
 });
 
 async function approveAppraisal(apprId, staffName) {
@@ -4198,6 +4206,39 @@ async function getAssignedStaffIds() {
       .eq('status', 'active');
     return (res.data || []).map(function(s){ return s.id; });
   } catch(e) { return []; }
+}
+
+
+async function resetAppraisalToDraft(apprId, staffName) {
+  if (!canApprove()) { showToast('You do not have permission to reset appraisals.'); return; }
+  if (!confirm('Reset the appraisal for ' + (staffName||'this staff member') + ' to draft? The HOD can then edit and resubmit.')) return;
+  try {
+    var cl = getClient();
+    var res = await cl.from('appraisals').update({
+      status:          'draft',
+      reviewed_by:     currentUser.id,
+      reviewed_at:     new Date().toISOString(),
+      review_comments: 'Reset to draft by ' + currentUser.name + ' on ' + new Date().toLocaleDateString('en-GB')
+    }).eq('id', apprId);
+    if (res.error) throw res.error;
+    showToast('Appraisal reset to draft for ' + (staffName||'staff member') + '. HOD can now edit and resubmit.');
+    loadAppraisalsPage();
+    loadHomeData();
+  } catch(e) { showToast('Error: ' + e.message); console.error('resetAppraisalToDraft:', e); }
+}
+
+async function deleteAppraisal(apprId, staffName) {
+  if (!currentUser || currentUser.role !== 'hr_admin') { showToast('Only HR Admin can permanently delete appraisals.'); return; }
+  if (!confirm('Permanently delete the appraisal for ' + (staffName||'this staff member') + '? This cannot be undone and all data will be lost.')) return;
+  if (!confirm('Are you sure? This is permanent.')) return;
+  try {
+    var cl = getClient();
+    var res = await cl.from('appraisals').delete().eq('id', apprId);
+    if (res.error) throw res.error;
+    showToast('Appraisal permanently deleted.');
+    loadAppraisalsPage();
+    loadHomeData();
+  } catch(e) { showToast('Error: ' + e.message); console.error('deleteAppraisal:', e); }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
