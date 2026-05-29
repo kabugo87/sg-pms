@@ -446,7 +446,7 @@ body.role-hod [data-page="settings"]    { display:none!important; }
               <button class="btn btn-sm appr-tab" id="tab-done"    data-tab="done"    style="background:transparent;color:var(--text-mid);border:none;padding:4px 10px;border-radius:3px;font-size:11px">Submitted</button>
             </div>
             <select class="filter-select hod-hide" id="filter-appr-prop"><option value="">Both properties</option><option value="skyz">Skyz</option><option value="phk">PHK</option></select>
-            <select class="filter-select hod-hide" id="filter-appr-dept"><option value="">All departments</option><option>Food &amp; Beverage</option><option>Front Office</option><option>Housekeeping</option><option>Kitchen</option><option>Finance</option><option>Sales &amp; Marketing</option><option>Maintenance</option><option>Management &amp; Admin</option><option>ICT &amp; Telecom</option><option>HR</option><option>Laundry</option></select>
+            <select class="filter-select hod-hide" id="filter-appr-dept"><option value="">All departments</option><option>Food &amp; Beverage</option><option>Front Office</option><option>Housekeeping</option><option>Kitchen</option><option>Finance</option><option>Sales</option><option>Maintenance</option><option>Management &amp; Admin</option><option>ICT &amp; Telecom</option><option>HR</option><option>Laundry</option></select>
             <button class="btn btn-primary btn-sm" id="btn-new-appraisal">+ New</button>
           </div>
         </div>
@@ -516,7 +516,7 @@ body.role-hod [data-page="settings"]    { display:none!important; }
           <div class="filter-row">
             <input type="text" id="filter-staff-search" class="filter-select hod-hide" placeholder="Search name..." style="width:160px" oninput="renderStaffTable()" />
             <select class="filter-select hod-hide" id="filter-staff-prop" onchange="renderStaffTable()"><option value="">Both properties</option><option value="skyz">Skyz</option><option value="phk">PHK</option></select>
-            <select class="filter-select hod-hide" id="filter-staff-dept" onchange="renderStaffTable()"><option value="">All departments</option><option>Food &amp; Beverage</option><option>Front Office</option><option>House Keeping</option><option>Finance</option><option>Sales &amp; Marketing</option><option>Maintenance</option><option>OPM/AGM</option><option>ICT &amp; Telecom</option><option>HR</option><option>Laundry</option><option>Admin</option></select>
+            <select class="filter-select hod-hide" id="filter-staff-dept" onchange="renderStaffTable()"><option value="">All departments</option><option>Food &amp; Beverage</option><option>Front Office</option><option>House Keeping</option><option>Finance</option><option>Sales</option><option>Maintenance</option><option>OPM/AGM</option><option>ICT &amp; Telecom</option><option>HR</option><option>Laundry</option><option>Admin</option></select>
             <button class="btn btn-primary btn-sm hod-hide" id="btn-add-staff">+ Add staff</button>
           </div>
         </div>
@@ -1310,8 +1310,13 @@ async function loadStaffPage() {
     }
     // HOD: filter to their department only
     if (currentUser.role === 'hod' && currentUser.department) {
-      const dRow = Object.values(_deptMap).find(function(d) { return d.name === currentUser.department; });
+      const dRow = Object.values(_deptMap).find(function(d) {
+        return d.name === currentUser.department ||
+               d.name.toLowerCase() === currentUser.department.toLowerCase() ||
+               d.name.replace(/[^a-zA-Z]/g,'').toLowerCase() === currentUser.department.replace(/[^a-zA-Z]/g,'').toLowerCase();
+      });
       if (dRow) query = query.eq('department_id', dRow.id);
+      else console.warn('HOD dept not matched:', currentUser.department, 'Available:', Object.values(_deptMap).map(function(d){return d.name;}));
     }
     const { data, error } = await query;
     if (error) throw error;
@@ -1345,7 +1350,11 @@ function renderStaffTable() {
   let staff = _staffCache;
   if (currentUser && currentUser.role === 'hod' && currentUser.department) {
     // HOD: always their department only, allow name search within it
-    staff = staff.filter(function(s) { return s.deptName === currentUser.department; });
+    var hodDept = currentUser.department.toLowerCase().replace(/[^a-z]/g,'');
+    staff = staff.filter(function(s) {
+      return s.deptName === currentUser.department ||
+             (s.deptName||'').toLowerCase().replace(/[^a-z]/g,'') === hodDept;
+    });
     if (search) staff = staff.filter(function(s) { return s.full_name.toLowerCase().includes(search); });
   } else {
     if (search) staff = staff.filter(function(s) { return s.full_name.toLowerCase().includes(search); });
@@ -3838,7 +3847,7 @@ function openEditStaff(s) {
 
 function populateStaffFormDropdowns() {
   var depts = ['Management', 'Front Office', 'Housekeeping', 'Kitchen', 'Food & Beverage',
-               'Finance', 'Sales & Marketing', 'Maintenance', 'ICT & Telecom', 'HR', 'Admin', 'Laundry'];
+               'Finance', 'Sales', 'Maintenance', 'ICT & Telecom', 'HR', 'Admin', 'Laundry'];
   var deptSel = document.getElementById('asf-dept');
   if (deptSel) {
     var cur = deptSel.value;
@@ -3923,13 +3932,13 @@ function loadDepartmentsPage() {
   if (!page) return;
 
   var depts = ['Management & Admin','Front Office','Housekeeping','Kitchen',
-               'Food & Beverage','Finance','Sales & Marketing','Maintenance',
+               'Food & Beverage','Finance','Sales','Maintenance',
                'ICT & Telecom','HR','Laundry'];
 
   var deptColors = {
     'Management & Admin':'#1B2A6B','Front Office':'#185FA5','Housekeeping':'#3B6D11',
     'Kitchen':'#800020','Food & Beverage':'#854F0B','Finance':'#534AB7',
-    'Sales & Marketing':'#0F6E56','Maintenance':'#888','ICT & Telecom':'#185FA5',
+    'Sales':'#0F6E56','Maintenance':'#888','ICT & Telecom':'#185FA5',
     'HR':'#800020','Laundry':'#3B6D11'
   };
 
