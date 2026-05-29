@@ -242,7 +242,7 @@ tr:hover td{background:#fafafa}
       <input type="password" id="login-password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
     </div>
     <button class="btn btn-primary" id="login-btn" onclick="doLogin()">Sign in &rarr;</button>
-    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <strong>R8</strong></p>
+    <p style="font-size:10px;color:var(--text-light);margin-top:14px">Simba Group Hotels &copy; 2026 &nbsp;&middot;&nbsp; <strong>R9</strong></p>
   </div>
 </div>
 
@@ -1190,20 +1190,15 @@ async function doLogin() {
     const client = getClient();
     const { data: authData, error: authErr } = await client.auth.signInWithPassword({ email: email, password: pwd });
     if (authErr) throw authErr;
-    const { data: profile, error: profErr } = await client.from('user_profiles').select('name,role,property,initials').eq('id', authData.user.id).single();
+    const { data: profile, error: profErr } = await client.from('user_profiles').select('name,role,property,initials,department').eq('id', authData.user.id).single();
     if (profErr || !profile) throw new Error('User profile not found. Contact HR Admin.');
-    currentUser = { id: authData.user.id, email: email, name: profile.name, role: profile.role, property: profile.property, initials: profile.initials };
+    currentUser = { id: authData.user.id, email: email, name: profile.name, role: profile.role, property: profile.property, initials: profile.initials, department: profile.department || null };
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
     document.getElementById('sb-avatar').textContent    = profile.initials || email[0].toUpperCase();
     document.getElementById('sb-user-name').textContent = profile.name;
-    document.getElementById('sb-user-role').textContent = roleLabel(profile.role);
-    if (profile.role === 'gm' || profile.role === 'hr') {
-      currentProp = profile.property;
-      const sw = document.getElementById('prop-switcher');
-      sw.value = profile.property;
-      sw.disabled = true;
-    }
+    document.getElementById('sb-user-role').textContent = profile.role === 'hod' && profile.department ? profile.department + ' HOD' : roleLabel(profile.role);
+    applyRoleRestrictions(profile);
     setWelcome();
     await loadLookups();
     loadHomeData();
@@ -1293,6 +1288,11 @@ async function loadStaffPage() {
     if (propFilter) {
       const pRow = Object.values(_propMap).find(function(p) { return p.code === propFilter; });
       if (pRow) query = query.eq('property_id', pRow.id);
+    }
+    // HOD: filter to their department only
+    if (currentUser.role === 'hod' && currentUser.department) {
+      const dRow = Object.values(_deptMap).find(function(d) { return d.name === currentUser.department; });
+      if (dRow) query = query.eq('department_id', dRow.id);
     }
     const { data, error } = await query;
     if (error) throw error;
@@ -1407,6 +1407,7 @@ async function loadAppraisalsPage() {
     const { data: cycle, error: ce } = await client.from('appraisal_cycles').select('id,label').eq('is_active', true).single();
     if (ce) throw ce;
     // Filter by property — only show appraisals for staff in current user's property
+    // For HODs: staff cache is already dept-filtered, so staffIds is correct
     const staffIds = _staffCache.map(function(s){ return s.id; });
     // Also include any staff specifically assigned to current user
     const assignedIds = await getAssignedStaffIds();
@@ -4059,18 +4060,46 @@ var _appraiserOptions = []; // cache of user_profiles
 
 async function loadAppraiserOptions(currentAssigned) {
   try {
-    var cl = getClient();
-    var res = await cl.from('user_profiles').select('id,name,role,property');
-    _appraiserOptions = res.data || [];
     var sel = document.getElementById('sp-appraiser-select');
     if (!sel) return;
+
+    // Build two groups:
+    // Group 1: system users from user_profiles (have login accounts)
+    // Group 2: managers/supervisors from _staffCache (broad net, property-filtered)
+    var cl = getClient();
+    var res = await cl.from('user_profiles').select('id,name,role,property');
+    var systemUsers = (res.data || []).filter(function(u) {
+      if (currentUser.role === 'hr_admin') return true;
+      return u.property === currentUser.property || u.property === 'both';
+    });
+
+    // Managers from staff cache — filter by property
+    var staffMgrs = _staffCache.filter(function(s) {
+      return s.isMgmt && s.id !== window._viewingStaffId;
+    }).sort(function(a,b){ return a.full_name.localeCompare(b.full_name); });
+
+    _appraiserOptions = systemUsers.map(function(u) {
+      return { id: u.id, name: u.name, label: u.name + ' (' + (u.role==='hr_admin'?'HR Admin':u.role==='hr'?'HR':u.role==='gm'?'GM':'HOD') + (u.property && u.property!=='both'?' · '+u.property.toUpperCase():'') + ') — System user' };
+    });
+
+    var systemIds = new Set(systemUsers.map(function(u){ return u.id; }));
+
     sel.innerHTML = '<option value="">Default (HOD / department)</option>'
-      + _appraiserOptions.map(function(u) {
-          var roleL = u.role === 'hr_admin' ? 'HR Admin' : u.role === 'hr' ? 'HR' : u.role === 'gm' ? 'GM' : u.role === 'hod' ? 'HOD' : u.role;
-          var propL = u.property === 'both' ? 'Both' : u.property ? u.property.toUpperCase() : '';
+      + '<optgroup label="System users (have login access)">'
+      + systemUsers.map(function(u) {
           var selected = currentAssigned && u.id === currentAssigned ? ' selected' : '';
-          return '<option value="' + u.id + '"' + selected + '>' + u.name + ' (' + roleL + (propL ? ', ' + propL : '') + ')</option>';
-        }).join('');
+          return '<option value="' + u.id + '"' + selected + '>' + u.name
+            + ' (' + (u.role==='hr_admin'?'HR Admin':u.role==='hr'?'HR':u.role==='gm'?'GM':'HOD')
+            + (u.property && u.property!=='both'?' · '+u.property.toUpperCase():'') + ')</option>';
+        }).join('')
+      + '</optgroup>'
+      + '<optgroup label="Managers &amp; supervisors (all properties)">'
+      + staffMgrs.map(function(s) {
+          var selected = currentAssigned && s.id === currentAssigned ? ' selected' : '';
+          return '<option value="' + s.id + '"' + selected + '>' + s.full_name
+            + ' — ' + (s.roleTitle||'') + ' · ' + (s.propCode||'').toUpperCase() + '</option>';
+        }).join('')
+      + '</optgroup>';
   } catch(e) { console.warn('loadAppraiserOptions:', e.message); }
 }
 
@@ -4083,20 +4112,30 @@ async function saveAssignedAppraiser() {
   var sid = window._viewingStaffId;
   var sel = document.getElementById('sp-appraiser-select');
   if (!sid || !sel) return;
-  var appraiserId = sel.value || null;
-  var appraiserName = appraiserId
-    ? (_appraiserOptions.find(function(u){ return u.id === appraiserId; }) || {}).name || 'Selected user'
-    : null;
+  var selectedId = sel.value || null;
+  var selectedText = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : '';
+
+  // Check if selected value is a system user (UUID in user_profiles) or a staff member
+  var isSystemUser = selectedId && _appraiserOptions.some(function(u){ return u.id === selectedId; });
+
+  // For system users: save to assigned_appraiser (auth.users FK)
+  // For staff managers: we store their staff ID — need to drop FK constraint or use text
+  // Simplest safe approach: only save system users to assigned_appraiser
+  // For staff managers without accounts, show a toast directing HR to create an account
+  if (selectedId && !isSystemUser) {
+    showToast('This manager does not have a system account yet. Ask HR Admin to create one, then assign them here.');
+    return;
+  }
+
   try {
     var cl = getClient();
-    var res = await cl.from('staff').update({ assigned_appraiser: appraiserId }).eq('id', sid);
+    var res = await cl.from('staff').update({ assigned_appraiser: selectedId }).eq('id', sid);
     if (res.error) throw res.error;
-    // Update cache
     var cached = _staffCache.find(function(x){ return x.id === sid; });
-    if (cached) cached.assigned_appraiser = appraiserId;
-    showToast(appraiserId
-      ? 'Appraiser assigned: ' + appraiserName
-      : 'Appraiser assignment cleared. Reverted to department default.');
+    if (cached) cached.assigned_appraiser = selectedId;
+    showToast(selectedId
+      ? 'Appraiser assigned: ' + selectedText.split(' —')[0]
+      : 'Assignment cleared. Reverted to department default.');
     loadStaffPage();
   } catch(e) { showToast('Error: ' + e.message); }
 }
@@ -4125,7 +4164,50 @@ async function getAssignedStaffIds() {
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('login-password').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
   document.getElementById('login-email').addEventListener('keydown',    function(e) { if (e.key === 'Enter') doLogin(); });
+  // Restore session on page refresh
+  restoreSession();
 });
+
+function applyRoleRestrictions(profile) {
+  // Property switcher
+  if (profile.role === 'gm' || profile.role === 'hr' || profile.role === 'hod') {
+    currentProp = profile.property;
+    var sw = document.getElementById('prop-switcher');
+    if (sw) { sw.value = profile.property; sw.disabled = true; }
+  }
+  // HOD: hide Setup menu items they don't need
+  if (profile.role === 'hod') {
+    var hideItems = ['page-kpis','page-jds','page-departments','page-settings'];
+    hideItems.forEach(function(id) {
+      var nav = document.querySelector('[data-page="' + id.replace('page-','') + '"]');
+      if (nav) nav.style.display = 'none';
+    });
+  }
+}
+
+async function restoreSession() {
+  try {
+    var client = getClient();
+    var { data: sessionData } = await client.auth.getSession();
+    if (!sessionData || !sessionData.session) return;
+    var user = sessionData.session.user;
+    var { data: profile, error: profErr } = await client.from('user_profiles')
+      .select('name,role,property,initials,department').eq('id', user.id).single();
+    if (profErr || !profile) return;
+    currentUser = { id: user.id, email: user.email, name: profile.name, role: profile.role, property: profile.property, initials: profile.initials, department: profile.department || null };
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('sb-avatar').textContent    = profile.initials || user.email[0].toUpperCase();
+    document.getElementById('sb-user-name').textContent = profile.name;
+    document.getElementById('sb-user-role').textContent = roleLabel(profile.role);
+    applyRoleRestrictions(profile);
+    setWelcome();
+    await loadLookups();
+    loadHomeData();
+  } catch(e) {
+    console.warn('restoreSession:', e.message);
+  }
+}
 
 </script>
 </body>
