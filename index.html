@@ -222,6 +222,7 @@ tr:hover td{background:#fafafa}
 body.role-hod .hod-hide { display:none!important; }
 body.role-hod #sidebar .sb-section:last-child { display:none!important; }
 body.role-hod .sb-prop { display:none!important; }
+body.role-hod #prop-switcher { display:none!important; }
 body.role-hod [data-page="home"]        { display:none!important; }
 body.role-hod [data-page="analytics"]   { display:none!important; }
 body.role-hod [data-page="reports"]     { display:none!important; }
@@ -513,9 +514,9 @@ body.role-hod [data-page="settings"]    { display:none!important; }
             <span id="staff-count" style="font-size:11px;color:var(--text-light)"></span>
           </div>
           <div class="filter-row">
-            <input type="text" id="filter-staff-search" class="filter-select" placeholder="Search name..." style="width:160px" oninput="renderStaffTable()" />
-            <select class="filter-select" id="filter-staff-prop" onchange="renderStaffTable()"><option value="">Both properties</option><option value="skyz">Skyz</option><option value="phk">PHK</option></select>
-            <select class="filter-select" id="filter-staff-dept" onchange="renderStaffTable()"><option value="">All departments</option><option>Food &amp; Beverage</option><option>Front Office</option><option>House Keeping</option><option>Finance</option><option>Sales &amp; Marketing</option><option>Maintenance</option><option>OPM/AGM</option><option>ICT &amp; Telecom</option><option>HR</option><option>Laundry</option><option>Admin</option></select>
+            <input type="text" id="filter-staff-search" class="filter-select hod-hide" placeholder="Search name..." style="width:160px" oninput="renderStaffTable()" />
+            <select class="filter-select hod-hide" id="filter-staff-prop" onchange="renderStaffTable()"><option value="">Both properties</option><option value="skyz">Skyz</option><option value="phk">PHK</option></select>
+            <select class="filter-select hod-hide" id="filter-staff-dept" onchange="renderStaffTable()"><option value="">All departments</option><option>Food &amp; Beverage</option><option>Front Office</option><option>House Keeping</option><option>Finance</option><option>Sales &amp; Marketing</option><option>Maintenance</option><option>OPM/AGM</option><option>ICT &amp; Telecom</option><option>HR</option><option>Laundry</option><option>Admin</option></select>
             <button class="btn btn-primary btn-sm hod-hide" id="btn-add-staff">+ Add staff</button>
           </div>
         </div>
@@ -1342,9 +1343,15 @@ function renderStaffTable() {
   if (!tbody) return;
 
   let staff = _staffCache;
-  if (search) staff = staff.filter(function(s) { return s.full_name.toLowerCase().includes(search); });
-  if (dept)   staff = staff.filter(function(s) { return s.deptName.toLowerCase().includes(dept); });
-  if (prop)   staff = staff.filter(function(s) { return s.propCode === prop; });
+  if (currentUser && currentUser.role === 'hod' && currentUser.department) {
+    // HOD: always their department only, allow name search within it
+    staff = staff.filter(function(s) { return s.deptName === currentUser.department; });
+    if (search) staff = staff.filter(function(s) { return s.full_name.toLowerCase().includes(search); });
+  } else {
+    if (search) staff = staff.filter(function(s) { return s.full_name.toLowerCase().includes(search); });
+    if (dept)   staff = staff.filter(function(s) { return s.deptName.toLowerCase().includes(dept); });
+    if (prop)   staff = staff.filter(function(s) { return s.propCode === prop; });
+  }
 
   const counter = document.getElementById('staff-count');
   if (counter) counter.textContent = staff.length + ' staff';
