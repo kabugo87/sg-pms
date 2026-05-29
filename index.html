@@ -1310,13 +1310,14 @@ async function loadStaffPage() {
     }
     // HOD: filter to their department only
     if (currentUser.role === 'hod' && currentUser.department) {
+      console.log('HOD dept:', currentUser.department, 'deptMap:', Object.values(_deptMap).map(function(d){return d.name;}));
       const dRow = Object.values(_deptMap).find(function(d) {
         return d.name === currentUser.department ||
                d.name.toLowerCase() === currentUser.department.toLowerCase() ||
                d.name.replace(/[^a-zA-Z]/g,'').toLowerCase() === currentUser.department.replace(/[^a-zA-Z]/g,'').toLowerCase();
       });
-      if (dRow) query = query.eq('department_id', dRow.id);
-      else console.warn('HOD dept not matched:', currentUser.department, 'Available:', Object.values(_deptMap).map(function(d){return d.name;}));
+      if (dRow) { console.log('Found dept row:', dRow); query = query.eq('department_id', dRow.id); }
+      else console.warn('HOD dept NOT matched:', currentUser.department, 'Available:', Object.values(_deptMap).map(function(d){return d.name;}));
     }
     const { data, error } = await query;
     if (error) throw error;
