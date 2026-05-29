@@ -217,6 +217,20 @@ tr:hover td{background:#fafafa}
   table { page-break-inside:auto; }
   tr { page-break-inside:avoid; }
 }
+
+/* HOD role restrictions — appraisals only */
+body.role-hod .hod-hide { display:none!important; }
+body.role-hod #sidebar .sb-section:last-child { display:none!important; }
+body.role-hod .sb-prop { display:none!important; }
+body.role-hod [data-page="home"]        { display:none!important; }
+body.role-hod [data-page="analytics"]   { display:none!important; }
+body.role-hod [data-page="reports"]     { display:none!important; }
+body.role-hod [data-page="staff"]       { display:none!important; }
+body.role-hod [data-page="kpis"]        { display:none!important; }
+body.role-hod [data-page="jds"]         { display:none!important; }
+body.role-hod [data-page="departments"] { display:none!important; }
+body.role-hod [data-page="settings"]    { display:none!important; }
+
 /* TOAST */
 #toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;padding:10px 18px;border-radius:6px;font-size:12px;z-index:3000;opacity:0;transition:opacity .25s;pointer-events:none}
 #toast.show{opacity:1}
@@ -297,19 +311,19 @@ tr:hover td{background:#fafafa}
         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         Staff &amp; Roles
       </div>
-      <div class="sb-item" data-page="kpis" onclick="navigate('kpis')">
+      <div class="sb-item hod-hide" data-page="kpis" onclick="navigate('kpis')">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
         KPI Setup
       </div>
-      <div class="sb-item" data-page="jds" onclick="navigate('jds')">
+      <div class="sb-item hod-hide" data-page="jds" onclick="navigate('jds')">
         <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         Job Descriptions
       </div>
-      <div class="sb-item" data-page="departments" onclick="navigate('departments')">
+      <div class="sb-item hod-hide" data-page="departments" onclick="navigate('departments')">
         <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
         Departments
       </div>
-      <div class="sb-item" data-page="settings" onclick="navigate('settings')">
+      <div class="sb-item hod-hide" data-page="settings" onclick="navigate('settings')">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         Settings
       </div>
@@ -383,12 +397,12 @@ tr:hover td{background:#fafafa}
             <div style="flex:1"><div class="nav-card-title">Staff &amp; Roles</div><div class="nav-card-sub">Manage staff, assign roles</div></div>
             <div class="nav-card-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
           </div>
-          <div class="nav-card" onclick="navigate('kpis')">
+          <div class="nav-card hod-hide" onclick="navigate('kpis')">
             <div class="nav-card-icon nc-amber"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
             <div style="flex:1"><div class="nav-card-title">KPI Setup</div><div class="nav-card-sub">BSC-linked KPIs per role</div></div>
             <div class="nav-card-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
           </div>
-          <div class="nav-card" onclick="navigate('jds')">
+          <div class="nav-card hod-hide" onclick="navigate('jds')">
             <div class="nav-card-icon nc-teal"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
             <div style="flex:1"><div class="nav-card-title">Job Descriptions</div><div class="nav-card-sub">Create and manage JDs per role</div></div>
             <div class="nav-card-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
@@ -430,8 +444,8 @@ tr:hover td{background:#fafafa}
               <button class="btn btn-sm appr-tab" id="tab-pending" data-tab="pending" style="background:transparent;color:var(--text-mid);border:none;padding:4px 10px;border-radius:3px;font-size:11px">Pending</button>
               <button class="btn btn-sm appr-tab" id="tab-done"    data-tab="done"    style="background:transparent;color:var(--text-mid);border:none;padding:4px 10px;border-radius:3px;font-size:11px">Submitted</button>
             </div>
-            <select class="filter-select" id="filter-appr-prop"><option value="">Both properties</option><option value="skyz">Skyz</option><option value="phk">PHK</option></select>
-            <select class="filter-select" id="filter-appr-dept"><option value="">All departments</option><option>Food &amp; Beverage</option><option>Front Office</option><option>Housekeeping</option><option>Kitchen</option><option>Finance</option><option>Sales &amp; Marketing</option><option>Maintenance</option><option>Management &amp; Admin</option><option>ICT &amp; Telecom</option><option>HR</option><option>Laundry</option></select>
+            <select class="filter-select hod-hide" id="filter-appr-prop"><option value="">Both properties</option><option value="skyz">Skyz</option><option value="phk">PHK</option></select>
+            <select class="filter-select hod-hide" id="filter-appr-dept"><option value="">All departments</option><option>Food &amp; Beverage</option><option>Front Office</option><option>Housekeeping</option><option>Kitchen</option><option>Finance</option><option>Sales &amp; Marketing</option><option>Maintenance</option><option>Management &amp; Admin</option><option>ICT &amp; Telecom</option><option>HR</option><option>Laundry</option></select>
             <button class="btn btn-primary btn-sm" id="btn-new-appraisal">+ New</button>
           </div>
         </div>
@@ -473,7 +487,7 @@ tr:hover td{background:#fafafa}
             <div style="flex:1"><div class="nav-card-title">Property report</div><div class="nav-card-sub">Department averages per property</div></div>
             <div class="nav-card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></div>
           </div>
-          <div class="nav-card" onclick="showConsolidatedReport()" id="nav-consolidated">
+          <div class="nav-card hod-hide" onclick="showConsolidatedReport()" id="nav-consolidated">
             <div class="nav-card-icon nc-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
             <div style="flex:1"><div class="nav-card-title">Consolidated report</div><div class="nav-card-sub">Both properties side by side</div></div>
             <div class="nav-card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></div>
@@ -502,7 +516,7 @@ tr:hover td{background:#fafafa}
             <input type="text" id="filter-staff-search" class="filter-select" placeholder="Search name..." style="width:160px" oninput="renderStaffTable()" />
             <select class="filter-select" id="filter-staff-prop" onchange="renderStaffTable()"><option value="">Both properties</option><option value="skyz">Skyz</option><option value="phk">PHK</option></select>
             <select class="filter-select" id="filter-staff-dept" onchange="renderStaffTable()"><option value="">All departments</option><option>Food &amp; Beverage</option><option>Front Office</option><option>House Keeping</option><option>Finance</option><option>Sales &amp; Marketing</option><option>Maintenance</option><option>OPM/AGM</option><option>ICT &amp; Telecom</option><option>HR</option><option>Laundry</option><option>Admin</option></select>
-            <button class="btn btn-primary btn-sm" id="btn-add-staff">+ Add staff</button>
+            <button class="btn btn-primary btn-sm hod-hide" id="btn-add-staff">+ Add staff</button>
           </div>
         </div>
         <div class="table-wrap">
@@ -1201,7 +1215,11 @@ async function doLogin() {
     applyRoleRestrictions(profile);
     setWelcome();
     await loadLookups();
-    loadHomeData();
+    if (profile.role === 'hod') {
+      navigate('appraisals');
+    } else {
+      loadHomeData();
+    }
   } catch(e) {
     err.textContent = e.message || 'Invalid email or password.';
     err.style.display = 'block';
@@ -4174,20 +4192,20 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function applyRoleRestrictions(profile) {
-  // Property switcher
+  // CSS body class handles all visibility — instant, no flash
+  document.body.className = 'role-' + profile.role;
+  // Lock property switcher
   if (profile.role === 'gm' || profile.role === 'hr' || profile.role === 'hod') {
     currentProp = profile.property;
     var sw = document.getElementById('prop-switcher');
     if (sw) { sw.value = profile.property; sw.disabled = true; }
   }
-  // HOD: hide Setup menu items they don't need
-  if (profile.role === 'hod') {
-    var hideItems = ['page-kpis','page-jds','page-departments','page-settings'];
-    hideItems.forEach(function(id) {
-      var nav = document.querySelector('[data-page="' + id.replace('page-','') + '"]');
-      if (nav) nav.style.display = 'none';
-    });
-  }
+  // Clear leftover filters and reset staff cache
+  ['filter-staff-search','filter-staff-dept','filter-staff-prop',
+   'filter-appr-prop','filter-appr-dept'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  _staffCache = [];
 }
 
 async function restoreSession() {
@@ -4208,7 +4226,11 @@ async function restoreSession() {
     applyRoleRestrictions(profile);
     setWelcome();
     await loadLookups();
-    loadHomeData();
+    if (profile.role === 'hod') {
+      navigate('appraisals');
+    } else {
+      loadHomeData();
+    }
   } catch(e) {
     console.warn('restoreSession:', e.message);
   }
